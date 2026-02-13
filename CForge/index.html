@@ -1,0 +1,2041 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>灵感铸造厂 V7.0 - Ultimate Edition</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+body { font-family: 'Noto Sans SC', sans-serif; background-color: #f1f5f9; }
+.step-panel { display: none; opacity: 0; transition: opacity 0.3s ease-in-out; }
+.step-panel.active { display: block; opacity: 1; }
+.option-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+.option-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+.option-btn:active:not(:disabled) { transform: translateY(0); }
+.option-btn.selected { background-color: #0f172a; color: white; border-color: #0f172a; box-shadow: 0 0 0 2px #94a3b8; }
+.ai-loading { animation: pulse-blue 1.5s infinite; pointer-events: none; opacity: 0.7; }
+@keyframes pulse-blue { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
+.dot-group { display: flex; gap: 3px; cursor: pointer; }
+.dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid #94a3b8; background-color: white; transition: all 0.1s;}
+.dot.active { background-color: #334155; border-color: #334155; }
+.dot:hover { border-color: #64748b; background-color: #e2e8f0; }
+input[type=range].spectrum-slider {-webkit-appearance: none; width: 100%; background: transparent;}
+input[type=range].spectrum-slider::-webkit-slider-thumb {-webkit-appearance: none; height: 14px; width: 14px;border-radius: 50%; background: #334155;cursor: pointer; margin-top: -5px;box-shadow: 0 0 0 2px white, 0 0 0 3px #cbd5e1;}
+input[type=range].spectrum-slider::-webkit-slider-runnable-track {width: 100%; height: 4px; cursor: pointer;background: #e2e8f0; border-radius: 2px;}
+.modal { transition: opacity 0.25s ease; }
+body.modal-active { overflow: hidden; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+</style>
+</head>
+<body class="h-screen flex flex-col text-slate-800 overflow-hidden">
+<!-- Header -->
+<header class="bg-white border-b border-slate-200 z-20 flex-none shadow-sm">
+<div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+<div class="flex items-center gap-3">
+<div class="w-9 h-9 bg-slate-800 rounded-lg flex items-center justify-center text-white shadow-lg">
+<i class="fa-solid fa-drafting-compass"></i>
+</div>
+<div>
+<h1 class="font-bold text-lg leading-tight tracking-tight">灵感铸造厂 <span class="text-slate-500 text-xs align-top">V7.0</span></h1>
+<div class="text-[10px] text-slate-400 font-mono flex items-center gap-1 cursor-pointer hover:text-slate-600" onclick="toggleSettings()">
+<span id="header-status-dot" class="w-2 h-2 rounded-full bg-slate-300"></span>
+<span id="header-status-text">需配置 AI</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex items-center gap-2 text-xs font-semibold text-slate-400 mr-4">
+<span id="step-dot-1" class="text-slate-800">1.基础档案</span> <i class="fa-solid fa-chevron-right text-[10px]"></i>
+<span id="step-dot-2">2.外貌细化</span> <i class="fa-solid fa-chevron-right text-[10px]"></i>
+<span id="step-dot-3">3.精神特质</span> <i class="fa-solid fa-chevron-right text-[10px]"></i>
+<span id="step-dot-4">4.深度细化</span> <i class="fa-solid fa-chevron-right text-[10px]"></i>
+<span id="step-dot-5">5.最终报告</span>
+</div>
+<div class="flex gap-2">
+<button onclick="exportCharacter()" class="text-slate-500 hover:text-slate-800 transition p-2 rounded-full hover:bg-slate-100" title="导出角色">
+<i class="fa-solid fa-download text-lg"></i>
+</button>
+<button onclick="importCharacter()" class="text-slate-500 hover:text-slate-800 transition p-2 rounded-full hover:bg-slate-100" title="导入角色">
+<i class="fa-solid fa-upload text-lg"></i>
+</button>
+<button onclick="toggleSettings()" class="text-slate-500 hover:text-slate-800 transition p-2 rounded-full hover:bg-slate-100 relative group" title="API 设置">
+<i class="fa-solid fa-gear text-lg"></i>
+<span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full hidden" id="config-alert-dot"></span>
+</button>
+</div>
+</div>
+</div>
+</header>
+
+<!-- Main Content -->
+<div class="flex-1 flex overflow-hidden max-w-7xl mx-auto w-full relative">
+<!-- Left: Workbench -->
+<main class="flex-1 overflow-y-auto p-4 md:p-6 w-full md:w-2/3 relative bg-slate-50" id="main-scroll">
+<!-- Step 1: Character Sheet -->
+<div id="step-1" class="step-panel active max-w-4xl mx-auto space-y-6 pb-24">
+<div class="flex justify-between items-end mb-2">
+<div>
+<h2 class="text-2xl font-bold text-slate-800">角色核心档案</h2>
+<p class="text-slate-500 text-sm">定义角色的内在数值与性格倾向。</p>
+</div>
+<button onclick="randomizeSheet()" class="text-sm bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 px-3 py-1.5 rounded-lg transition shadow-sm font-medium flex items-center gap-2">
+<i class="fa-solid fa-dice text-slate-400"></i> 随机数值
+</button>
+</div>
+
+<!-- Basic Info Grid -->
+<div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+<h3 class="text-xs font-bold text-slate-400 uppercase mb-4 tracking-wider border-b pb-2">基础信息</h3>
+<div class="grid grid-cols-2 md:grid-cols-6 gap-4">
+<div class="col-span-2 md:col-span-3">
+<label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">姓名</label>
+<div class="flex gap-2">
+<input type="text" id="input-name" class="w-full text-sm border-slate-300 rounded focus:border-slate-500 focus:ring-0 py-1.5 px-2 bg-slate-50" placeholder="角色姓名">
+<button onclick="generateSingleField('name')" class="px-3 bg-slate-800 hover:bg-black text-white rounded text-xs flex items-center gap-1 min-w-[80px] justify-center">
+<i class="fa-solid fa-magic"></i> 生成
+</button>
+</div>
+</div>
+<div class="col-span-1">
+<label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">性别</label>
+<select id="input-gender" class="w-full text-sm border-slate-300 rounded focus:border-slate-500 focus:ring-0 py-1.5 bg-slate-50">
+<option value="男">男</option>
+<option value="女">女</option>
+<option value="无性">无性</option>
+<option value="其他">其他</option>
+</select>
+</div>
+<div class="col-span-1">
+<label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">年龄</label>
+<input type="number" id="input-age" class="w-full text-sm border-slate-300 rounded focus:border-slate-500 focus:ring-0 py-1.5 px-2 bg-slate-50" placeholder="20">
+</div>
+<div class="col-span-1">
+<label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">身高(cm)</label>
+<input type="number" id="input-height" class="w-full text-sm border-slate-300 rounded focus:border-slate-500 focus:ring-0 py-1.5 px-2 bg-slate-50" placeholder="170">
+</div>
+<div class="col-span-2">
+<label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">种族</label>
+<div class="flex gap-2">
+<input type="text" id="input-race" class="w-full text-sm border-slate-300 rounded focus:border-slate-500 focus:ring-0 py-1.5 px-2 bg-slate-50" placeholder="人类">
+<button onclick="generateSingleField('race')" class="px-2 bg-slate-100 hover:bg-slate-200 rounded text-slate-500 text-xs">
+<i class="fa-solid fa-magic"></i>
+</button>
+</div>
+</div>
+<div class="col-span-2">
+<label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">阵营</label>
+<select id="input-alignment" class="w-full text-sm border-slate-300 rounded focus:border-slate-500 focus:ring-0 py-1.5 bg-slate-50">
+<option value="守序善良">守序善良</option>
+<option value="中立善良">中立善良</option>
+<option value="混乱善良">混乱善良</option>
+<option value="守序中立">守序中立</option>
+<option value="绝对中立">绝对中立</option>
+<option value="混乱中立">混乱中立</option>
+<option value="守序邪恶">守序邪恶</option>
+<option value="中立邪恶">中立邪恶</option>
+<option value="混乱邪恶">混乱邪恶</option>
+</select>
+</div>
+<div class="col-span-2 md:col-span-6">
+<label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">核心身份 / 职业</label>
+<div class="flex gap-2">
+<input type="text" id="input-archetype" class="w-full text-sm border-slate-300 rounded focus:border-slate-500 focus:ring-0 py-1.5 px-2 bg-slate-50" placeholder="例如：落魄的赛博侦探">
+<button onclick="generateSingleField('archetype')" class="px-3 bg-slate-800 hover:bg-black text-white rounded text-xs flex items-center gap-1 min-w-[80px] justify-center">
+<i class="fa-solid fa-magic"></i> 生成
+</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Attributes & Personality -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+<h3 class="text-xs font-bold text-slate-400 uppercase mb-4 tracking-wider border-b pb-2">个人特质 (Attributes)</h3>
+<div class="grid grid-cols-2 gap-x-8 gap-y-3" id="attributes-container"></div>
+</div>
+<div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+<h3 class="text-xs font-bold text-slate-400 uppercase mb-4 tracking-wider border-b pb-2">性格倾向 (Personality)</h3>
+<div class="space-y-3" id="personality-container"></div>
+</div>
+</div>
+
+<div class="flex justify-end pt-4">
+<button onclick="finishStep1()" class="bg-slate-900 hover:bg-black text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-slate-300 transition flex items-center gap-2 group">
+<span>确认并生成外貌</span> <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+</button>
+</div>
+</div>
+
+<!-- Step 2: Visuals -->
+<div id="step-2" class="step-panel max-w-4xl mx-auto space-y-6 pb-24">
+<div class="flex justify-between items-center mb-4">
+<div>
+<h2 class="text-2xl font-bold text-slate-800">外貌具象化</h2>
+<p class="text-xs text-slate-500 mt-1">💡 提示：大部分类别可以选择多个选项（点击多次）</p>
+</div>
+<div class="text-xs text-slate-500 bg-white px-3 py-1 rounded-full border">基于本地预设 + AI 推演</div>
+</div>
+
+<!-- Hair System -->
+<div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+<div class="flex justify-between items-center mb-4">
+<h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider">
+<i class="fa-solid fa-user-tag mr-2 text-slate-400"></i> 发型特征
+</h3>
+<button onclick="refreshVisuals('hair')" class="text-xs text-blue-600 hover:underline">全部重随</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div>
+<span class="text-[10px] font-bold text-slate-400 uppercase block mb-2">1. 长度 (Length)</span>
+<div class="flex flex-wrap gap-2" id="opt-hair-length"></div>
+</div>
+<div>
+<span class="text-[10px] font-bold text-slate-400 uppercase block mb-2">2. 质感/造型 (Texture)</span>
+<div class="flex flex-wrap gap-2" id="opt-hair-style"></div>
+</div>
+<div>
+<span class="text-[10px] font-bold text-slate-400 uppercase block mb-2">3. 颜色 (Color)</span>
+<div class="flex flex-wrap gap-2" id="opt-hair-color"></div>
+</div>
+</div>
+</div>
+
+<!-- Face & Eyes -->
+<div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+<h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">
+<i class="fa-solid fa-eye mr-2 text-slate-400"></i> 面部与眼睛
+</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div>
+<span class="text-[10px] font-bold text-slate-400 uppercase block mb-2">眼型 (Shape)</span>
+<div class="flex flex-wrap gap-2" id="opt-eye-shape"></div>
+</div>
+<div>
+<span class="text-[10px] font-bold text-slate-400 uppercase block mb-2">瞳色 (Iris Color)</span>
+<div class="flex flex-wrap gap-2" id="opt-eye-color"></div>
+</div>
+<div>
+<span class="text-[10px] font-bold text-slate-400 uppercase block mb-2">脸型 (Face Shape)</span>
+<div class="flex flex-wrap gap-2" id="opt-face-structure"></div>
+</div>
+<div>
+<span class="text-[10px] font-bold text-slate-400 uppercase block mb-2">肤色 (Skin Tone)</span>
+<div class="flex flex-wrap gap-2" id="opt-skin-tone"></div>
+</div>
+<div>
+<span class="text-[10px] font-bold text-slate-400 uppercase block mb-2">特殊标记 (Marks)</span>
+<div class="flex flex-wrap gap-2" id="opt-special-marks"></div>
+</div>
+<div>
+<span class="text-[10px] font-bold text-slate-400 uppercase block mb-2">面部特征 (Feature)</span>
+<div class="flex flex-wrap gap-2" id="opt-face-feature"></div>
+</div>
+</div>
+</div>
+
+<!-- Body & Clothing -->
+<div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+<h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4">
+<i class="fa-solid fa-shirt mr-2 text-slate-400"></i> 身材与穿搭
+</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div>
+<span class="text-[10px] font-bold text-slate-400 uppercase block mb-2">体型 (Build)</span>
+<div class="flex flex-wrap gap-2" id="opt-body-build"></div>
+</div>
+<div>
+<span class="text-[10px] font-bold text-slate-400 uppercase block mb-2">配饰 (Accessories)</span>
+<div class="flex flex-wrap gap-2" id="opt-accessories"></div>
+</div>
+<div>
+<span class="text-[10px] font-bold text-slate-400 uppercase block mb-2">穿搭风格 (Style)</span>
+<div class="flex flex-wrap gap-2" id="opt-cloth-style"></div>
+</div>
+<div>
+<span class="text-[10px] font-bold text-slate-400 uppercase block mb-2">标志单品 (Item)</span>
+<div class="flex flex-wrap gap-2" id="opt-cloth-item"></div>
+</div>
+</div>
+</div>
+
+<div class="flex justify-between pt-4">
+<button onclick="goToStep(1)" class="text-slate-400 hover:text-slate-600 px-4 py-2 font-medium">返回修改数值</button>
+<button onclick="finishStep2()" class="bg-slate-900 hover:bg-black text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-slate-300 transition flex items-center gap-2 group">
+<span>下一步:注入灵魂</span> <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+</button>
+</div>
+</div>
+
+<!-- Step 3: Soul & Details -->
+<div id="step-3" class="step-panel max-w-4xl mx-auto space-y-6 pb-24">
+<div class="bg-slate-100 p-6 rounded-xl border border-slate-200 mb-6">
+<div class="flex gap-3 items-start">
+<i class="fa-solid fa-ghost text-slate-400 text-xl mt-1"></i>
+<div>
+<h3 class="font-bold text-slate-800 text-sm">AI 深度推演</h3>
+<p class="text-xs text-slate-500 mt-1">根据【<span id="summary-archetype" class="font-bold"></span>】的设定，AI 预测了以下深层特征。</p>
+<p class="text-xs text-purple-600 mt-1">💡 可以选择多个选项</p>
+</div>
+</div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+<h3 class="text-xs font-bold text-slate-400 uppercase mb-3 tracking-wider">精神状态</h3>
+<div class="mb-4">
+<span class="text-[10px] text-slate-400 block mb-1">恐惧的事物</span>
+<div class="flex flex-wrap gap-2" id="opt-fear"></div>
+</div>
+<div>
+<span class="text-[10px] text-slate-400 block mb-1">心理阴影/创伤</span>
+<div class="flex flex-wrap gap-2" id="opt-trauma"></div>
+</div>
+</div>
+
+<div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+<h3 class="text-xs font-bold text-slate-400 uppercase mb-3 tracking-wider">个人喜好</h3>
+<div class="mb-4">
+<span class="text-[10px] text-slate-400 block mb-1">喜爱的事物</span>
+<div class="flex flex-wrap gap-2" id="opt-likes"></div>
+</div>
+<div>
+<span class="text-[10px] text-slate-400 block mb-1">厌恶的事物</span>
+<div class="flex flex-wrap gap-2" id="opt-dislikes"></div>
+</div>
+</div>
+</div>
+
+<div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+<h3 class="text-xs font-bold text-slate-400 uppercase mb-3 tracking-wider">社会评价 & 随身物品</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div>
+<span class="text-[10px] text-slate-400 block mb-1">社会评价</span>
+<div class="flex flex-wrap gap-2" id="opt-social"></div>
+</div>
+<div>
+<span class="text-[10px] text-slate-400 block mb-1">重要随身物</span>
+<div class="flex flex-wrap gap-2" id="opt-items"></div>
+</div>
+</div>
+</div>
+
+<div class="flex justify-between pt-4">
+<button onclick="goToStep(2)" class="text-slate-400 hover:text-slate-600 px-4 py-2 font-medium">返回修改外貌</button>
+<button onclick="finishStep3()" class="bg-slate-900 hover:bg-black text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-slate-300 transition flex items-center gap-2 group">
+<span>下一步：深度细化</span> <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+</button>
+</div>
+</div>
+
+<!-- Step 4: Deep Details -->
+<div id="step-4" class="step-panel max-w-4xl mx-auto space-y-6 pb-24">
+<div class="bg-gradient-to-r from-purple-100 to-blue-100 p-6 rounded-xl border border-purple-200 mb-6">
+<div class="flex gap-3 items-start">
+<i class="fa-solid fa-brain text-purple-600 text-xl mt-1"></i>
+<div>
+<h3 class="font-bold text-purple-900 text-sm">AI 深度细化</h3>
+<p class="text-xs text-purple-700 mt-1">AI 正在根据你的选择生成具体细节...</p>
+</div>
+</div>
+</div>
+
+<div id="deep-details-container" class="space-y-4"></div>
+
+<div class="flex justify-between pt-4">
+<button onclick="goToStep(3)" class="text-slate-400 hover:text-slate-600 px-4 py-2 font-medium">返回修改特质</button>
+<button onclick="finishStep4()" class="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-purple-200 transition flex items-center gap-2 group">
+<span>生成最终报告</span> <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+</button>
+</div>
+</div>
+
+<!-- Step 5: Final Report -->
+<div id="step-5" class="step-panel max-w-4xl mx-auto space-y-6 pb-24">
+<div class="bg-gradient-to-r from-green-100 to-emerald-100 p-6 rounded-xl border border-green-200 mb-6">
+<div class="flex gap-3 items-start">
+<i class="fa-solid fa-file-contract text-green-600 text-xl mt-1"></i>
+<div>
+<h3 class="font-bold text-green-900 text-sm">最终报告生成</h3>
+<p class="text-xs text-green-700 mt-1">选择报告格式，AI 将生成完整的角色档案</p>
+</div>
+</div>
+</div>
+
+<div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+<h3 class="text-sm font-bold text-slate-700 mb-4">选择报告格式</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<button onclick="generateReport('novel')" class="p-4 border-2 border-slate-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition text-left">
+<div class="flex items-center gap-3 mb-2">
+<i class="fa-solid fa-book text-blue-500 text-xl"></i>
+<span class="font-bold text-slate-800">小说风格</span>
+</div>
+<p class="text-xs text-slate-500">叙事性描述，适合创作参考</p>
+</button>
+<button onclick="generateReport('rpg')" class="p-4 border-2 border-slate-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition text-left">
+<div class="flex items-center gap-3 mb-2">
+<i class="fa-solid fa-dice-d20 text-purple-500 text-xl"></i>
+<span class="font-bold text-slate-800">TRPG 卡片</span>
+</div>
+<p class="text-xs text-slate-500">结构化数据，适合跑团使用</p>
+</button>
+<button onclick="generateReport('profile')" class="p-4 border-2 border-slate-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition text-left">
+<div class="flex items-center gap-3 mb-2">
+<i class="fa-solid fa-id-card text-green-500 text-xl"></i>
+<span class="font-bold text-slate-800">档案报告</span>
+</div>
+<p class="text-xs text-slate-500">官方文档风格，详细记录</p>
+</button>
+<button onclick="generateReport('interview')" class="p-4 border-2 border-slate-200 rounded-xl hover:border-orange-500 hover:bg-orange-50 transition text-left">
+<div class="flex items-center gap-3 mb-2">
+<i class="fa-solid fa-comments text-orange-500 text-xl"></i>
+<span class="font-bold text-slate-800">访谈记录</span>
+</div>
+<p class="text-xs text-slate-500">对话形式，展现性格</p>
+</button>
+<button onclick="generateReport('diary')" class="p-4 border-2 border-slate-200 rounded-xl hover:border-pink-500 hover:bg-pink-50 transition text-left">
+<div class="flex items-center gap-3 mb-2">
+<i class="fa-solid fa-book-open text-pink-500 text-xl"></i>
+<span class="font-bold text-slate-800">日记体</span>
+</div>
+<p class="text-xs text-slate-500">第一人称，内心独白</p>
+</button>
+<button onclick="generateReport('medical')" class="p-4 border-2 border-slate-200 rounded-xl hover:border-red-500 hover:bg-red-50 transition text-left">
+<div class="flex items-center gap-3 mb-2">
+<i class="fa-solid fa-file-medical text-red-500 text-xl"></i>
+<span class="font-bold text-slate-800">医疗档案</span>
+</div>
+<p class="text-xs text-slate-500">专业术语，科学记录</p>
+</button>
+</div>
+</div>
+
+<div id="report-display" class="hidden mt-6">
+<div class="bg-white p-8 rounded-xl shadow-lg border border-slate-200">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="text-xl font-bold text-slate-800 mb-1" id="report-title">角色报告</h3>
+<p class="text-xs text-slate-500">生成时间：<span id="report-time"></span></p>
+</div>
+<div class="flex gap-2">
+<button onclick="copyReport()" class="text-xs bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-lg border border-slate-300 transition">
+<i class="fa-regular fa-copy"></i> 复制
+</button>
+<button onclick="downloadReport()" class="text-xs bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg transition">
+<i class="fa-solid fa-download"></i> 下载
+</button>
+</div>
+</div>
+<div id="report-content" class="text-slate-700 leading-relaxed whitespace-pre-wrap" style="font-family: serif;"></div>
+</div>
+</div>
+
+<div class="flex justify-between pt-4">
+<button onclick="goToStep(4)" class="text-slate-400 hover:text-slate-600 px-4 py-2 font-medium">返回细化</button>
+<button onclick="goToStep(1)" class="bg-slate-600 hover:bg-slate-700 text-white px-6 py-3 rounded-xl font-bold transition">
+<i class="fa-solid fa-rotate-left"></i> 重新开始
+</button>
+</div>
+</div>
+
+</main>
+
+<!-- Right: Preview -->
+<aside class="hidden lg:block w-80 bg-white border-l border-slate-200 p-6 z-10 flex flex-col">
+<h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+<i class="fa-regular fa-id-card text-slate-400"></i> 实时档案
+</h3>
+<div id="preview-card" class="bg-slate-50 rounded-lg p-5 border border-slate-200 text-sm space-y-4 flex-1 overflow-y-auto font-mono text-xs">
+<div class="border-b border-slate-200 pb-3">
+<div class="text-[10px] uppercase text-slate-400 font-bold mb-1">IDENTITY</div>
+<div class="font-bold text-base text-slate-800 mb-1" id="p-name">未命名</div>
+<div class="flex justify-between items-baseline">
+<span class="font-bold text-sm text-slate-700" id="p-archetype">???</span>
+<span class="text-slate-500" id="p-gender">-</span>
+</div>
+<div class="mt-1 flex gap-2 text-slate-500 text-[10px]">
+<span id="p-race">种族: ?</span> | <span id="p-age">Age: ?</span> | <span id="p-height">H: ?</span>
+</div>
+<div class="mt-1 text-slate-500" id="p-alignment">阵营: ?</div>
+</div>
+<div class="border-b border-slate-200 pb-3">
+<div class="text-[10px] uppercase text-slate-400 font-bold mb-2">STATS</div>
+<div class="grid grid-cols-2 gap-y-1 gap-x-2" id="p-stats"></div>
+</div>
+<div class="border-b border-slate-200 pb-3">
+<div class="text-[10px] uppercase text-slate-400 font-bold mb-2">PERSONALITY</div>
+<div class="space-y-1" id="p-personality"></div>
+</div>
+<div>
+<div class="text-[10px] uppercase text-slate-400 font-bold mb-2">VISUALS</div>
+<ul class="space-y-1 text-slate-600 list-disc list-inside" id="p-visuals">
+<li class="italic text-slate-300">等待生成...</li>
+</ul>
+</div>
+<div class="border-t border-slate-200 pt-3 mt-3">
+<div class="text-[10px] uppercase text-slate-400 font-bold mb-2">SOUL</div>
+<div class="flex flex-wrap gap-1" id="p-soul"></div>
+</div>
+</div>
+</aside>
+</div>
+
+<!-- API Settings Modal -->
+<div id="settings-modal" class="modal opacity-0 pointer-events-none fixed inset-0 z-50 flex items-center justify-center">
+<div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="toggleSettings()"></div>
+<div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 relative z-10 transform transition-all scale-95" id="modal-content">
+<h2 class="text-xl font-bold mb-1">API 设置</h2>
+<div class="space-y-4 mt-4">
+<div>
+<label class="block text-xs font-bold text-slate-700 uppercase mb-2">服务商预设</label>
+<select id="api-preset" onchange="applyPreset()" class="w-full px-4 py-2 rounded-lg border border-slate-300 text-sm bg-slate-50">
+<option value="openai">OpenAI (Official)</option>
+<option value="gemini" selected>Google Gemini</option>
+<option value="deepseek">DeepSeek</option>
+<option value="custom">Custom</option>
+</select>
+</div>
+<div>
+<label class="block text-xs font-bold text-slate-700 uppercase mb-2">Endpoint URL</label>
+<input type="text" id="api-url" oninput="updateUrlPreview()" class="w-full px-4 py-2 rounded-lg border border-slate-300 text-sm font-mono" value="https://generativelanguage.googleapis.com/v1beta/openai">
+</div>
+<div>
+<label class="block text-xs font-bold text-slate-700 uppercase mb-2">API Key</label>
+<input type="password" id="api-key" class="w-full px-4 py-2 rounded-lg border border-slate-300 text-sm font-mono">
+</div>
+<div>
+<label class="block text-xs font-bold text-slate-700 uppercase mb-2">Model Name</label>
+<input list="model-suggestions" type="text" id="api-model" class="w-full px-4 py-2 rounded-lg border border-slate-300 text-sm font-mono" value="gemini-2.0-flash">
+<datalist id="model-suggestions">
+<option value="gemini-2.0-flash">
+<option value="gemini-1.5-flash">
+<option value="gemini-1.5-pro">
+<option value="gpt-3.5-turbo">
+<option value="gpt-4o">
+<option value="deepseek-chat">
+</datalist>
+</div>
+<div class="bg-slate-100 rounded px-3 py-2 text-[10px] text-slate-500 font-mono break-all">
+<span class="font-bold text-slate-400">Request URL:</span> <span id="url-preview">...</span>
+</div>
+<div class="bg-slate-50 rounded-lg p-3 border border-slate-200 flex flex-col justify-between">
+<div class="flex justify-between items-center w-full mb-2">
+<div class="text-xs font-bold text-slate-700">连通性测试</div>
+<button onclick="testConnection()" id="btn-test-conn" class="text-xs bg-white border border-slate-300 px-3 py-1.5 rounded shadow-sm">测试连接</button>
+</div>
+<div id="test-status-text" class="text-xs text-slate-400 mb-1"></div>
+<div id="debug-error-box" class="hidden text-[10px] font-mono bg-red-50 text-red-700 p-2 rounded border border-red-100 break-all"></div>
+</div>
+</div>
+<div class="mt-6 flex justify-end gap-3">
+<button onclick="toggleSettings()" class="px-4 py-2 text-slate-500 hover:bg-slate-100 rounded-lg text-sm">关闭</button>
+<button onclick="saveSettings()" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm shadow-md">保存</button>
+</div>
+</div>
+</div>
+
+<script>
+// ===== LOCAL DATA PRESETS =====
+const LOCAL_PRESETS = {
+  'hair-length': ['寸头', '超短发', '短发', '齐耳', '齐肩', '中长发', '及腰', '及膝', '拖地长发'],
+  'hair-color': ['黑色', '深棕', '浅棕', '金色', '银白', '灰色', '红色', '酒红', '蓝色', '深蓝', '紫色', '粉色', '渐变色', '挑染'],
+  'hair-style': ['直发', '微卷', '大波浪', '小卷', '爆炸头', '刺猬头', '凌乱', '光滑', '马尾', '双马尾', '丸子头', '麻花辫', '公主切', '中分', '偏分', '刘海'],
+  'eye-color': ['黑色', '深棕', '浅棕', '蓝色', '深蓝', '绿色', '翠绿', '灰色', '银灰', '琥珀色', '金色', '紫色', '红色', '粉色', '异色瞳'],
+  'eye-shape': ['杏眼', '桃花眼', '丹凤眼', '圆眼', '狐狸眼', '下垂眼', '上挑眼', '细长眼', '三角眼', '死鱼眼'],
+  'body-build': ['骨感', '纤瘦', '苗条', '匀称', '健壮', '魁梧', '丰满', '微胖', '矮小', '娇小', '高挑', '修长', '肌肉发达', '壮硕'],
+  'skin-tone': ['苍白', '白皙', '象牙白', '小麦色', '健康肤色', '古铜色', '棕色', '深棕', '黝黑'],
+  'facial-structure': ['鹅蛋脸', '瓜子脸', '圆脸', '方脸', '长脸', '菱形脸', '心形脸', '国字脸'],
+  'special-marks': ['无', '雀斑', '美人痣', '泪痣', '疤痕', '纹身', '胎记', '酒窝', '梨涡'],
+  'accessories': ['无', '眼镜', '墨镜', '耳环', '项链', '手表', '戒指', '发饰', '帽子', '面具', '眼罩', '绷带']
+};
+
+// ===== DEFINITIONS =====
+const attributesList = [
+  { id: 'stamina', label: '体力' }, { id: 'endurance', label: '耐力' },
+  { id: 'vision', label: '视力' }, { id: 'strength', label: '力量' },
+  { id: 'agility', label: '敏捷' }, { id: 'reflex', label: '反应' },
+  { id: 'iq', label: '智商' }, { id: 'eq', label: '情商' },
+  { id: 'patience', label: '耐心' }, { id: 'intuition', label: '直觉' },
+  { id: 'luck', label: '运气' }, { id: 'drive', label: '动力' }
+];
+
+const personalityList = [
+  { left: '悲观', right: '乐观', id: 'p1' },
+  { left: '自卑', right: '自信', id: 'p2' },
+  { left: '冷血', right: '温柔', id: 'p3' },
+  { left: '强势', right: '弱势', id: 'p4' },
+  { left: '野蛮', right: '礼貌', id: 'p5' },
+  { left: '幽默', right: '正经', id: 'p6' },
+  { left: '叛逆', right: '保守', id: 'p7' },
+  { left: '偏激', right: '温顺', id: 'p8' },
+  { left: '高冷', right: '热情', id: 'p9' },
+  { left: '果决', right: '犹豫', id: 'p10' },
+  { left: '现实', right: '浪漫', id: 'p11' },
+  { left: '邪恶', right: '正义', id: 'p12' },
+  { left: '混沌', right: '清醒', id: 'p13' }
+];
+
+// ===== STATE =====
+let state = {
+  step: 1,
+  stats: {},
+  personality: {},
+  selections: {},
+  api: {
+    enabled: true,
+    verified: false,
+    url: "https://api.deepseek.com",
+    key: "sk-a6158402691b45cf82f26fa841f2cd27",
+    model: "deepseek-chat"
+  }
+};
+
+// ===== STEP 1 RENDERING =====
+function renderStep1() {
+  const attrContainer = document.getElementById('attributes-container');
+  attrContainer.innerHTML = '';
+  attributesList.forEach(t => {
+    const row = document.createElement('div');
+    row.className = "flex justify-between items-center";
+    row.innerHTML = `
+      <span class="text-xs font-medium text-slate-600 w-8">${t.label}</span>
+      <div class="dot-group" id="dots-${t.id}">
+        ${[1,2,3,4,5].map(i => `<div class="dot" onclick="setStat('${t.id}', ${i})"></div>`).join('')}
+      </div>
+    `;
+    attrContainer.appendChild(row);
+    if(!state.stats[t.id]) state.stats[t.id] = 3;
+  });
+  updateDotVisuals();
+
+  const persContainer = document.getElementById('personality-container');
+  persContainer.innerHTML = '';
+  personalityList.forEach(p => {
+    const row = document.createElement('div');
+    row.className = "flex items-center gap-2 text-xs";
+    row.innerHTML = `
+      <span class="w-8 text-right text-slate-400">${p.left}</span>
+      <input type="range" min="1" max="5" value="3" class="spectrum-slider flex-1" 
+             oninput="setPersonality('${p.id}', this.value)" id="range-${p.id}">
+      <span class="w-8 text-left text-slate-400">${p.right}</span>
+    `;
+    persContainer.appendChild(row);
+    state.personality[p.id] = 3;
+  });
+}
+
+function setStat(id, val) {
+  state.stats[id] = val;
+  updateDotVisuals();
+  updatePreview();
+}
+
+function updateDotVisuals() {
+  attributesList.forEach(t => {
+    const val = state.stats[t.id];
+    const container = document.getElementById(`dots-${t.id}`);
+    if(!container) return;
+    Array.from(container.children).forEach((dot, idx) => {
+      if (idx < val) dot.classList.add('active');
+      else dot.classList.remove('active');
+    });
+  });
+}
+
+function setPersonality(id, val) {
+  state.personality[id] = parseInt(val);
+  updatePreview();
+}
+
+function randomizeSheet() {
+  attributesList.forEach(t => setStat(t.id, Math.floor(Math.random()*5)+1));
+  personalityList.forEach(p => {
+    const val = Math.floor(Math.random()*5)+1;
+    const el = document.getElementById(`range-${p.id}`);
+    if(el) el.value = val;
+    setPersonality(p.id, val);
+  });
+  
+  const genders = ["男", "女", "无性"];
+  document.getElementById('input-gender').value = genders[Math.floor(Math.random()*3)];
+  document.getElementById('input-age').value = Math.floor(Math.random()*40)+15;
+  
+  const heightEl = document.getElementById('input-height');
+  if(heightEl) {
+    heightEl.value = Math.floor(Math.random()*50)+150;
+  }
+  
+  if(state.api.verified) {
+    const nameEl = document.getElementById('input-name');
+    if(nameEl) generateSingleField('name');
+    generateSingleField('race');
+    generateSingleField('archetype');
+  }
+  updatePreview();
+}
+
+// ===== AI INTERACTION (Only for contextual generation) =====
+async function generateSingleField(field) {
+  const btn = event?.currentTarget;
+  if(btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+  
+  try {
+    const profile = getProfileSummary();
+    let prompt = '';
+    
+    if(field === 'name') {
+      prompt = `基于角色设定生成1个合适的中文姓名(2-4字):${profile}。只输出JSON数组格式:["姓名"]`;
+    } else if(field === 'race') {
+      prompt = `基于角色设定生成1个创意种族名称(中文,2-4字):${profile}。只输出JSON数组格式:["种族"]`;
+    } else {
+      prompt = `基于角色设定生成1个创意职业/身份(中文,6-10字):${profile}。只输出JSON数组格式:["职业"]`;
+    }
+    
+    const res = await callAI(prompt, 1);
+    const targetId = field === 'name' ? 'input-name' : `input-${field}`;
+    const element = document.getElementById(targetId);
+    if(element) {
+      element.value = res[0] || "";
+      updatePreview();
+    }
+  } catch(e) {
+    console.error(e);
+  }
+  if(btn) btn.innerHTML = '<i class="fa-solid fa-magic"></i>';
+}
+
+async function callAI(userPrompt, count = 8) {
+  if(!state.api.verified && !state.api.key) {
+    return ["需连接AI"];
+  }
+  
+  const fullUrl = `${state.api.url}/chat/completions`;
+  try {
+    const res = await fetch(fullUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${state.api.key}`
+      },
+      body: JSON.stringify({
+        model: state.api.model,
+        messages: [{
+          role: "system",
+          content: `你是角色生成助手。严格按要求输出JSON数组格式:["选项1","选项2",...],共${count}个中文短词。`
+        }, {
+          role: "user",
+          content: userPrompt
+        }],
+        temperature: 0.9
+      })
+    });
+    
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    let txt = data.choices[0].message.content;
+    txt = txt.replace(/```json|```/g, '').trim();
+    return JSON.parse(txt);
+  } catch(e) {
+    console.error("AI Error", e);
+    return ["Error", "Check API"];
+  }
+}
+
+function getProfileSummary() {
+  let text = `性别:${document.getElementById('input-gender').value}, 年龄:${document.getElementById('input-age').value}, 种族:${document.getElementById('input-race').value}, 职业:${document.getElementById('input-archetype').value}. `;
+  text += "属性: ";
+  attributesList.forEach(t => text += `${t.label}=${state.stats[t.id]}/5, `);
+  text += "性格: ";
+  personalityList.forEach(p => {
+    const val = state.personality[p.id];
+    if(val < 3) text += `${p.left}, `;
+    if(val > 3) text += `${p.right}, `;
+  });
+  return text;
+}
+
+// ===== STEP 2: VISUALS (Multi-select) =====
+async function renderSection(containerId, category) {
+  const container = document.getElementById(containerId);
+  
+  if(!container) {
+    console.error("Container not found:", containerId);
+    return;
+  }
+  
+  // Use local presets if available
+  let options = LOCAL_PRESETS[category];
+  
+  // Use AI for contextual categories
+  if (!options) {
+    container.innerHTML = '<div class="text-xs text-slate-400 p-2"><i class="fa-solid fa-spinner fa-spin"></i> AI 推演中...</div>';
+    options = await fetchAIOptions(category);
+  }
+  
+  // Initialize array if not exists (for multi-select)
+  if(!state.selections[category]) {
+    state.selections[category] = [];
+  }
+  
+  container.innerHTML = '';
+  
+  if(!options || options.length === 0) {
+    container.innerHTML = '<div class="text-xs text-red-400 p-2">加载失败</div>';
+    return;
+  }
+  
+  // Determine if this category supports multi-select
+  const multiSelectCategories = [
+    'hair-length', 'hair-style', 'hair-color',
+    'eye-shape', 'eye-color', 'special-marks', 'accessories',
+    'facial-features', 'clothing-style', 'clothing-item',
+    'phobias', 'mental_trauma', 'favorite_things', 'hated_things',
+    'social_reputation', 'inventory_items'
+  ];
+  const isMultiSelect = multiSelectCategories.includes(category);
+  
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn px-2 py-1.5 bg-white border border-slate-200 rounded text-xs text-slate-600 hover:border-slate-400 text-left';
+    btn.textContent = opt;
+    
+    // Check if already selected
+    if(Array.isArray(state.selections[category]) && state.selections[category].includes(opt)) {
+      btn.classList.add('selected');
+    } else if(state.selections[category] === opt) {
+      btn.classList.add('selected');
+    }
+    
+    btn.onclick = () => {
+      if(isMultiSelect) {
+        // Multi-select mode
+        if(!Array.isArray(state.selections[category])) {
+          state.selections[category] = [];
+        }
+        
+        if(state.selections[category].includes(opt)) {
+          // Remove
+          state.selections[category] = state.selections[category].filter(x => x !== opt);
+          btn.classList.remove('selected');
+        } else {
+          // Add
+          state.selections[category].push(opt);
+          btn.classList.add('selected');
+        }
+      } else {
+        // Single-select mode
+        Array.from(container.children).forEach(c => c.classList.remove('selected'));
+        btn.classList.add('selected');
+        state.selections[category] = opt;
+      }
+      updatePreview();
+    };
+    container.appendChild(btn);
+  });
+}
+
+async function fetchAIOptions(category) {
+  const profile = getProfileSummary();
+  
+  const prompts = {
+    'facial-features': `基于${profile},生成8个面部特征描述(如:高鼻梁、雀斑、酒窝等)`,
+    'clothing-style': `基于${profile},生成8个穿搭风格(如:朋克、学院风、军装等)`,
+    'clothing-item': `基于${profile},生成8个标志性服饰单品(如:皮夹克、围巾、墨镜等)`,
+    'phobias': `基于${profile},推测8个可能的恐惧对象`,
+    'mental_trauma': `基于${profile},推测8个可能的心理创伤`,
+    'favorite_things': `基于${profile},推测8个喜爱的事物`,
+    'hated_things': `基于${profile},推测8个厌恶的事物`,
+    'social_reputation': `基于${profile},生成8个社会评价标签`,
+    'inventory_items': `基于${profile},生成8个重要随身物品`
+  };
+  
+  const prompt = prompts[category] || `生成8个关于${category}的中文短词`;
+  return await callAI(prompt, 8);
+}
+
+async function finishStep1() {
+  goToStep(2);
+  // Load local presets immediately
+  renderSection('opt-hair-length', 'hair-length');
+  renderSection('opt-hair-style', 'hair-style');
+  renderSection('opt-hair-color', 'hair-color');
+  renderSection('opt-eye-shape', 'eye-shape');
+  renderSection('opt-eye-color', 'eye-color');
+  renderSection('opt-body-build', 'body-build');
+  renderSection('opt-skin-tone', 'skin-tone');
+  renderSection('opt-face-structure', 'facial-structure');
+  renderSection('opt-special-marks', 'special-marks');
+  renderSection('opt-accessories', 'accessories');
+  
+  // Load AI-based options
+  renderSection('opt-face-feature', 'facial-features');
+  renderSection('opt-cloth-style', 'clothing-style');
+  renderSection('opt-cloth-item', 'clothing-item');
+}
+
+async function finishStep2() {
+  goToStep(3);
+  document.getElementById('summary-archetype').textContent = document.getElementById('input-archetype').value;
+  
+  // All Step 3 options use AI
+  renderSection('opt-fear', 'phobias');
+  renderSection('opt-trauma', 'mental_trauma');
+  renderSection('opt-likes', 'favorite_things');
+  renderSection('opt-dislikes', 'hated_things');
+  renderSection('opt-social', 'social_reputation');
+  renderSection('opt-items', 'inventory_items');
+}
+
+async function finishStep3() {
+  goToStep(4);
+  await generateDeepDetails();
+}
+
+async function finishStep4() {
+  goToStep(5);
+}
+
+async function refreshVisuals(group) {
+  if(group === 'hair') {
+    renderSection('opt-hair-length', 'hair-length');
+    renderSection('opt-hair-style', 'hair-style');
+    renderSection('opt-hair-color', 'hair-color');
+  }
+}
+
+function goToStep(n) {
+  state.step = n;
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`step-${n}`).classList.add('active');
+  
+  // Update step indicators
+  for(let i = 1; i <= 5; i++) {
+    const dot = document.getElementById(`step-dot-${i}`);
+    if(dot) {
+      if(i === n) dot.className = 'text-slate-800 font-bold';
+      else if(i < n) dot.className = 'text-slate-500';
+      else dot.className = 'text-slate-400';
+    }
+  }
+  
+  // Scroll to top
+  const mainScroll = document.getElementById('main-scroll');
+  if(mainScroll) mainScroll.scrollTop = 0;
+  
+  updatePreview();
+}
+
+// ===== PREVIEW UPDATE =====
+function updatePreview() {
+  const nameEl = document.getElementById('input-name');
+  if(nameEl) {
+    document.getElementById('p-name').textContent = nameEl.value || '未命名';
+  }
+  
+  document.getElementById('p-archetype').textContent = document.getElementById('input-archetype').value || '???';
+  document.getElementById('p-gender').textContent = document.getElementById('input-gender').value;
+  document.getElementById('p-race').textContent = '种族: ' + (document.getElementById('input-race').value || '?');
+  document.getElementById('p-age').textContent = 'Age: ' + document.getElementById('input-age').value;
+  
+  const heightEl = document.getElementById('input-height');
+  if(heightEl && heightEl.value) {
+    document.getElementById('p-height').textContent = 'H: ' + heightEl.value + 'cm';
+  }
+  
+  document.getElementById('p-alignment').textContent = '阵营: ' + document.getElementById('input-alignment').value;
+
+  const sDiv = document.getElementById('p-stats');
+  sDiv.innerHTML = '';
+  attributesList.forEach(t => {
+    const v = state.stats[t.id];
+    if(v > 3 || v < 2) {
+      const d = document.createElement('span');
+      d.className = "text-[10px] bg-slate-100 px-1 rounded text-slate-600";
+      d.textContent = `${t.label}:${v}`;
+      sDiv.appendChild(d);
+    }
+  });
+
+  const pDiv = document.getElementById('p-personality');
+  pDiv.innerHTML = '';
+  personalityList.forEach(p => {
+    const v = state.personality[p.id];
+    if(v !== 3) {
+      const d = document.createElement('span');
+      d.className = "text-[10px] text-slate-500 mr-2";
+      d.textContent = v < 3 ? p.left : p.right;
+      pDiv.appendChild(d);
+    }
+  });
+
+  const vList = document.getElementById('p-visuals');
+  vList.innerHTML = '';
+  const s = state.selections;
+  const add = (txt) => { if(txt) vList.innerHTML += `<li>${txt}</li>`; };
+  
+  // Helper to get selected items (handles both array and string)
+  const getSelected = (key) => {
+    if(!s[key]) return '';
+    if(Array.isArray(s[key])) return s[key].join(', ');
+    return s[key];
+  };
+  
+  if(getSelected('hair-length') || getSelected('hair-color')) {
+    add(`发: ${getSelected('hair-length')} ${getSelected('hair-style')} (${getSelected('hair-color')})`);
+  }
+  if(getSelected('eye-color')) add(`眼: ${getSelected('eye-color')} ${getSelected('eye-shape')}`);
+  if(getSelected('skin-tone')) add(`肤: ${getSelected('skin-tone')}`);
+  if(getSelected('facial-structure')) add(`脸: ${getSelected('facial-structure')}`);
+  if(getSelected('special-marks')) add(`标记: ${getSelected('special-marks')}`);
+  if(getSelected('facial-features')) add(`面: ${getSelected('facial-features')}`);
+  if(getSelected('body-build')) add(`体: ${getSelected('body-build')}`);
+  if(getSelected('accessories')) add(`配饰: ${getSelected('accessories')}`);
+  if(getSelected('clothing-style')) add(`衣: ${getSelected('clothing-style')} - ${getSelected('clothing-item')}`);
+
+  const soulDiv = document.getElementById('p-soul');
+  soulDiv.innerHTML = '';
+  ['phobias','mental_trauma','favorite_things','hated_things','social_reputation','inventory_items'].forEach(k => {
+    const items = s[k];
+    if(items) {
+      const itemArray = Array.isArray(items) ? items : [items];
+      itemArray.forEach(item => {
+        const tag = document.createElement('span');
+        tag.className = "bg-slate-800 text-white px-1.5 py-0.5 rounded text-[10px]";
+        tag.textContent = item;
+        soulDiv.appendChild(tag);
+      });
+    }
+  });
+}
+
+function copyResult() {
+  const t = document.getElementById('preview-card').innerText;
+  navigator.clipboard.writeText(t).then(() => alert("已复制到剪贴板"));
+}
+
+// ===== STEP 4: DEEP DETAILS (Interactive Q&A) =====
+let currentQuestions = [];
+let currentQuestionIndex = 0;
+let questionAnswers = {};
+
+async function generateDeepDetails() {
+  const container = document.getElementById('deep-details-container');
+  container.innerHTML = '<div class="text-center py-8"><i class="fa-solid fa-spinner fa-spin text-3xl text-purple-500"></i><p class="text-sm text-slate-500 mt-3">AI 正在准备问题...</p></div>';
+  
+  currentQuestions = [];
+  currentQuestionIndex = 0;
+  questionAnswers = {};
+  
+  const s = state.selections;
+  
+  // Helper to get selected items
+  const getSelected = (key) => {
+    if(!s[key]) return [];
+    return Array.isArray(s[key]) ? s[key] : [s[key]];
+  };
+  
+  // Generate questions based on selections
+  const marks = getSelected('special-marks');
+  if(marks.some(m => ['疤痕', '刀疤', '烧伤痕迹', '弹孔疤'].includes(m))) {
+    currentQuestions.push({
+      id: 'scars',
+      category: '伤疤细节',
+      question: `你选择了以下标记：${marks.join('、')}。请描述这些伤疤的具体位置、形状、大小，以及它们的来历。`,
+      context: `角色有: ${marks.join(', ')}`
+    });
+  }
+  
+  const trauma = getSelected('mental_trauma');
+  if(trauma.length > 0) {
+    currentQuestions.push({
+      id: 'trauma',
+      category: '创伤来源',
+      question: `你选择了以下心理创伤：${trauma.join('、')}。请描述这些创伤是如何形成的？发生了什么事件？`,
+      context: `角色有心理创伤: ${trauma.join(', ')}`
+    });
+  }
+  
+  const items = getSelected('inventory_items');
+  if(items.length > 0) {
+    currentQuestions.push({
+      id: 'items',
+      category: '物品故事',
+      question: `你选择了以下随身物品：${items.join('、')}。请为其中最重要的2-3件物品讲述它们的来历和意义。`,
+      context: `角色携带: ${items.join(', ')}`
+    });
+  }
+  
+  const phobias = getSelected('phobias');
+  if(phobias.length > 0) {
+    currentQuestions.push({
+      id: 'phobias',
+      category: '恐惧根源',
+      question: `你选择了以下恐惧对象：${phobias.join('、')}。这些恐惧是如何产生的？有什么具体的触发场景吗？`,
+      context: `角色恐惧: ${phobias.join(', ')}`
+    });
+  }
+  
+  const clothStyle = getSelected('clothing-style');
+  const clothItem = getSelected('clothing-item');
+  if(clothStyle.length > 0 || clothItem.length > 0) {
+    currentQuestions.push({
+      id: 'clothing',
+      category: '穿搭细节',
+      question: `你选择了穿搭风格：${clothStyle.join('、')}，标志单品：${clothItem.join('、')}。请描述一套完整的日常穿搭，包括颜色、材质、搭配方式。`,
+      context: `穿搭风格: ${clothStyle.join(', ')}，单品: ${clothItem.join(', ')}`
+    });
+  }
+  
+  const personalityTraits = [];
+  personalityList.forEach(p => {
+    const v = state.personality[p.id];
+    if(v < 2) personalityTraits.push(p.left);
+    if(v > 4) personalityTraits.push(p.right);
+  });
+  
+  if(personalityTraits.length > 0) {
+    currentQuestions.push({
+      id: 'personality',
+      category: '性格表现',
+      question: `角色的性格特征包括：${personalityTraits.join('、')}。请举2-3个具体的日常场景例子，展现这些性格是如何表现出来的。`,
+      context: `性格特征: ${personalityTraits.join(', ')}`
+    });
+  }
+  
+  container.innerHTML = '';
+  
+  if(currentQuestions.length === 0) {
+    container.innerHTML = '<div class="text-center py-8 text-slate-400"><i class="fa-solid fa-info-circle text-2xl mb-2"></i><p class="text-sm">暂无需要深度细化的内容</p><p class="text-xs mt-2">提示：选择疤痕、创伤等特征后会有更多问题</p></div>';
+    return;
+  }
+  
+  // Show first question
+  await showQuestion(0);
+}
+
+async function showQuestion(index) {
+  if(index >= currentQuestions.length) {
+    // All questions answered
+    showCompletionSummary();
+    return;
+  }
+  
+  currentQuestionIndex = index;
+  const q = currentQuestions[index];
+  const container = document.getElementById('deep-details-container');
+  
+  // Step 1: AI asks question, user provides their answer
+  container.innerHTML = `
+    <div class="bg-white p-6 rounded-xl shadow-sm border-2 border-purple-300">
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <h4 class="text-lg font-bold text-purple-900 mb-1">步骤 1/5: ${q.category}</h4>
+          <p class="text-xs text-slate-500">问题 ${index + 1} / ${currentQuestions.length}</p>
+        </div>
+        <div class="text-xs bg-purple-100 text-purple-700 px-3 py-1 rounded-full">
+          ${index + 1}/${currentQuestions.length}
+        </div>
+      </div>
+      
+      <div class="bg-purple-50 p-4 rounded-lg mb-4">
+        <div class="flex items-start gap-2">
+          <i class="fa-solid fa-robot text-purple-600 text-xl mt-1"></i>
+          <div>
+            <p class="text-xs font-bold text-purple-700 mb-1">AI 的问题：</p>
+            <p class="text-sm text-slate-700 leading-relaxed">${q.question}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mb-4">
+        <label class="text-xs font-bold text-slate-600 uppercase block mb-2">
+          <i class="fa-solid fa-user"></i> 你的回答
+        </label>
+        <textarea id="user-initial-answer" class="w-full p-3 border-2 border-purple-300 rounded-lg text-sm resize-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200" rows="4" placeholder="请简要回答这个问题，AI 会根据你的回答生成详细内容..."></textarea>
+        <p class="text-xs text-slate-500 mt-1">💡 提示：简单描述即可，AI 会帮你扩展成完整内容</p>
+      </div>
+      
+      <div class="flex justify-between items-center pt-4 border-t">
+        <button onclick="skipQuestion()" class="text-slate-400 hover:text-slate-600 px-4 py-2 text-sm">
+          <i class="fa-solid fa-forward"></i> 跳过此问题
+        </button>
+        <button onclick="submitUserAnswer()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+          <i class="fa-solid fa-paper-plane"></i> 提交回答，让 AI 生成详细内容
+        </button>
+      </div>
+    </div>
+    
+    ${index > 0 ? `
+    <div class="mt-4">
+      <button onclick="showQuestion(${index - 1})" class="text-sm text-slate-500 hover:text-slate-700">
+        <i class="fa-solid fa-arrow-left"></i> 返回上一个问题
+      </button>
+    </div>
+    ` : ''}
+  `;
+}
+
+// Step 2: User submits their answer, AI generates detailed content
+async function submitUserAnswer() {
+  const userAnswer = document.getElementById('user-initial-answer').value.trim();
+  if(!userAnswer) {
+    alert('请先回答问题');
+    return;
+  }
+  
+  const q = currentQuestions[currentQuestionIndex];
+  const container = document.getElementById('deep-details-container');
+  
+  // Show loading state
+  container.innerHTML = `
+    <div class="bg-white p-6 rounded-xl shadow-sm border-2 border-purple-300">
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <h4 class="text-lg font-bold text-purple-900 mb-1">步骤 2/5: AI 生成详细内容</h4>
+          <p class="text-xs text-slate-500">问题 ${currentQuestionIndex + 1} / ${currentQuestions.length}</p>
+        </div>
+      </div>
+      
+      <div class="bg-blue-50 p-4 rounded-lg mb-4">
+        <div class="flex items-start gap-2">
+          <i class="fa-solid fa-user text-blue-600 text-xl mt-1"></i>
+          <div>
+            <p class="text-xs font-bold text-blue-700 mb-1">你的回答：</p>
+            <p class="text-sm text-slate-700 leading-relaxed">${userAnswer}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-slate-50 p-6 rounded-lg border border-slate-200 text-center">
+        <i class="fa-solid fa-spinner fa-spin text-3xl text-purple-600 mb-3"></i>
+        <p class="text-sm text-slate-600">AI 正在根据你的回答生成详细内容...</p>
+      </div>
+    </div>
+  `;
+  
+  try {
+    const fullProfile = getFullProfile();
+    const prompt = `${fullProfile}\n\n${q.context}\n\n问题：${q.question}\n\n用户的回答：${userAnswer}\n\n请根据用户的回答，用第三人称，生成一段150-200字的详细描述。要符合角色设定，内容丰富，有画面感。`;
+    
+    const aiGenerated = await callAIText(prompt);
+    
+    // Step 3: Show AI generated content and ask for approval
+    showAIGeneratedContent(userAnswer, aiGenerated);
+    
+  } catch(e) {
+    alert('AI 生成失败：' + e.message);
+    showQuestion(currentQuestionIndex); // Go back to question
+  }
+}
+
+// Step 3: Show AI generated content and ask for user approval
+function showAIGeneratedContent(userAnswer, aiGenerated) {
+  const q = currentQuestions[currentQuestionIndex];
+  const container = document.getElementById('deep-details-container');
+  
+  container.innerHTML = `
+    <div class="bg-white p-6 rounded-xl shadow-sm border-2 border-purple-300">
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <h4 class="text-lg font-bold text-purple-900 mb-1">步骤 3/5: 查看 AI 生成的内容</h4>
+          <p class="text-xs text-slate-500">问题 ${currentQuestionIndex + 1} / ${currentQuestions.length}</p>
+        </div>
+      </div>
+      
+      <div class="bg-blue-50 p-4 rounded-lg mb-3">
+        <div class="flex items-start gap-2">
+          <i class="fa-solid fa-user text-blue-600 text-lg mt-1"></i>
+          <div class="flex-1">
+            <p class="text-xs font-bold text-blue-700 mb-1">你的回答：</p>
+            <p class="text-sm text-slate-700 leading-relaxed">${userAnswer}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-green-50 p-4 rounded-lg mb-4 border-2 border-green-200">
+        <div class="flex items-start gap-2">
+          <i class="fa-solid fa-robot text-green-600 text-lg mt-1"></i>
+          <div class="flex-1">
+            <p class="text-xs font-bold text-green-700 mb-1">AI 生成的详细内容：</p>
+            <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap" id="ai-generated-content">${aiGenerated}</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-amber-50 p-4 rounded-lg mb-4 border border-amber-200">
+        <p class="text-sm text-amber-800 font-medium mb-2">
+          <i class="fa-solid fa-question-circle"></i> 你对这个内容满意吗？
+        </p>
+        <div class="flex gap-3">
+          <button onclick="approveContent()" class="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-check-circle text-lg"></i>
+            <span>满意，通过</span>
+          </button>
+          <button onclick="showModifyOptions()" class="flex-1 bg-orange-600 hover:bg-orange-700 text-white px-4 py-3 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-edit text-lg"></i>
+            <span>不满意，需要修改</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Store current data
+  window.currentUserAnswer = userAnswer;
+  window.currentAIGenerated = aiGenerated;
+}
+
+// Step 4: User chooses how to modify
+function showModifyOptions() {
+  const q = currentQuestions[currentQuestionIndex];
+  const container = document.getElementById('deep-details-container');
+  
+  container.innerHTML = `
+    <div class="bg-white p-6 rounded-xl shadow-sm border-2 border-orange-300">
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <h4 class="text-lg font-bold text-orange-900 mb-1">步骤 4/5: 选择修改方式</h4>
+          <p class="text-xs text-slate-500">问题 ${currentQuestionIndex + 1} / ${currentQuestions.length}</p>
+        </div>
+      </div>
+      
+      <div class="bg-slate-50 p-4 rounded-lg mb-4">
+        <p class="text-xs font-bold text-slate-600 mb-2">当前 AI 生成的内容：</p>
+        <p class="text-sm text-slate-700 leading-relaxed">${window.currentAIGenerated}</p>
+      </div>
+      
+      <div class="space-y-3">
+        <button onclick="chooseSmallEdit()" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg text-left transition border-2 border-transparent hover:border-blue-800">
+          <div class="flex items-start gap-3">
+            <i class="fa-solid fa-pen text-2xl mt-1"></i>
+            <div>
+              <p class="font-bold mb-1">📝 小改：直接修改文本</p>
+              <p class="text-sm opacity-90">适合：改几个字、调整语句、修正细节</p>
+            </div>
+          </div>
+        </button>
+        
+        <button onclick="chooseBigEdit()" class="w-full bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-lg text-left transition border-2 border-transparent hover:border-purple-800">
+          <div class="flex items-start gap-3">
+            <i class="fa-solid fa-comments text-2xl mt-1"></i>
+            <div>
+              <p class="font-bold mb-1">💬 大改：给 AI 提建议</p>
+              <p class="text-sm opacity-90">适合：改变方向、增加内容、重新构思</p>
+            </div>
+          </div>
+        </button>
+        
+        <button onclick="showAIGeneratedContent('${window.currentUserAnswer.replace(/'/g, "\\'")}', '${window.currentAIGenerated.replace(/'/g, "\\'")}', '${window.currentAIGenerated.replace(/'/g, "\\'")})" class="w-full bg-slate-500 hover:bg-slate-600 text-white px-4 py-2 rounded-lg text-sm transition">
+          <i class="fa-solid fa-arrow-left"></i> 返回查看内容
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+// Step 4a: Small edit - direct text editing
+function chooseSmallEdit() {
+  const q = currentQuestions[currentQuestionIndex];
+  const container = document.getElementById('deep-details-container');
+  
+  container.innerHTML = `
+    <div class="bg-white p-6 rounded-xl shadow-sm border-2 border-blue-300">
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <h4 class="text-lg font-bold text-blue-900 mb-1">步骤 5/5: 直接修改文本</h4>
+          <p class="text-xs text-slate-500">问题 ${currentQuestionIndex + 1} / ${currentQuestions.length}</p>
+        </div>
+      </div>
+      
+      <div class="mb-4">
+        <label class="text-xs font-bold text-slate-600 uppercase block mb-2">
+          <i class="fa-solid fa-edit"></i> 编辑内容（直接修改下面的文本）
+        </label>
+        <textarea id="manual-edit-content" class="w-full p-3 border-2 border-blue-300 rounded-lg text-sm resize-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200" rows="8">${window.currentAIGenerated}</textarea>
+      </div>
+      
+      <div class="flex justify-between items-center pt-4 border-t">
+        <button onclick="showModifyOptions()" class="text-slate-400 hover:text-slate-600 px-4 py-2 text-sm">
+          <i class="fa-solid fa-arrow-left"></i> 返回选择修改方式
+        </button>
+        <button onclick="saveManualEdit()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+          <i class="fa-solid fa-check"></i> 保存并进入下一题
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+// Step 4b: Big edit - give AI suggestions
+function chooseBigEdit() {
+  const q = currentQuestions[currentQuestionIndex];
+  const container = document.getElementById('deep-details-container');
+  
+  container.innerHTML = `
+    <div class="bg-white p-6 rounded-xl shadow-sm border-2 border-purple-300">
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <h4 class="text-lg font-bold text-purple-900 mb-1">步骤 5/5: 给 AI 提建议</h4>
+          <p class="text-xs text-slate-500">问题 ${currentQuestionIndex + 1} / ${currentQuestions.length}</p>
+        </div>
+      </div>
+      
+      <div class="bg-slate-50 p-4 rounded-lg mb-4">
+        <p class="text-xs font-bold text-slate-600 mb-2">当前内容：</p>
+        <p class="text-sm text-slate-700 leading-relaxed">${window.currentAIGenerated}</p>
+      </div>
+      
+      <div class="mb-4">
+        <label class="text-xs font-bold text-slate-600 uppercase block mb-2">
+          <i class="fa-solid fa-lightbulb"></i> 你的修改建议
+        </label>
+        <textarea id="ai-suggestion-input" class="w-full p-3 border-2 border-purple-300 rounded-lg text-sm resize-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200" rows="4" placeholder="例如：增加更多情感描写、改成悲伤的语气、加入童年回忆的细节..."></textarea>
+        <p class="text-xs text-slate-500 mt-1">💡 提示：告诉 AI 你想要什么样的改变，AI 会重新生成</p>
+      </div>
+      
+      <div class="flex justify-between items-center pt-4 border-t">
+        <button onclick="showModifyOptions()" class="text-slate-400 hover:text-slate-600 px-4 py-2 text-sm">
+          <i class="fa-solid fa-arrow-left"></i> 返回选择修改方式
+        </button>
+        <button onclick="regenerateWithSuggestion()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+          <i class="fa-solid fa-magic"></i> 让 AI 重新生成
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+// Save manual edit and move to next question
+function saveManualEdit() {
+  const editedContent = document.getElementById('manual-edit-content').value.trim();
+  if(!editedContent) {
+    alert('内容不能为空');
+    return;
+  }
+  
+  const q = currentQuestions[currentQuestionIndex];
+  questionAnswers[q.id] = {
+    category: q.category,
+    question: q.question,
+    userAnswer: window.currentUserAnswer,
+    answer: editedContent,
+    source: 'manual-edit'
+  };
+  
+  showQuestion(currentQuestionIndex + 1);
+}
+
+// Regenerate with user's suggestion
+async function regenerateWithSuggestion() {
+  const suggestion = document.getElementById('ai-suggestion-input').value.trim();
+  if(!suggestion) {
+    alert('请输入你的修改建议');
+    return;
+  }
+  
+  const q = currentQuestions[currentQuestionIndex];
+  const container = document.getElementById('deep-details-container');
+  
+  // Show loading
+  container.innerHTML = `
+    <div class="bg-white p-6 rounded-xl shadow-sm border-2 border-purple-300">
+      <div class="bg-slate-50 p-6 rounded-lg border border-slate-200 text-center">
+        <i class="fa-solid fa-spinner fa-spin text-3xl text-purple-600 mb-3"></i>
+        <p class="text-sm text-slate-600">AI 正在根据你的建议重新生成...</p>
+      </div>
+    </div>
+  `;
+  
+  try {
+    const fullProfile = getFullProfile();
+    const prompt = `${fullProfile}\n\n${q.context}\n\n问题：${q.question}\n\n用户的回答：${window.currentUserAnswer}\n\n之前生成的内容：${window.currentAIGenerated}\n\n用户的修改建议：${suggestion}\n\n请根据用户的修改建议，重新生成一段150-200字的详细描述。要符合角色设定，内容丰富，有画面感。`;
+    
+    const newGenerated = await callAIText(prompt);
+    
+    // Show new content for approval
+    showAIGeneratedContent(window.currentUserAnswer, newGenerated);
+    
+  } catch(e) {
+    alert('AI 生成失败：' + e.message);
+    chooseBigEdit(); // Go back to suggestion input
+  }
+}
+
+// Step 5: User approves the content
+function approveContent() {
+  const q = currentQuestions[currentQuestionIndex];
+  questionAnswers[q.id] = {
+    category: q.category,
+    question: q.question,
+    userAnswer: window.currentUserAnswer,
+    answer: window.currentAIGenerated,
+    source: 'approved'
+  };
+  
+  showQuestion(currentQuestionIndex + 1);
+}
+
+function skipQuestion() {
+  if(confirm('确定要跳过这个问题吗？')) {
+    showQuestion(currentQuestionIndex + 1);
+  }
+}
+
+function showCompletionSummary() {
+  const container = document.getElementById('deep-details-container');
+  
+  let summaryHTML = '<div class="space-y-4">';
+  
+  summaryHTML += `
+    <div class="bg-green-100 p-6 rounded-xl border border-green-300 text-center">
+      <i class="fa-solid fa-check-circle text-green-600 text-3xl mb-2"></i>
+      <h3 class="text-lg font-bold text-green-900 mb-1">深度细化完成！</h3>
+      <p class="text-sm text-green-700">已回答 ${Object.keys(questionAnswers).length} 个问题</p>
+    </div>
+  `;
+  
+  // Show all answers
+  Object.values(questionAnswers).forEach(qa => {
+    const sourceLabel = {
+      'approved': 'AI 生成（已通过）',
+      'manual-edit': '手动修改',
+      'user': '完全自定义'
+    }[qa.source] || 'AI 生成';
+    
+    const sourceColor = {
+      'approved': 'bg-green-100 text-green-700',
+      'manual-edit': 'bg-blue-100 text-blue-700',
+      'user': 'bg-purple-100 text-purple-700'
+    }[qa.source] || 'bg-green-100 text-green-700';
+    
+    summaryHTML += `
+      <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+        <div class="flex justify-between items-start mb-3">
+          <h4 class="text-sm font-bold text-slate-700">${qa.category}</h4>
+          <span class="text-xs px-2 py-1 rounded ${sourceColor}">
+            ${sourceLabel}
+          </span>
+        </div>
+        <p class="text-xs text-slate-500 mb-2">${qa.question}</p>
+        ${qa.userAnswer ? `
+        <div class="bg-blue-50 p-3 rounded-lg mb-2">
+          <p class="text-xs font-bold text-blue-700 mb-1">你的回答：</p>
+          <p class="text-sm text-slate-700 leading-relaxed">${qa.userAnswer}</p>
+        </div>
+        ` : ''}
+        <div class="bg-slate-50 p-3 rounded-lg">
+          <p class="text-xs font-bold text-slate-600 mb-1">最终内容：</p>
+          <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">${qa.answer}</p>
+        </div>
+      </div>
+    `;
+  });
+  
+  summaryHTML += '</div>';
+  
+  container.innerHTML = summaryHTML;
+}
+
+async function callAIText(prompt) {
+  const fullUrl = `${state.api.url}/chat/completions`;
+  const res = await fetch(fullUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${state.api.key}`
+    },
+    body: JSON.stringify({
+      model: state.api.model,
+      messages: [{role: "user", content: prompt}],
+      temperature: 0.8
+    })
+  });
+  
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  const data = await res.json();
+  return data.choices[0].message.content.trim();
+}
+
+function getFullProfile() {
+  const nameEl = document.getElementById('input-name');
+  const heightEl = document.getElementById('input-height');
+  
+  let text = `【基础信息】\n`;
+  text += `姓名: ${nameEl ? nameEl.value : '未命名'}\n`;
+  text += `性别: ${document.getElementById('input-gender').value}\n`;
+  text += `年龄: ${document.getElementById('input-age').value}\n`;
+  if(heightEl && heightEl.value) text += `身高: ${heightEl.value}cm\n`;
+  text += `种族: ${document.getElementById('input-race').value}\n`;
+  text += `职业: ${document.getElementById('input-archetype').value}\n`;
+  text += `阵营: ${document.getElementById('input-alignment').value}\n\n`;
+  
+  text += `【属性】\n`;
+  attributesList.forEach(t => {
+    const v = state.stats[t.id];
+    text += `${t.label}: ${v}/5, `;
+  });
+  
+  text += `\n\n【性格】\n`;
+  personalityList.forEach(p => {
+    const v = state.personality[p.id];
+    if(v !== 3) text += `${v < 3 ? p.left : p.right}, `;
+  });
+  
+  text += `\n\n【外貌】\n`;
+  const s = state.selections;
+  const getSelected = (key) => {
+    if(!s[key]) return '';
+    return Array.isArray(s[key]) ? s[key].join(', ') : s[key];
+  };
+  
+  if(getSelected('hair-length')) text += `头发长度: ${getSelected('hair-length')}\n`;
+  if(getSelected('hair-style')) text += `发型: ${getSelected('hair-style')}\n`;
+  if(getSelected('hair-color')) text += `发色: ${getSelected('hair-color')}\n`;
+  if(getSelected('eye-shape')) text += `眼型: ${getSelected('eye-shape')}\n`;
+  if(getSelected('eye-color')) text += `瞳色: ${getSelected('eye-color')}\n`;
+  if(getSelected('skin-tone')) text += `肤色: ${getSelected('skin-tone')}\n`;
+  if(getSelected('facial-structure')) text += `脸型: ${getSelected('facial-structure')}\n`;
+  if(getSelected('special-marks')) text += `特殊标记: ${getSelected('special-marks')}\n`;
+  if(getSelected('body-build')) text += `体型: ${getSelected('body-build')}\n`;
+  if(getSelected('accessories')) text += `配饰: ${getSelected('accessories')}\n`;
+  if(getSelected('clothing-style')) text += `服装风格: ${getSelected('clothing-style')}\n`;
+  
+  text += `\n【心理特征】\n`;
+  if(getSelected('phobias')) text += `恐惧: ${getSelected('phobias')}\n`;
+  if(getSelected('mental_trauma')) text += `创伤: ${getSelected('mental_trauma')}\n`;
+  if(getSelected('favorite_things')) text += `喜好: ${getSelected('favorite_things')}\n`;
+  if(getSelected('hated_things')) text += `厌恶: ${getSelected('hated_things')}\n`;
+  if(getSelected('social_reputation')) text += `社会评价: ${getSelected('social_reputation')}\n`;
+  if(getSelected('inventory_items')) text += `随身物品: ${getSelected('inventory_items')}\n`;
+  
+  return text;
+}
+
+// ===== EXPORT / IMPORT =====
+function exportCharacter() {
+  const nameEl = document.getElementById('input-name');
+  const heightEl = document.getElementById('input-height');
+  
+  const data = {
+    version: "7.0",
+    timestamp: new Date().toISOString(),
+    basic: {
+      name: nameEl ? nameEl.value : '',
+      gender: document.getElementById('input-gender').value,
+      age: document.getElementById('input-age').value,
+      height: heightEl ? heightEl.value : '',
+      race: document.getElementById('input-race').value,
+      alignment: document.getElementById('input-alignment').value,
+      archetype: document.getElementById('input-archetype').value
+    },
+    stats: state.stats,
+    personality: state.personality,
+    selections: state.selections,
+    questionAnswers: questionAnswers  // Include Step 4 Q&A data
+  };
+  
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `character_${data.basic.archetype || 'unnamed'}_${Date.now()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importCharacter() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target.result);
+        
+        // Restore basic info
+        const nameEl = document.getElementById('input-name');
+        const heightEl = document.getElementById('input-height');
+        
+        if(nameEl) nameEl.value = data.basic.name || '';
+        document.getElementById('input-gender').value = data.basic.gender || '男';
+        document.getElementById('input-age').value = data.basic.age || 20;
+        if(heightEl) heightEl.value = data.basic.height || '';
+        document.getElementById('input-race').value = data.basic.race || '';
+        document.getElementById('input-alignment').value = data.basic.alignment || '绝对中立';
+        document.getElementById('input-archetype').value = data.basic.archetype || '';
+        
+        // Restore stats
+        state.stats = data.stats || {};
+        updateDotVisuals();
+        
+        // Restore personality
+        state.personality = data.personality || {};
+        personalityList.forEach(p => {
+          const el = document.getElementById(`range-${p.id}`);
+          if(el && state.personality[p.id]) {
+            el.value = state.personality[p.id];
+          }
+        });
+        
+        // Restore selections
+        state.selections = data.selections || {};
+        
+        // Restore Step 4 Q&A answers (if available)
+        if(data.questionAnswers) {
+          Object.keys(questionAnswers).forEach(key => delete questionAnswers[key]);
+          Object.assign(questionAnswers, data.questionAnswers);
+        }
+        
+        updatePreview();
+        alert('角色导入成功！');
+      } catch(e) {
+        alert('导入失败：文件格式错误');
+        console.error(e);
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+// ===== AI PROMPT GENERATION =====
+async function generatePrompt() {
+  const btn = event.currentTarget;
+  const originalHTML = btn.innerHTML;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 生成中...';
+  btn.disabled = true;
+  
+  try {
+    const profile = getFullProfile();
+    const prompt = `你是专业的 AI 绘图 Prompt 工程师。根据以下角色信息，生成一个详细的英文 Stable Diffusion / Midjourney 风格的绘图提示词。
+
+角色信息：
+${profile}
+
+要求：
+1. 使用英文，用逗号分隔的关键词格式
+2. 包含：画风、角色外貌、服装、表情、姿势、背景、光影、画质标签
+3. 突出角色的核心特征和个性
+4. 长度控制在 150-200 词
+5. 只输出 prompt 本身，不要解释
+
+示例格式：
+masterpiece, best quality, 1girl, [hair description], [eye description], [clothing], [expression], [pose], [background], detailed, high resolution`;
+
+    const result = await callAI(prompt, 1);
+    const generatedPrompt = result[0] || "生成失败";
+    
+    document.getElementById('prompt-content').textContent = generatedPrompt;
+    document.getElementById('prompt-display').classList.remove('hidden');
+    
+    // Scroll to prompt
+    document.getElementById('prompt-display').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } catch(e) {
+    alert('生成失败：' + e.message);
+  }
+  
+  btn.innerHTML = originalHTML;
+  btn.disabled = false;
+}
+
+function getFullProfile() {
+  let text = `【基础信息】\n`;
+  text += `性别: ${document.getElementById('input-gender').value}\n`;
+  text += `年龄: ${document.getElementById('input-age').value}\n`;
+  text += `种族: ${document.getElementById('input-race').value}\n`;
+  text += `职业: ${document.getElementById('input-archetype').value}\n`;
+  text += `阵营: ${document.getElementById('input-alignment').value}\n\n`;
+  
+  text += `【属性】\n`;
+  attributesList.forEach(t => {
+    const v = state.stats[t.id];
+    if(v > 3 || v < 2) text += `${t.label}: ${v}/5, `;
+  });
+  text += `\n\n【性格】\n`;
+  personalityList.forEach(p => {
+    const v = state.personality[p.id];
+    if(v !== 3) text += `${v < 3 ? p.left : p.right}, `;
+  });
+  
+  text += `\n\n【外貌】\n`;
+  const s = state.selections;
+  if(s['hair-length']) text += `头发: ${s['hair-length']} ${s['hair-style']||''} ${s['hair-color']||''}\n`;
+  if(s['eye-color']) text += `眼睛: ${s['eye-shape']||''} ${s['eye-color']}\n`;
+  if(s['skin-tone']) text += `肤色: ${s['skin-tone']}\n`;
+  if(s['facial-structure']) text += `脸型: ${s['facial-structure']}\n`;
+  if(s['special-marks']) text += `特殊标记: ${s['special-marks']}\n`;
+  if(s['body-build']) text += `体型: ${s['body-build']}\n`;
+  if(s['accessories']) text += `配饰: ${s['accessories']}\n`;
+  if(s['clothing-style']) text += `服装: ${s['clothing-style']} - ${s['clothing-item']||''}\n`;
+  
+  text += `\n【心理特征】\n`;
+  if(s['phobias']) text += `恐惧: ${s['phobias']}\n`;
+  if(s['mental_trauma']) text += `创伤: ${s['mental_trauma']}\n`;
+  if(s['favorite_things']) text += `喜好: ${s['favorite_things']}\n`;
+  if(s['hated_things']) text += `厌恶: ${s['hated_things']}\n`;
+  
+  return text;
+}
+
+function copyPrompt() {
+  const text = document.getElementById('prompt-content').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.currentTarget;
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-check"></i> 已复制';
+    setTimeout(() => btn.innerHTML = orig, 2000);
+  });
+}
+
+// ===== SETTINGS & API =====
+function getCleanUrl(raw) {
+  let u = raw.trim().replace(/\/$/, "");
+  u = u.replace(/\/chat\/completions\/?$/, "");
+  return u;
+}
+
+function updateUrlPreview() {
+  const u = getCleanUrl(document.getElementById('api-url').value);
+  document.getElementById('url-preview').textContent = `${u}/chat/completions`;
+}
+
+function applyPreset() {
+  const v = document.getElementById('api-preset').value;
+  const uIn = document.getElementById('api-url');
+  const mIn = document.getElementById('api-model');
+  
+  if(v==='openai') {
+    uIn.value="https://api.openai.com/v1";
+    mIn.value="gpt-3.5-turbo";
+  } else if(v==='gemini') {
+    uIn.value="https://generativelanguage.googleapis.com/v1beta/openai";
+    mIn.value="gemini-2.0-flash";
+  } else if(v==='deepseek') {
+    uIn.value="https://api.deepseek.com";
+    mIn.value="deepseek-chat";
+  }
+  updateUrlPreview();
+}
+
+async function testConnection() {
+  const key = document.getElementById('api-key').value;
+  const url = getCleanUrl(document.getElementById('api-url').value);
+  const model = document.getElementById('api-model').value;
+  const btn = document.getElementById('btn-test-conn');
+  const stat = document.getElementById('test-status-text');
+  const err = document.getElementById('debug-error-box');
+  
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+  err.classList.add('hidden');
+  
+  const doReq = async (u) => {
+    return await fetch(`${u}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type':'application/json',
+        'Authorization':`Bearer ${key}`
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [{role:"user", content:"hi"}]
+      })
+    });
+  };
+  
+  try {
+    let res = await doReq(url);
+    
+    if(res.status === 404 && url.includes('googleapis') && !url.includes('/openai')) {
+      const fix = `${url}/openai`;
+      const r2 = await doReq(fix);
+      if(r2.ok) {
+        res = r2;
+        document.getElementById('api-url').value = fix;
+        updateUrlPreview();
+      }
+    }
+    
+    if(res.ok) {
+      stat.innerHTML = '<span class="text-green-600 font-bold">✓ 连接成功</span>';
+      state.api.verified = true;
+    } else {
+      throw new Error(`HTTP ${res.status}`);
+    }
+  } catch(e) {
+    stat.innerHTML = '<span class="text-red-500">✗ 连接失败</span>';
+    err.innerHTML = e.message;
+    err.classList.remove('hidden');
+    state.api.verified = false;
+  }
+  
+  btn.disabled = false;
+  btn.innerHTML = "测试连接";
+}
+
+function toggleSettings() {
+  const m = document.getElementById('settings-modal');
+  const c = document.getElementById('modal-content');
+  
+  if(m.classList.contains('pointer-events-none')) {
+    m.classList.remove('opacity-0','pointer-events-none');
+    c.classList.add('scale-100');
+    document.body.classList.add('modal-active');
+  } else {
+    m.classList.add('opacity-0','pointer-events-none');
+    c.classList.remove('scale-100');
+    document.body.classList.remove('modal-active');
+  }
+}
+
+function saveSettings() {
+  state.api.key = document.getElementById('api-key').value;
+  state.api.url = getCleanUrl(document.getElementById('api-url').value);
+  state.api.model = document.getElementById('api-model').value;
+  
+  if(state.api.key) state.api.enabled = true;
+  
+  const dot = document.getElementById('header-status-dot');
+  const txt = document.getElementById('header-status-text');
+  
+  if(state.api.verified) {
+    dot.className = "w-2 h-2 rounded-full bg-green-500";
+    txt.textContent = "AI 在线";
+  } else if (state.api.key) {
+    dot.className = "w-2 h-2 rounded-full bg-yellow-500";
+    txt.textContent = "未验证";
+  }
+  
+  toggleSettings();
+}
+
+// ===== STEP 5: REPORT GENERATION =====
+async function generateReport(format) {
+  const btn = event.currentTarget;
+  const originalHTML = btn.innerHTML;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 生成中...';
+  btn.disabled = true;
+  
+  try {
+    const fullProfile = getFullProfile();
+    
+    // Get deep details from Step 4 questionAnswers
+    let deepDetailsText = '';
+    if(Object.keys(questionAnswers).length > 0) {
+      Object.values(questionAnswers).forEach(qa => {
+        deepDetailsText += `【${qa.category}】\n问题：${qa.question}\n回答：${qa.answer}\n\n`;
+      });
+    }
+    
+    let systemPrompt = '';
+    let formatName = '';
+    
+    switch(format) {
+      case 'novel':
+        formatName = '小说风格角色描述';
+        systemPrompt = `你是专业的小说作家。根据角色信息，写一段800-1000字的第三人称角色描述，包含外貌、性格、背景、特征等。文笔优美，富有画面感。`;
+        break;
+      case 'rpg':
+        formatName = 'TRPG 角色卡片';
+        systemPrompt = `你是TRPG游戏主持人。根据角色信息，生成一份结构化的角色卡片，包含：基础信息、属性数值、技能特长、背景故事、装备物品、性格特质等模块。格式清晰，便于跑团使用。`;
+        break;
+      case 'profile':
+        formatName = '官方档案报告';
+        systemPrompt = `你是档案管理员。根据角色信息，生成一份正式的人物档案，使用官方文档风格，包含：个人信息、身体特征、心理评估、社会关系、重要事件记录等。语言严谨专业。`;
+        break;
+      case 'interview':
+        formatName = '人物访谈记录';
+        systemPrompt = `你是记者。根据角色信息，编写一份访谈记录，用问答形式展现角色性格和经历。包含8-10个问题，角色的回答要符合其性格特征。`;
+        break;
+      case 'diary':
+        formatName = '角色日记';
+        systemPrompt = `你是角色本人。根据角色信息，以第一人称写一篇日记，记录某个重要的一天，展现内心想法、情感变化、对过去的回忆。800字左右，情感真挚。`;
+        break;
+      case 'medical':
+        formatName = '医疗/心理档案';
+        systemPrompt = `你是医生/心理医生。根据角色信息，生成一份医疗档案，包含：生理指标、健康状况、心理评估、创伤记录、治疗建议等。使用专业医学术语。`;
+        break;
+    }
+    
+    const prompt = `${systemPrompt}\n\n【角色完整信息】\n${fullProfile}\n\n${deepDetailsText ? '【深度细节】\n' + deepDetailsText : ''}\n请生成报告：`;
+    
+    const report = await callAIText(prompt);
+    
+    // Display report
+    document.getElementById('report-title').textContent = formatName;
+    document.getElementById('report-time').textContent = new Date().toLocaleString('zh-CN');
+    document.getElementById('report-content').textContent = report;
+    document.getElementById('report-display').classList.remove('hidden');
+    
+    // Scroll to report
+    document.getElementById('report-display').scrollIntoView({ behavior: 'smooth' });
+    
+  } catch(e) {
+    alert('生成失败：' + e.message);
+  }
+  
+  btn.innerHTML = originalHTML;
+  btn.disabled = false;
+}
+
+function copyReport() {
+  const text = document.getElementById('report-content').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.currentTarget;
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-check"></i> 已复制';
+    setTimeout(() => btn.innerHTML = orig, 2000);
+  });
+}
+
+function downloadReport() {
+  const text = document.getElementById('report-content').textContent;
+  const title = document.getElementById('report-title').textContent;
+  const nameEl = document.getElementById('input-name');
+  const name = nameEl ? nameEl.value : '未命名';
+  
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${name}_${title}_${Date.now()}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ===== INIT =====
+window.onload = () => {
+  console.log("=== Character Forge V7.0 Initializing ===");
+  renderStep1();
+  updateUrlPreview();
+  
+  // Pre-fill API settings
+  document.getElementById('api-url').value = state.api.url;
+  document.getElementById('api-key').value = state.api.key;
+  document.getElementById('api-model').value = state.api.model;
+  document.getElementById('api-preset').value = 'deepseek';
+  
+  // Update status
+  const dot = document.getElementById('header-status-dot');
+  const txt = document.getElementById('header-status-text');
+  dot.className = "w-2 h-2 rounded-full bg-green-500";
+  txt.textContent = "DeepSeek 已配置";
+  
+  // Auto-verify connection
+  testConnection();
+  
+  console.log("=== Initialization complete ===");
+};
+</script>
+</body>
+</html>

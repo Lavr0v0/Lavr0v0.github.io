@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Step 4 新交互流程测试</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 p-8">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold text-slate-800 mb-6">Step 4 新交互流程测试</h1>
+    
+    <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
+      <h2 class="text-xl font-bold text-purple-900 mb-4">新的 5 步交互流程</h2>
+      <ol class="list-decimal list-inside space-y-2 text-sm text-slate-700">
+        <li><strong>步骤 1</strong>: AI 问问题 → 用户简要回答</li>
+        <li><strong>步骤 2</strong>: AI 根据用户回答生成详细内容</li>
+        <li><strong>步骤 3</strong>: 用户查看 AI 生成的内容，选择"满意"或"不满意"</li>
+        <li><strong>步骤 4</strong>: 如果不满意，选择修改方式：
+          <ul class="list-disc list-inside ml-6 mt-1">
+            <li>📝 小改：直接修改文本</li>
+            <li>💬 大改：给 AI 提建议，让 AI 重新生成</li>
+          </ul>
+        </li>
+        <li><strong>步骤 5</strong>: 通过后进入下一个问题</li>
+      </ol>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow-lg mb-6">
+      <h2 class="text-xl font-bold text-purple-900 mb-4">API 配置</h2>
+      <div class="space-y-3">
+        <div>
+          <label class="text-sm font-bold text-slate-600">API URL</label>
+          <input type="text" id="api-url" value="https://api.deepseek.com" class="w-full p-2 border rounded text-sm">
+        </div>
+        <div>
+          <label class="text-sm font-bold text-slate-600">API Key</label>
+          <input type="text" id="api-key" value="sk-a6158402691b45cf82f26fa841f2cd27" class="w-full p-2 border rounded text-sm">
+        </div>
+        <button onclick="startTest()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-bold w-full">
+          <i class="fa-solid fa-play"></i> 开始测试新流程
+        </button>
+      </div>
+    </div>
+
+    <div id="test-container" class="bg-white p-6 rounded-xl shadow-lg">
+      <p class="text-center text-slate-400">点击"开始测试新流程"开始</p>
+    </div>
+
+    <div id="answers-log" class="mt-6 bg-slate-800 text-green-400 p-4 rounded-xl font-mono text-xs">
+      <div class="font-bold mb-2">答案记录（调试用）：</div>
+      <div id="log-content">等待开始...</div>
+    </div>
+  </div>
+
+  <script>
+    const questionAnswers = {};
+    let currentQuestions = [];
+    let currentQuestionIndex = 0;
+
+    const mockQuestions = [
+      {
+        id: 'scars',
+        category: '疤痕来源',
+        question: '你选择了以下疤痕：脸部刀疤。请描述这个疤痕是如何形成的？',
+        context: '角色有疤痕: 脸部刀疤'
+      }
+    ];
+
+    function startTest() {
+      currentQuestions = [...mockQuestions];
+      currentQuestionIndex = 0;
+      Object.keys(questionAnswers).forEach(key => delete questionAnswers[key]);
+      updateLog();
+      showQuestion(0);
+    }
+
+    async function showQuestion(index) {
+      if(index >= currentQuestions.length) {
+        showCompletionSummary();
+        return;
+      }
+      
+      currentQuestionIndex = index;
+      const q = currentQuestions[index];
+      const container = document.getElementById('test-container');
+      
+      container.innerHTML = `
+        <div class="bg-white p-6 rounded-xl shadow-sm border-2 border-purple-300">
+          <div class="flex justify-between items-start mb-4">
+            <div>
+              <h4 class="text-lg font-bold text-purple-900 mb-1">步骤 1/5: ${q.category}</h4>
+              <p class="text-xs text-slate-500">问题 ${index + 1} / ${currentQuestions.length}</p>
+            </div>
+          </div>
+          
+          <div class="bg-purple-50 p-4 rounded-lg mb-4">
+            <div class="flex items-start gap-2">
+              <i class="fa-solid fa-robot text-purple-600 text-xl mt-1"></i>
+              <div>
+                <p class="text-xs font-bold text-purple-700 mb-1">AI 的问题：</p>
+                <p class="text-sm text-slate-700 leading-relaxed">${q.question}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mb-4">
+            <label class="text-xs font-bold text-slate-600 uppercase block mb-2">
+              <i class="fa-solid fa-user"></i> 你的回答
+            </label>
+            <textarea id="user-initial-answer" class="w-full p-3 border-2 border-purple-300 rounded-lg text-sm resize-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200" rows="4" placeholder="请简要回答这个问题，AI 会根据你的回答生成详细内容..."></textarea>
+            <p class="text-xs text-slate-500 mt-1">💡 提示：简单描述即可，AI 会帮你扩展成完整内容</p>
+          </div>
+          
+          <div class="flex justify-end pt-4 border-t">
+            <button onclick="submitUserAnswer()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2">
+              <i class="fa-solid fa-paper-plane"></i> 提交回答，让 AI 生成详细内容
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    async function submitUserAnswer() {
+      const userAnswer = document.getElementById('user-initial-answer').value.trim();
+      if(!userAnswer) {
+        alert('请先回答问题');
+        return;
+      }
+      
+      const q = currentQuestions[currentQuestionIndex];
+      const container = document.getElementById('test-container');
+      
+      container.innerHTML = `
+        <div class="bg-white p-6 rounded-xl shadow-sm border-2 border-purple-300">
+          <div class="bg-slate-50 p-6 rounded-lg border border-slate-200 text-center">
+            <i class="fa-solid fa-spinner fa-spin text-3xl text-purple-600 mb-3"></i>
+            <p class="text-sm text-slate-600">AI 正在根据你的回答生成详细内容...</p>
+          </div>
+        </div>
+      `;
+      
+      try {
+        const prompt = `${q.context}\n\n问题：${q.question}\n\n用户的回答：${userAnswer}\n\n请根据用户的回答，用第三人称，生成一段150-200字的详细描述。`;
+        const aiGenerated = await callAIText(prompt);
+        showAIGeneratedContent(userAnswer, aiGenerated);
+      } catch(e) {
+        alert('AI 生成失败：' + e.message);
+        showQuestion(currentQuestionIndex);
+      }
+    }
+
+    function showAIGeneratedContent(userAnswer, aiGenerated) {
+      const container = document.getElementById('test-container');
+      
+      container.innerHTML = `
+        <div class="bg-white p-6 rounded-xl shadow-sm border-2 border-purple-300">
+          <div class="mb-4">
+            <h4 class="text-lg font-bold text-purple-900 mb-1">步骤 3/5: 查看 AI 生成的内容</h4>
+          </div>
+          
+          <div class="bg-blue-50 p-4 rounded-lg mb-3">
+            <div class="flex items-start gap-2">
+              <i class="fa-solid fa-user text-blue-600 text-lg mt-1"></i>
+              <div class="flex-1">
+                <p class="text-xs font-bold text-blue-700 mb-1">你的回答：</p>
+                <p class="text-sm text-slate-700 leading-relaxed">${userAnswer}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-green-50 p-4 rounded-lg mb-4 border-2 border-green-200">
+            <div class="flex items-start gap-2">
+              <i class="fa-solid fa-robot text-green-600 text-lg mt-1"></i>
+              <div class="flex-1">
+                <p class="text-xs font-bold text-green-700 mb-1">AI 生成的详细内容：</p>
+                <p class="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">${aiGenerated}</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-amber-50 p-4 rounded-lg mb-4 border border-amber-200">
+            <p class="text-sm text-amber-800 font-medium mb-2">
+              <i class="fa-solid fa-question-circle"></i> 你对这个内容满意吗？
+            </p>
+            <div class="flex gap-3">
+              <button onclick="approveContent()" class="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-check-circle text-lg"></i>
+                <span>满意，通过</span>
+              </button>
+              <button onclick="showModifyOptions()" class="flex-1 bg-orange-600 hover:bg-orange-700 text-white px-4 py-3 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-edit text-lg"></i>
+                <span>不满意，需要修改</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      window.currentUserAnswer = userAnswer;
+      window.currentAIGenerated = aiGenerated;
+    }
+
+    function showModifyOptions() {
+      const container = document.getElementById('test-container');
+      
+      container.innerHTML = `
+        <div class="bg-white p-6 rounded-xl shadow-sm border-2 border-orange-300">
+          <div class="mb-4">
+            <h4 class="text-lg font-bold text-orange-900 mb-1">步骤 4/5: 选择修改方式</h4>
+          </div>
+          
+          <div class="bg-slate-50 p-4 rounded-lg mb-4">
+            <p class="text-xs font-bold text-slate-600 mb-2">当前 AI 生成的内容：</p>
+            <p class="text-sm text-slate-700 leading-relaxed">${window.currentAIGenerated}</p>
+          </div>
+          
+          <div class="space-y-3">
+            <button onclick="chooseSmallEdit()" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg text-left transition">
+              <div class="flex items-start gap-3">
+                <i class="fa-solid fa-pen text-2xl mt-1"></i>
+                <div>
+                  <p class="font-bold mb-1">📝 小改：直接修改文本</p>
+                  <p class="text-sm opacity-90">适合：改几个字、调整语句、修正细节</p>
+                </div>
+              </div>
+            </button>
+            
+            <button onclick="chooseBigEdit()" class="w-full bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-lg text-left transition">
+              <div class="flex items-start gap-3">
+                <i class="fa-solid fa-comments text-2xl mt-1"></i>
+                <div>
+                  <p class="font-bold mb-1">💬 大改：给 AI 提建议</p>
+                  <p class="text-sm opacity-90">适合：改变方向、增加内容、重新构思</p>
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function chooseSmallEdit() {
+      const container = document.getElementById('test-container');
+      
+      container.innerHTML = `
+        <div class="bg-white p-6 rounded-xl shadow-sm border-2 border-blue-300">
+          <div class="mb-4">
+            <h4 class="text-lg font-bold text-blue-900 mb-1">步骤 5/5: 直接修改文本</h4>
+          </div>
+          
+          <div class="mb-4">
+            <label class="text-xs font-bold text-slate-600 uppercase block mb-2">
+              <i class="fa-solid fa-edit"></i> 编辑内容
+            </label>
+            <textarea id="manual-edit-content" class="w-full p-3 border-2 border-blue-300 rounded-lg text-sm resize-none" rows="8">${window.currentAIGenerated}</textarea>
+          </div>
+          
+          <div class="flex justify-between pt-4 border-t">
+            <button onclick="showModifyOptions()" class="text-slate-400 hover:text-slate-600 px-4 py-2 text-sm">
+              <i class="fa-solid fa-arrow-left"></i> 返回
+            </button>
+            <button onclick="saveManualEdit()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg text-sm font-medium">
+              <i class="fa-solid fa-check"></i> 保存并完成
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function chooseBigEdit() {
+      const container = document.getElementById('test-container');
+      
+      container.innerHTML = `
+        <div class="bg-white p-6 rounded-xl shadow-sm border-2 border-purple-300">
+          <div class="mb-4">
+            <h4 class="text-lg font-bold text-purple-900 mb-1">步骤 5/5: 给 AI 提建议</h4>
+          </div>
+          
+          <div class="bg-slate-50 p-4 rounded-lg mb-4">
+            <p class="text-xs font-bold text-slate-600 mb-2">当前内容：</p>
+            <p class="text-sm text-slate-700 leading-relaxed">${window.currentAIGenerated}</p>
+          </div>
+          
+          <div class="mb-4">
+            <label class="text-xs font-bold text-slate-600 uppercase block mb-2">
+              <i class="fa-solid fa-lightbulb"></i> 你的修改建议
+            </label>
+            <textarea id="ai-suggestion-input" class="w-full p-3 border-2 border-purple-300 rounded-lg text-sm resize-none" rows="4" placeholder="例如：增加更多情感描写、改成悲伤的语气、加入童年回忆的细节..."></textarea>
+          </div>
+          
+          <div class="flex justify-between pt-4 border-t">
+            <button onclick="showModifyOptions()" class="text-slate-400 hover:text-slate-600 px-4 py-2 text-sm">
+              <i class="fa-solid fa-arrow-left"></i> 返回
+            </button>
+            <button onclick="regenerateWithSuggestion()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg text-sm font-medium">
+              <i class="fa-solid fa-magic"></i> 让 AI 重新生成
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function saveManualEdit() {
+      const editedContent = document.getElementById('manual-edit-content').value.trim();
+      const q = currentQuestions[currentQuestionIndex];
+      questionAnswers[q.id] = {
+        category: q.category,
+        question: q.question,
+        userAnswer: window.currentUserAnswer,
+        answer: editedContent,
+        source: 'manual-edit'
+      };
+      updateLog();
+      showCompletionSummary();
+    }
+
+    async function regenerateWithSuggestion() {
+      const suggestion = document.getElementById('ai-suggestion-input').value.trim();
+      if(!suggestion) {
+        alert('请输入你的修改建议');
+        return;
+      }
+      
+      const container = document.getElementById('test-container');
+      container.innerHTML = `
+        <div class="bg-white p-6 rounded-xl shadow-sm border-2 border-purple-300">
+          <div class="bg-slate-50 p-6 rounded-lg text-center">
+            <i class="fa-solid fa-spinner fa-spin text-3xl text-purple-600 mb-3"></i>
+            <p class="text-sm text-slate-600">AI 正在根据你的建议重新生成...</p>
+          </div>
+        </div>
+      `;
+      
+      try {
+        const q = currentQuestions[currentQuestionIndex];
+        const prompt = `${q.context}\n\n问题：${q.question}\n\n用户的回答：${window.currentUserAnswer}\n\n之前生成的内容：${window.currentAIGenerated}\n\n用户的修改建议：${suggestion}\n\n请根据用户的修改建议，重新生成一段150-200字的详细描述。`;
+        const newGenerated = await callAIText(prompt);
+        showAIGeneratedContent(window.currentUserAnswer, newGenerated);
+      } catch(e) {
+        alert('AI 生成失败：' + e.message);
+      }
+    }
+
+    function approveContent() {
+      const q = currentQuestions[currentQuestionIndex];
+      questionAnswers[q.id] = {
+        category: q.category,
+        question: q.question,
+        userAnswer: window.currentUserAnswer,
+        answer: window.currentAIGenerated,
+        source: 'approved'
+      };
+      updateLog();
+      showCompletionSummary();
+    }
+
+    function showCompletionSummary() {
+      const container = document.getElementById('test-container');
+      container.innerHTML = `
+        <div class="bg-green-100 p-6 rounded-xl border border-green-300 text-center">
+          <i class="fa-solid fa-check-circle text-green-600 text-3xl mb-2"></i>
+          <h3 class="text-lg font-bold text-green-900 mb-1">测试完成！</h3>
+          <p class="text-sm text-green-700">查看下方的答案记录</p>
+        </div>
+      `;
+    }
+
+    async function callAIText(prompt) {
+      const apiUrl = document.getElementById('api-url').value;
+      const apiKey = document.getElementById('api-key').value;
+      
+      const res = await fetch(`${apiUrl}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages: [{role: "user", content: prompt}],
+          temperature: 0.8
+        })
+      });
+      
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      return data.choices[0].message.content.trim();
+    }
+
+    function updateLog() {
+      document.getElementById('log-content').innerHTML = JSON.stringify(questionAnswers, null, 2);
+    }
+  </script>
+</body>
+</html>

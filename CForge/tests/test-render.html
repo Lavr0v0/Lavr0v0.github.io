@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Render Section 测试</title>
+<style>
+body { font-family: sans-serif; padding: 20px; }
+.container { border: 2px solid #ccc; padding: 10px; margin: 10px 0; min-height: 50px; }
+button { margin: 5px; padding: 5px 10px; }
+.option-btn { margin: 3px; padding: 5px 10px; border: 1px solid #ccc; background: white; cursor: pointer; }
+.option-btn.selected { background: #333; color: white; }
+</style>
+</head>
+<body>
+<h1>Render Section 测试</h1>
+
+<button onclick="testLocal()">测试本地预设</button>
+<button onclick="testAI()">测试 AI 生成</button>
+<button onclick="clearAll()">清空</button>
+
+<h3>测试容器 1 (本地预设 - 头发长度):</h3>
+<div id="test-container-1" class="container"></div>
+
+<h3>测试容器 2 (AI - 面部特征):</h3>
+<div id="test-container-2" class="container"></div>
+
+<h3>日志:</h3>
+<div id="log" style="background: #f5f5f5; padding: 10px; font-family: monospace; font-size: 12px;"></div>
+
+<script>
+const API_URL = "https://api.deepseek.com";
+const API_KEY = "sk-a6158402691b45cf82f26fa841f2cd27";
+const MODEL = "deepseek-chat";
+
+const LOCAL_PRESETS = {
+  'hair-length': ['寸头', '超短发', '短发', '齐耳', '齐肩', '中长发', '及腰', '及膝', '拖地长发'],
+  'hair-color': ['黑色', '深棕', '浅棕', '金色', '银白', '灰色', '红色', '酒红', '蓝色', '深蓝', '紫色', '粉色', '渐变色', '挑染']
+};
+
+let state = {
+  selections: {}
+};
+
+function log(msg) {
+  const logDiv = document.getElementById('log');
+  logDiv.innerHTML += `[${new Date().toLocaleTimeString()}] ${msg}<br>`;
+  console.log(msg);
+}
+
+function clearAll() {
+  document.getElementById('test-container-1').innerHTML = '';
+  document.getElementById('test-container-2').innerHTML = '';
+  document.getElementById('log').innerHTML = '';
+  state.selections = {};
+}
+
+async function callAI(userPrompt, count = 8) {
+  log("调用 AI: " + userPrompt.substring(0, 50) + "...");
+  
+  try {
+    const res = await fetch(`${API_URL}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${API_KEY}`
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [{
+          role: "system",
+          content: `你是角色生成助手。严格按要求输出JSON数组格式:["选项1","选项2",...],共${count}个中文短词。不要有任何其他文字，只输出JSON数组。`
+        }, {
+          role: "user",
+          content: userPrompt
+        }],
+        temperature: 0.9
+      })
+    });
+    
+    if(!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+    
+    const data = await res.json();
+    let txt = data.choices[0].message.content;
+    log("AI 返回: " + txt);
+    
+    txt = txt.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    
+    try {
+      const parsed = JSON.parse(txt);
+      log("✓ 解析成功，得到 " + parsed.length + " 个选项");
+      return parsed;
+    } catch(parseError) {
+      log("✗ 解析失败: " + parseError.message);
+      const match = txt.match(/\[.*\]/s);
+      if(match) {
+        const extracted = JSON.parse(match[0]);
+        log("✓ 提取成功，得到 " + extracted.length + " 个选项");
+        return extracted;
+      }
+      return ["解析失败"];
+    }
+  } catch(e) {
+    log("✗ AI 调用失败: " + e.message);
+    return ["连接失败"];
+  }
+}
+
+async function renderSection(containerId, category, multiSelect = true) {
+  log(`开始渲染: containerId=${containerId}, category=${category}`);
+  
+  const container = document.getElementById(containerId);
+  
+  if(!container) {
+    log(`✗ 找不到容器: ${containerId}`);
+    return;
+  }
+  
+  log(`✓ 找到容器: ${containerId}`);
+  
+  let options = LOCAL_PRESETS[category];
+  
+  if(options) {
+    log(`✓ 使用本地预设，共 ${options.length} 个选项`);
+  } else {
+    log(`使用 AI 生成...`);
+    container.innerHTML = '<div style="color: #999;">AI 推演中...</div>';
+    
+    const prompt = `生成8个关于${category}的中文短词。只输出JSON数组。`;
+    options = await callAI(prompt, 8);
+    log(`AI 返回 ${options.length} 个选项`);
+  }
+  
+  if(!state.selections[category]) {
+    state.selections[category] = [];
+  }
+  
+  container.innerHTML = '';
+  
+  if(!options || options.length === 0) {
+    log(`✗ 没有选项可渲染`);
+    container.innerHTML = '<div style="color: red;">加载失败</div>';
+    return;
+  }
+  
+  log(`开始创建 ${options.length} 个按钮...`);
+  
+  options.forEach((opt, index) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = opt;
+    
+    if(state.selections[category].includes(opt)) {
+      btn.classList.add('selected');
+    }
+    
+    btn.onclick = () => {
+      if(multiSelect) {
+        if(state.selections[category].includes(opt)) {
+          state.selections[category] = state.selections[category].filter(x => x !== opt);
+          btn.classList.remove('selected');
+          log(`取消选择: ${opt}`);
+        } else {
+          state.selections[category].push(opt);
+          btn.classList.add('selected');
+          log(`选择: ${opt}`);
+        }
+      } else {
+        Array.from(container.children).forEach(c => c.classList.remove('selected'));
+        btn.classList.add('selected');
+        state.selections[category] = [opt];
+        log(`单选: ${opt}`);
+      }
+    };
+    
+    container.appendChild(btn);
+  });
+  
+  log(`✓ 成功渲染 ${options.length} 个按钮`);
+}
+
+async function testLocal() {
+  log("=== 测试本地预设 ===");
+  await renderSection('test-container-1', 'hair-length', true);
+}
+
+async function testAI() {
+  log("=== 测试 AI 生成 ===");
+  await renderSection('test-container-2', 'facial-features', true);
+}
+
+window.onload = () => {
+  log("页面加载完成");
+};
+</script>
+</body>
+</html>

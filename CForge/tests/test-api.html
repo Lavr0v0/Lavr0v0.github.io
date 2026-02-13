@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>API 连接测试</title>
+<style>
+body { font-family: sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+.log { background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 10px 0; font-family: monospace; font-size: 12px; max-height: 400px; overflow-y: auto; }
+button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+.success { color: green; }
+.error { color: red; }
+</style>
+</head>
+<body>
+<h1>DeepSeek API 连接测试</h1>
+
+<div>
+<button onclick="testConnection()">测试连接</button>
+<button onclick="testGeneration()">测试生成</button>
+<button onclick="clearLog()">清空日志</button>
+</div>
+
+<h3>测试日志：</h3>
+<div id="log" class="log"></div>
+
+<script>
+const API_URL = "https://api.deepseek.com";
+const API_KEY = "sk-a6158402691b45cf82f26fa841f2cd27";
+const MODEL = "deepseek-chat";
+
+function log(message, type = 'info') {
+  const logDiv = document.getElementById('log');
+  const time = new Date().toLocaleTimeString();
+  const className = type === 'error' ? 'error' : type === 'success' ? 'success' : '';
+  logDiv.innerHTML += `<div class="${className}">[${time}] ${message}</div>`;
+  logDiv.scrollTop = logDiv.scrollHeight;
+  console.log(message);
+}
+
+function clearLog() {
+  document.getElementById('log').innerHTML = '';
+}
+
+async function testConnection() {
+  log("=== 开始测试连接 ===");
+  log("API URL: " + API_URL);
+  log("Model: " + MODEL);
+  log("API Key: " + (API_KEY ? "已设置 (长度: " + API_KEY.length + ")" : "未设置"));
+  
+  try {
+    log("发送测试请求...");
+    const response = await fetch(`${API_URL}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${API_KEY}`
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [{
+          role: "user",
+          content: "hi"
+        }],
+        max_tokens: 10
+      })
+    });
+    
+    log("响应状态: " + response.status);
+    
+    if(response.ok) {
+      const data = await response.json();
+      log("✓ 连接成功！", 'success');
+      log("响应数据: " + JSON.stringify(data, null, 2));
+    } else {
+      const errorText = await response.text();
+      log("✗ 连接失败", 'error');
+      log("错误信息: " + errorText, 'error');
+    }
+  } catch(e) {
+    log("✗ 请求异常: " + e.message, 'error');
+    log("详细错误: " + e.stack, 'error');
+  }
+}
+
+async function testGeneration() {
+  log("=== 开始测试生成 ===");
+  
+  try {
+    log("请求生成 8 个中文名字...");
+    const response = await fetch(`${API_URL}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${API_KEY}`
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [{
+          role: "system",
+          content: "你是角色生成助手。严格按要求输出JSON数组格式:[\"选项1\",\"选项2\",...],共8个中文短词。不要有任何其他文字，只输出JSON数组。"
+        }, {
+          role: "user",
+          content: "生成8个中文名字。只输出JSON数组。"
+        }],
+        temperature: 0.9
+      })
+    });
+    
+    log("响应状态: " + response.status);
+    
+    if(response.ok) {
+      const data = await response.json();
+      log("原始响应: " + JSON.stringify(data, null, 2));
+      
+      const content = data.choices[0].message.content;
+      log("AI 返回内容: " + content);
+      
+      // Try to parse
+      let cleaned = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      log("清理后内容: " + cleaned);
+      
+      try {
+        const parsed = JSON.parse(cleaned);
+        log("✓ 解析成功！", 'success');
+        log("生成的名字: " + parsed.join(", "), 'success');
+      } catch(parseError) {
+        log("✗ JSON 解析失败", 'error');
+        log("解析错误: " + parseError.message, 'error');
+        
+        // Try to extract array
+        const match = cleaned.match(/\[.*\]/s);
+        if(match) {
+          log("尝试提取数组...");
+          const extracted = JSON.parse(match[0]);
+          log("✓ 提取成功: " + extracted.join(", "), 'success');
+        }
+      }
+    } else {
+      const errorText = await response.text();
+      log("✗ 请求失败", 'error');
+      log("错误信息: " + errorText, 'error');
+    }
+  } catch(e) {
+    log("✗ 请求异常: " + e.message, 'error');
+    log("详细错误: " + e.stack, 'error');
+  }
+}
+
+// Auto test on load
+window.onload = () => {
+  log("页面加载完成，准备测试");
+  log("提示：打开浏览器控制台(F12)可以看到更多信息");
+};
+</script>
+</body>
+</html>

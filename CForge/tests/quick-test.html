@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>快速测试</title>
+<style>
+body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+.test { border: 2px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; }
+.pass { border-color: green; background: #f0fff0; }
+.fail { border-color: red; background: #fff0f0; }
+button { padding: 10px 20px; margin: 5px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }
+button:hover { background: #0056b3; }
+</style>
+</head>
+<body>
+<h1>Character Forge V7.0 快速测试</h1>
+
+<div class="test" id="test-1">
+<h3>测试 1: 页面加载</h3>
+<p id="result-1">等待测试...</p>
+</div>
+
+<div class="test" id="test-2">
+<h3>测试 2: 基础元素</h3>
+<p id="result-2">等待测试...</p>
+</div>
+
+<div class="test" id="test-3">
+<h3>测试 3: API 配置</h3>
+<p id="result-3">等待测试...</p>
+</div>
+
+<button onclick="runTests()">运行测试</button>
+<button onclick="openMain()">打开主程序</button>
+
+<script>
+function pass(testId, message) {
+  document.getElementById(`test-${testId}`).className = 'test pass';
+  document.getElementById(`result-${testId}`).innerHTML = '✓ ' + message;
+}
+
+function fail(testId, message) {
+  document.getElementById(`test-${testId}`).className = 'test fail';
+  document.getElementById(`result-${testId}`).innerHTML = '✗ ' + message;
+}
+
+function runTests() {
+  // Test 1: Page load
+  try {
+    pass(1, '页面加载成功');
+  } catch(e) {
+    fail(1, '页面加载失败: ' + e.message);
+  }
+  
+  // Test 2: Check if main file exists
+  fetch('character-forge-v2.html')
+    .then(res => {
+      if(res.ok) {
+        pass(2, '主程序文件存在 (大小: ' + (res.headers.get('content-length') || '未知') + ' 字节)');
+      } else {
+        fail(2, '主程序文件不存在');
+      }
+    })
+    .catch(e => fail(2, '无法访问主程序: ' + e.message));
+  
+  // Test 3: Check API
+  const API_URL = "https://api.deepseek.com";
+  const API_KEY = "sk-a6158402691b45cf82f26fa841f2cd27";
+  
+  fetch(`${API_URL}/chat/completions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${API_KEY}`
+    },
+    body: JSON.stringify({
+      model: "deepseek-chat",
+      messages: [{role:"user", content:"hi"}],
+      max_tokens: 5
+    })
+  })
+  .then(res => {
+    if(res.ok) {
+      pass(3, 'API 连接正常');
+    } else {
+      fail(3, 'API 返回错误: HTTP ' + res.status);
+    }
+  })
+  .catch(e => fail(3, 'API 连接失败: ' + e.message));
+}
+
+function openMain() {
+  window.open('character-forge-v2.html', '_blank');
+}
+
+window.onload = () => {
+  console.log('Quick test page loaded');
+  runTests();
+};
+</script>
+</body>
+</html>
