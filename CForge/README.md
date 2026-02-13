@@ -54,10 +54,25 @@ Character Forge/
 
 ## API 配置
 
-程序已预配置 DeepSeek API：
-- URL: `https://api.deepseek.com`
-- Key: `sk-a6158402691b45cf82f26fa841f2cd27`
-- Model: `deepseek-chat`
+### 方式 1: 开发者模式（测试/演示）
+适合开发者和测试人员快速体验：
+1. 打开"API 设置"
+2. 点击"开发者模式"
+3. 输入密码：`131313`
+4. 自动配置完成
+
+详细说明：[docs/开发者模式说明.md](docs/开发者模式说明.md)
+
+### 方式 2: 使用自己的 API（推荐）
+适合正式使用：
+1. 选择服务商（OpenAI、Gemini、DeepSeek）
+2. 输入你的 API Key
+3. 测试并保存
+
+**获取 API Key**：
+- OpenAI: https://platform.openai.com/api-keys
+- Google Gemini: https://aistudio.google.com/app/apikey
+- DeepSeek: https://platform.deepseek.com/api_keys
 
 ## 系统要求
 

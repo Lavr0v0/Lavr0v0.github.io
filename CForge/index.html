@@ -490,6 +490,16 @@ body.modal-active { overflow: hidden; }
 <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="toggleSettings()"></div>
 <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 relative z-10 transform transition-all scale-95" id="modal-content">
 <h2 class="text-xl font-bold mb-1">API 设置</h2>
+
+<!-- 开发者模式提示 -->
+<div id="dev-mode-banner" class="hidden bg-amber-50 border border-amber-200 rounded-lg p-3 mt-3 mb-3">
+  <div class="flex items-center gap-2 text-amber-800 text-sm">
+    <i class="fa-solid fa-code"></i>
+    <span class="font-bold">开发者模式已启用</span>
+  </div>
+  <p class="text-xs text-amber-600 mt-1">使用预配置的 API 密钥</p>
+</div>
+
 <div class="space-y-4 mt-4">
 <div>
 <label class="block text-xs font-bold text-slate-700 uppercase mb-2">服务商预设</label>
@@ -505,7 +515,12 @@ body.modal-active { overflow: hidden; }
 <input type="text" id="api-url" oninput="updateUrlPreview()" class="w-full px-4 py-2 rounded-lg border border-slate-300 text-sm font-mono" value="https://generativelanguage.googleapis.com/v1beta/openai">
 </div>
 <div>
-<label class="block text-xs font-bold text-slate-700 uppercase mb-2">API Key</label>
+<label class="block text-xs font-bold text-slate-700 uppercase mb-2 flex items-center justify-between">
+  <span>API Key</span>
+  <button onclick="showDevModePrompt()" class="text-[10px] text-slate-400 hover:text-slate-600 flex items-center gap-1">
+    <i class="fa-solid fa-code"></i> 开发者模式
+  </button>
+</label>
 <input type="password" id="api-key" class="w-full px-4 py-2 rounded-lg border border-slate-300 text-sm font-mono">
 </div>
 <div>
@@ -589,9 +604,10 @@ let state = {
   api: {
     enabled: true,
     verified: false,
-    url: "https://api.deepseek.com",
-    key: "sk-a6158402691b45cf82f26fa841f2cd27",
-    model: "deepseek-chat"
+    url: "",
+    key: "",
+    model: "deepseek-chat",
+    devMode: false  // 开发者模式标记
   }
 };
 
@@ -1891,6 +1907,9 @@ function toggleSettings() {
     m.classList.remove('opacity-0','pointer-events-none');
     c.classList.add('scale-100');
     document.body.classList.add('modal-active');
+    
+    // Check and show dev mode banner if enabled
+    checkDevMode();
   } else {
     m.classList.add('opacity-0','pointer-events-none');
     c.classList.remove('scale-100');
@@ -2013,26 +2032,76 @@ function downloadReport() {
   URL.revokeObjectURL(url);
 }
 
+// ===== DEVELOPER MODE =====
+function showDevModePrompt() {
+  const password = prompt('请输入开发者密码：');
+  if (password === '131313') {
+    enableDevMode();
+  } else if (password !== null) {
+    alert('密码错误');
+  }
+}
+
+function enableDevMode() {
+  state.api.devMode = true;
+  state.api.url = "https://api.deepseek.com";
+  state.api.key = "sk-a6158402691b45cf82f26fa841f2cd27";
+  state.api.model = "deepseek-chat";
+  
+  // Update UI
+  document.getElementById('api-url').value = state.api.url;
+  document.getElementById('api-key').value = state.api.key;
+  document.getElementById('api-model').value = state.api.model;
+  document.getElementById('api-preset').value = 'deepseek';
+  
+  // Show dev mode banner
+  document.getElementById('dev-mode-banner').classList.remove('hidden');
+  
+  // Update header status
+  const dot = document.getElementById('header-status-dot');
+  const txt = document.getElementById('header-status-text');
+  dot.className = "w-2 h-2 rounded-full bg-amber-500";
+  txt.textContent = "开发者模式";
+  
+  alert('开发者模式已启用！\n已自动配置 DeepSeek API。');
+  
+  // Auto test connection
+  testConnection();
+}
+
+function checkDevMode() {
+  if (state.api.devMode) {
+    document.getElementById('dev-mode-banner').classList.remove('hidden');
+    const dot = document.getElementById('header-status-dot');
+    const txt = document.getElementById('header-status-text');
+    dot.className = "w-2 h-2 rounded-full bg-amber-500";
+    txt.textContent = "开发者模式";
+  }
+}
+
 // ===== INIT =====
 window.onload = () => {
   console.log("=== Character Forge V7.0 Initializing ===");
   renderStep1();
   updateUrlPreview();
   
-  // Pre-fill API settings
-  document.getElementById('api-url').value = state.api.url;
-  document.getElementById('api-key').value = state.api.key;
-  document.getElementById('api-model').value = state.api.model;
-  document.getElementById('api-preset').value = 'deepseek';
+  // Check if dev mode is enabled
+  checkDevMode();
   
-  // Update status
-  const dot = document.getElementById('header-status-dot');
-  const txt = document.getElementById('header-status-text');
-  dot.className = "w-2 h-2 rounded-full bg-green-500";
-  txt.textContent = "DeepSeek 已配置";
-  
-  // Auto-verify connection
-  testConnection();
+  // Pre-fill API settings if dev mode
+  if (state.api.devMode) {
+    document.getElementById('api-url').value = state.api.url;
+    document.getElementById('api-key').value = state.api.key;
+    document.getElementById('api-model').value = state.api.model;
+    document.getElementById('api-preset').value = 'deepseek';
+    testConnection();
+  } else {
+    // Update status for normal mode
+    const dot = document.getElementById('header-status-dot');
+    const txt = document.getElementById('header-status-text');
+    dot.className = "w-2 h-2 rounded-full bg-slate-300";
+    txt.textContent = "需配置 AI";
+  }
   
   console.log("=== Initialization complete ===");
 };
