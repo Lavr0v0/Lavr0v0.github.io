@@ -115,7 +115,8 @@
 
             <!-- 闭合括号 -->
             <div class="typing-hidden" id="closing-bracket">
-                <span class="text-base01 select-none mr-4">6</span>
+                <!-- 更新行号为 7，以适应新增的链接 -->
+                <span class="text-base01 select-none mr-4">7</span>
                 <span class="text-base0">};</span>
                 <span class="cursor"></span>
             </div>
@@ -133,10 +134,11 @@
         // 定义要显示的链接配置
         // 格式: [Key颜色, Key文本, Value颜色, Value文本, 链接URL]
         const links = [
-            { key: 'blog',     val: '"./thoughts"', url: 'https://your-blog.com' },
-            { key: 'github',   val: '"./code"',     url: 'https://github.com/your-username' },
-            { key: 'projects', val: '[...works]',   url: '#' },
-            { key: 'email',    val: '"@contact"',   url: 'mailto:your-email@example.com' }
+            { key: 'blog',     val: '"./thoughts"',        url: 'https://your-blog.com' },
+            { key: 'github',   val: '"./code"',            url: 'https://github.com/your-username' },
+            { key: 'cforge',   val: '"./character-forge"', url: '/CForge/' }, // 新增的 CForge 链接
+            { key: 'projects', val: '[...works]',          url: '#' },
+            { key: 'email',    val: '"@contact"',          url: 'mailto:your-email@example.com' }
         ];
 
         const container = document.getElementById('typewriter-area');
