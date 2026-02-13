@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>lavro.org</title>
-    <!-- 添加 Favicon -->
     <link rel="icon" type="image/png" href="/favicon.png">
     
     <!-- 引入 JetBrains Mono -->
@@ -15,7 +14,7 @@
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- 配置 Solarized Dark 主题颜色 -->
+    <!-- 配置深灰色主题 (One Dark 风格) -->
     <script>
         tailwind.config = {
             theme: {
@@ -24,23 +23,18 @@
                         mono: ['"JetBrains Mono"', 'monospace'],
                     },
                     colors: {
-                        // Solarized Dark Palette
-                        base03: '#002b36', // Dark Background
-                        base02: '#073642', // Lighter Background (Selection)
-                        base01: '#586e75', // Comments
-                        base00: '#657b83', 
-                        base0: '#839496',  // Body Text
-                        base1: '#93a1a1',  // Lighter Text
-                        base2: '#eee8d5',
-                        base3: '#fdf6e3',  // Lightest (Title)
-                        yellow: '#b58900',
-                        orange: '#cb4b16',
-                        red: '#dc322f',
-                        magenta: '#d33682',
-                        violet: '#6c71c4',
-                        blue: '#268bd2',
-                        cyan: '#2aa198',
-                        green: '#859900',
+                        // One Darkish Palette
+                        base03: '#282c34', // 深灰色背景
+                        base02: '#3e4451', // 选中行背景
+                        base01: '#5c6370', // 注释
+                        base00: '#abb2bf', // 普通文本
+                        base0: '#e06c75',  // 红色 (Keywords)
+                        base1: '#98c379',  // 绿色 (Strings)
+                        base2: '#e5c07b',  // 黄色 (Functions)
+                        base3: '#61afef',  // 蓝色 (Variables)
+                        cyan: '#56b6c2',
+                        magenta: '#c678dd',
+                        white: '#dcdfe4'
                     }
                 }
             }
@@ -49,17 +43,17 @@
 
     <style>
         body {
-            background-color: #002b36; /* base03: 深色背景 */
-            color: #839496; /* base0: 主体文字 */
+            background-color: #282c34; /* base03 */
+            color: #abb2bf; /* base00 */
         }
         
-        /* 光标动画 - 改为亮色 */
+        /* 光标动画 */
         .cursor::after {
             content: ' ';
             display: inline-block;
             width: 0.6em;
             height: 1.2em;
-            background-color: #93a1a1; /* base1 */
+            background-color: #56b6c2;
             vertical-align: bottom;
             animation: blink 1s step-end infinite;
             margin-left: 2px;
@@ -74,17 +68,73 @@
             display: none;
         }
 
-        /* 链接交互效果：深色高亮 */
+        /* 交互效果 */
         .code-line {
             transition: background-color 0.1s;
         }
-        .code-line:hover {
-            background-color: #073642; /* base02: 选中行背景 */
+        .code-line.interactive:hover {
+            background-color: #3e4451; /* base02 */
             cursor: pointer;
         }
-        .code-line:hover .link-text {
-            color: #268bd2; /* blue */
+        .code-line.interactive:hover .link-text {
+            color: #61afef; /* blue */
             text-decoration: underline;
+        }
+
+        /* 复制成功提示 */
+        .copy-tooltip {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #98c379;
+            color: #282c34;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 50;
+        }
+        .copy-tooltip.show {
+            opacity: 1;
+        }
+
+        /* 音乐播放时的波形动画 */
+        .music-wave {
+            display: inline-flex;
+            align-items: flex-end;
+            height: 12px;
+            margin-left: 8px;
+            display: none; /* 默认隐藏 */
+        }
+        .music-wave.active {
+            display: inline-flex;
+        }
+        .bar {
+            width: 3px;
+            background-color: #98c379;
+            margin-right: 2px;
+            animation: wave 1s infinite ease-in-out;
+        }
+        .bar:nth-child(1) { animation-delay: 0.0s; height: 40%; }
+        .bar:nth-child(2) { animation-delay: 0.2s; height: 100%; }
+        .bar:nth-child(3) { animation-delay: 0.4s; height: 60%; }
+        
+        @keyframes wave {
+            0%, 100% { height: 20%; }
+            50% { height: 100%; }
+        }
+
+        /* 彩蛋触发器样式 */
+        #egg-trigger {
+            transition: color 0.3s;
+            user-select: none;
+        }
+        #egg-trigger:active {
+            color: #e5c07b;
         }
     </style>
 </head>
@@ -93,91 +143,189 @@
     <main class="w-full max-w-lg">
         
         <!-- 顶部标题 -->
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold text-base3">
-                lavro.org<span class="text-base01 text-lg font-normal ml-2">// config</span>
+        <div class="mb-8 select-none">
+            <h1 class="text-3xl font-bold text-white">
+                lavro.org<span id="egg-trigger" class="text-base01 text-lg font-normal ml-2 cursor-pointer hover:text-base00 transition-colors">// config</span>
+                <!-- 音乐波形动画 -->
+                <div id="music-wave" class="music-wave">
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                </div>
             </h1>
         </div>
 
         <!-- 代码区域 -->
         <div class="text-base md:text-lg leading-relaxed" id="code-container">
-            
-            <!-- 行 1 -->
-            <div>
-                <span class="text-base01 select-none mr-4">1</span>
-                <span class="text-green">const</span> <span class="text-blue">me</span> <span class="text-base0">=</span> <span class="text-base0">{</span>
-            </div>
-
-            <!-- 动态生成的链接区域 -->
-            <div id="typewriter-area">
-                <!-- 内容将通过 JS 逐行显示 -->
-            </div>
-
-            <!-- 闭合括号 -->
-            <div class="typing-hidden" id="closing-bracket">
-                <!-- 更新行号为 7，以适应新增的链接 -->
-                <span class="text-base01 select-none mr-4">7</span>
-                <span class="text-base0">};</span>
-                <span class="cursor"></span>
-            </div>
-
+            <!-- 动态生成的区域 -->
+            <div id="typewriter-area"></div>
         </div>
 
         <!-- 极简底部 -->
         <footer class="mt-12 text-xs text-base01 opacity-0 transition-opacity duration-1000" id="footer">
-            <p>-- INSERT MODE --</p>
+            <p>-- NORMAL MODE --</p>
         </footer>
+
+        <!-- 复制提示框 -->
+        <div id="toast" class="copy-tooltip">Copied!</div>
 
     </main>
 
     <script>
-        // 定义要显示的链接配置
-        // 格式: [Key颜色, Key文本, Value颜色, Value文本, 链接URL]
-        const links = [
-            { key: 'blog',     val: '"./thoughts"',        url: 'https://your-blog.com' },
-            { key: 'github',   val: '"./code"',            url: 'https://github.com/your-username' },
-            { key: 'cforge',   val: '"./character-forge"', url: '/CForge/' }, // 新增的 CForge 链接
-            { key: 'projects', val: '[...works]',          url: '#' },
-            { key: 'email',    val: '"@contact"',          url: 'mailto:your-email@example.com' }
+        /* * 配置结构与之前保持一致，颜色类名已适配新主题
+         */
+        const scriptLines = [
+            // Method 1: Connect
+            { type: 'comment', text: '// Method 1: Connect' },
+            { type: 'code',    text: '<span class="text-magenta">return</span> <span class="text-white">{</span>' },
+            
+            { type: 'kv', key: 'email',   val: '"tiphereth_lucis..."', fullVal: 'tiphereth_lucis@outlook.com', action: 'link', url: 'mailto:tiphereth_lucis@outlook.com' },
+            { type: 'kv', key: 'steam',   val: '"Steam Profile"', action: 'link', url: 'https://steamcommunity.com/profiles/76561199125299095/' },
+            { type: 'kv', key: 'discord', val: '"lavro_"', action: 'copy', text: 'lavro_' },
+            { type: 'kv', key: 'qq',      val: '"1041022220"', action: 'copy', text: '1041022220' },
+            
+            { type: 'code',    text: '<span class="text-white">};</span>' },
+            { type: 'spacer' }, 
+
+            // Method 2: Build
+            { type: 'comment', text: '// Method 2: Build' },
+            { type: 'code',    text: '<span class="text-magenta">return</span> <span class="text-white">[</span>' },
+            
+            { type: 'kv', key: null, val: '"Character Forge"', action: 'link', url: '/CForge/', isArrayItem: true },
+            
+            { type: 'code',    text: '<span class="text-white">];</span>' },
         ];
 
         const container = document.getElementById('typewriter-area');
         const footer = document.getElementById('footer');
-        const closing = document.getElementById('closing-bracket');
+        const toast = document.getElementById('toast');
+        const eggTrigger = document.getElementById('egg-trigger');
+        const musicWave = document.getElementById('music-wave');
         
+        // --- 音乐彩蛋逻辑 ---
+        // 使用一首免版权的 Lofi 音乐链接，你也可以替换成你自己的 mp3 链接
+        const audio = new Audio('https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3');
+        audio.loop = true;
+        audio.volume = 0.5;
+
+        let clickCount = 0;
+        let isPlaying = false;
+        let clickTimer;
+
+        eggTrigger.addEventListener('click', () => {
+            if (isPlaying) {
+                // 如果正在播放，点击一次直接暂停
+                toggleMusic(false);
+                clickCount = 0;
+            } else {
+                // 如果未播放，检测三次点击
+                clickCount++;
+                
+                // 简单的视觉反馈
+                eggTrigger.style.color = '#98c379'; // Flash green
+                setTimeout(() => eggTrigger.style.color = '', 150);
+
+                if (clickCount === 3) {
+                    toggleMusic(true);
+                    clickCount = 0;
+                }
+                
+                // 如果超过2秒没点，重置计数
+                clearTimeout(clickTimer);
+                clickTimer = setTimeout(() => {
+                    clickCount = 0;
+                }, 2000);
+            }
+        });
+
+        function toggleMusic(play) {
+            if (play) {
+                audio.play().catch(e => console.log("Audio play failed (interaction required):", e));
+                musicWave.classList.add('active');
+                eggTrigger.textContent = '// playing...';
+                isPlaying = true;
+            } else {
+                audio.pause();
+                musicWave.classList.remove('active');
+                eggTrigger.textContent = '// config';
+                isPlaying = false;
+            }
+        }
+
+        // --- 打字机 & 核心逻辑 ---
+
         let lineIndex = 0;
-        const startLineNum = 2; // 起始行号
+        const startLineNum = 1;
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 2000);
+            });
+        }
 
         function typeLine() {
-            if (lineIndex < links.length) {
-                const item = links[lineIndex];
+            if (lineIndex < scriptLines.length) {
+                const item = scriptLines[lineIndex];
                 const lineNum = startLineNum + lineIndex;
                 
-                // 创建行元素
                 const div = document.createElement('div');
-                div.className = 'code-line pl-0 flex items-center group';
-                div.onclick = () => window.open(item.url, item.url.startsWith('mailto') ? '_self' : '_blank');
+                div.className = 'flex items-center group pl-0';
                 
-                // 构建 HTML
-                div.innerHTML = `
-                    <span class="text-base01 select-none mr-4 opacity-50 group-hover:opacity-100 w-6 text-right inline-block">${lineNum}</span>
-                    <div class="pl-4">
-                        <span class="text-base0">${item.key}:</span> 
-                        <span class="link-text text-cyan group-hover:text-blue transition-colors ml-2">${item.val}</span><span class="text-base0">,</span>
-                    </div>
-                `;
+                const lineNumSpan = `<span class="text-base01 select-none mr-4 opacity-30 w-6 text-right inline-block text-sm pt-1">${lineNum}</span>`;
                 
+                let contentHtml = '';
+
+                if (item.type === 'spacer') {
+                    contentHtml = `<span>&nbsp;</span>`;
+                    div.className += ' h-6';
+                } 
+                else if (item.type === 'comment') {
+                    contentHtml = `<span class="text-base01 italic">${item.text}</span>`;
+                } 
+                else if (item.type === 'code') {
+                    contentHtml = `${item.text}`;
+                } 
+                else if (item.type === 'kv') {
+                    div.className += ' code-line interactive';
+                    
+                    if (item.action === 'link') {
+                        div.onclick = () => window.open(item.url, item.url.startsWith('mailto') ? '_self' : '_blank');
+                    } else if (item.action === 'copy') {
+                        div.onclick = () => copyToClipboard(item.text);
+                    }
+
+                    const keyPart = item.key ? `<span class="text-base0">${item.key}:</span>` : '';
+                    // 链接用青色(cyan)，普通值用绿色(base1)
+                    const valColor = item.action === 'link' ? 'text-cyan' : 'text-base1';
+                    const valPart = `<span class="link-text ${valColor} transition-colors ml-2">${item.val}</span>`;
+                    const comma = `<span class="text-base01">,</span>`;
+                    const comment = item.action === 'copy' ? `<span class="text-base01 text-sm ml-4 opacity-50 hidden group-hover:inline font-sans tracking-wide">// copy</span>` : '';
+
+                    if (item.isArrayItem) {
+                         contentHtml = `<div class="pl-4">${valPart}${comma}</div>`;
+                    } else {
+                         contentHtml = `<div class="pl-4">${keyPart} ${valPart}${comma}${comment}</div>`;
+                    }
+                }
+
+                const cursorHtml = (lineIndex === scriptLines.length - 1) ? '<span class="cursor"></span>' : '';
+
+                div.innerHTML = `${lineNumSpan}<div class="flex-1">${contentHtml}</div>${cursorHtml}`;
+                
+                const prevCursor = container.querySelector('.cursor');
+                if (prevCursor) prevCursor.remove();
+
                 container.appendChild(div);
                 
                 lineIndex++;
-                setTimeout(typeLine, 100); 
+                setTimeout(typeLine, 60); 
             } else {
-                closing.classList.remove('typing-hidden');
                 footer.classList.remove('opacity-0');
             }
         }
 
-        setTimeout(typeLine, 500);
+        setTimeout(typeLine, 300);
 
     </script>
 </body>
