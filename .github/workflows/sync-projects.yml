@@ -56,9 +56,11 @@ jobs:
           git add .
           git commit -m "Sync projects" || echo "No changes"
 
-          # 用 PAT 推送（而不是 github-actions[bot]）
+          # 用 PAT 推送，避免 github-actions[bot] 403
           git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/Lavr0v0/Lavr0v0.github.io.git"
           git push
+
+
 
 
 
