@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout site repo
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Install tools
         run: sudo apt-get update && sudo apt-get install -y jq rsync
@@ -21,6 +23,11 @@ jobs:
           GH_TOKEN: ${{ secrets.SITE_SYNC_TOKEN }}
         run: |
           set -euo pipefail
+
+          if [ ! -f projects.json ]; then
+            echo "projects.json not found in repo root"
+            exit 1
+          fi
 
           jq -c '.[]' projects.json | while read -r p; do
             repo=$(echo "$p" | jq -r '.repo')
@@ -49,16 +56,16 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.SITE_SYNC_TOKEN }}
         run: |
-          echo "token_length=${#GH_TOKEN}"
-          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/Lavr0v0/Lavr0v0.github.io.git"
-          git remote set-url --push origin "https://x-access-token:${GH_TOKEN}@github.com/Lavr0v0/Lavr0v0.github.io.git"
-          git remote -v
-          git push origin HEAD:main
+          set -euo pipefail
 
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
+          git add .
+          git commit -m "Sync projects" || { echo "No changes"; exit 0; }
 
+          # 防止 actions/checkout 注入的默认凭证抢占
+          git config --global --unset-all credential.helper || true
 
-
-
-
-
+          # 直接用 PAT 推送（绕过 origin）
+          git push "https://x-access-token:${GH_TOKEN}@github.com/Lavr0v0/Lavr0v0.github.io.git" HEAD:main
