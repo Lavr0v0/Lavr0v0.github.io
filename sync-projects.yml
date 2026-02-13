@@ -1,0 +1,65 @@
+name: Sync projects into site repo
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "projects.json"
+  schedule:
+    - cron: "*/2 * * * *"  # 每30分钟同步一次（想更频繁可改）
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout site repo
+        uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq rsync
+
+      - name: Read projects.json and sync
+        env:
+          GH_TOKEN: ${{ secrets.SITE_SYNC_TOKEN }}
+        run: |
+          set -e
+
+          if [ ! -f projects.json ]; then
+            echo "projects.json not found"
+            exit 1
+          fi
+
+          # 清理旧的 staging
+          rm -rf _staging
+          mkdir -p _staging
+
+          # 遍历项目清单
+          jq -c '.[]' projects.json | while read -r p; do
+            repo=$(echo "$p" | jq -r '.repo')
+            branch=$(echo "$p" | jq -r '.branch')
+            source=$(echo "$p" | jq -r '.source')
+            target=$(echo "$p" | jq -r '.target')
+
+            echo "Syncing $repo ($branch): $source -> $target"
+
+            rm -rf _staging/src
+            git clone --depth 1 --branch "$branch" "https://x-access-token:${GH_TOKEN}@github.com/${repo}.git" _staging/src
+
+            rm -rf "${target}"
+            mkdir -p "${target}"
+
+            rsync -av --delete \
+              --exclude ".git" \
+              --exclude ".github" \
+              --exclude ".DS_Store" \
+              "_staging/src/${source}/" "${target}/"
+          done
+
+      - name: Commit & push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add .
+          git commit -m "Sync projects: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" || echo "No changes"
+          git push
