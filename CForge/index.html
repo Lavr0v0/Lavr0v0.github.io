@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>灵感铸造厂 V7.0 - Ultimate Edition</title>
+<title>灵感铸造厂 V7.1 - Ultimate Edition</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <style>
@@ -15,105 +15,64 @@ body {
   background-color: #f1f5f9; 
 }
 
-/* ===== 页面切换动画 ===== */
+/* ===== 性能优化：启用硬件加速 ===== */
+.step-panel,
+.option-btn,
+.dot,
+.card-hover,
+.modal,
+input[type=range].spectrum-slider::-webkit-slider-thumb {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* ===== 页面切换动画（优化） ===== */
 .step-panel { 
   display: none; 
   opacity: 0; 
-  transform: translateY(20px);
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .step-panel.active { 
   display: block; 
-  opacity: 1; 
-  transform: translateY(0);
-  animation: slideInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeIn 0.3s ease-out forwards;
 }
 
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-/* ===== 按钮动画 ===== */
+/* ===== 按钮动画（简化） ===== */
 .option-btn { 
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-}
-.option-btn::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
-  transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
-}
-.option-btn:active::before {
-  width: 300px;
-  height: 300px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
 }
 .option-btn:hover:not(:disabled) { 
-  transform: translateY(-3px) scale(1.02); 
-  box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px) translateZ(0); 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 .option-btn:active:not(:disabled) { 
-  transform: translateY(-1px) scale(0.98);
-  transition: all 0.1s;
+  transform: translateY(0) translateZ(0);
 }
 .option-btn.selected { 
   background-color: #0f172a; 
   color: white; 
   border-color: #0f172a; 
-  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.3);
-  animation: selectPulse 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.3);
 }
 
-@keyframes selectPulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
-/* ===== AI 加载动画 ===== */
+/* ===== AI 加载动画（优化） ===== */
 .ai-loading { 
-  animation: aiPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; 
+  animation: aiPulse 2s ease-in-out infinite; 
   pointer-events: none;
-  position: relative;
-}
-.ai-loading::after {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: inherit;
-  background: linear-gradient(45deg, #3b82f6, #8b5cf6, #ec4899, #3b82f6);
-  background-size: 300% 300%;
-  animation: gradientShift 3s ease infinite;
-  opacity: 0.3;
-  z-index: -1;
 }
 
 @keyframes aiPulse { 
-  0%, 100% { opacity: 0.5; transform: scale(1); } 
-  50% { opacity: 1; transform: scale(1.02); } 
+  0%, 100% { opacity: 0.6; } 
+  50% { opacity: 1; } 
 }
 
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* ===== 属性点动画 ===== */
+/* ===== 属性点动画（简化） ===== */
 .dot-group { 
   display: flex; 
   gap: 4px; 
@@ -125,34 +84,20 @@ body {
   border-radius: 50%; 
   border: 2px solid #94a3b8; 
   background-color: white; 
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-}
-.dot::before {
-  content: '';
-  position: absolute;
-  inset: -4px;
-  border-radius: 50%;
-  background: rgba(51, 65, 85, 0.1);
-  transform: scale(0);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.dot:hover::before {
-  transform: scale(1);
+  transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
 }
 .dot.active { 
   background-color: #334155; 
   border-color: #334155;
-  transform: scale(1.15);
-  box-shadow: 0 0 0 3px rgba(51, 65, 85, 0.2);
+  transform: scale(1.1) translateZ(0);
 }
 .dot:hover { 
   border-color: #64748b; 
   background-color: #e2e8f0;
-  transform: scale(1.2);
+  transform: scale(1.15) translateZ(0);
 }
 
-/* ===== 滑块动画 ===== */
+/* ===== 滑块动画（优化） ===== */
 input[type=range].spectrum-slider {
   -webkit-appearance: none;
   appearance: none;
@@ -168,50 +113,36 @@ input[type=range].spectrum-slider::-webkit-slider-thumb {
   background: #334155;
   cursor: pointer; 
   margin-top: -6px;
-  box-shadow: 0 0 0 3px white, 0 0 0 4px #cbd5e1, 0 2px 8px rgba(0,0,0,0.1);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 0 3px white, 0 0 0 4px #cbd5e1;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 input[type=range].spectrum-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-  box-shadow: 0 0 0 3px white, 0 0 0 5px #94a3b8, 0 4px 12px rgba(0,0,0,0.15);
-}
-input[type=range].spectrum-slider::-webkit-slider-thumb:active {
-  transform: scale(1.1);
+  transform: scale(1.15) translateZ(0);
+  box-shadow: 0 0 0 3px white, 0 0 0 5px #94a3b8;
 }
 input[type=range].spectrum-slider::-webkit-slider-runnable-track {
   width: 100%; 
   height: 4px; 
   cursor: pointer;
-  background: linear-gradient(to right, #e2e8f0 0%, #cbd5e1 50%, #e2e8f0 100%); 
+  background: #e2e8f0; 
   border-radius: 2px;
-  transition: background 0.3s;
-}
-input[type=range].spectrum-slider:hover::-webkit-slider-runnable-track {
-  background: linear-gradient(to right, #cbd5e1 0%, #94a3b8 50%, #cbd5e1 100%);
 }
 
-/* ===== 模态框动画 ===== */
+/* ===== 模态框动画（简化） ===== */
 .modal { 
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(0px);
-}
-.modal:not(.pointer-events-none) {
-  backdrop-filter: blur(4px);
-}
-.modal-content {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.2s ease;
 }
 body.modal-active { 
   overflow: hidden; 
 }
 
-/* ===== 卡片悬停动画 ===== */
+/* ===== 卡片悬停动画（优化） ===== */
 .card-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px) translateZ(0);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 /* ===== 加载旋转动画 ===== */
@@ -223,41 +154,13 @@ body.modal-active {
   animation: spin 1s linear infinite;
 }
 
-/* ===== 淡入动画 ===== */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-.fade-in {
-  animation: fadeIn 0.5s ease-in-out;
-}
-
-/* ===== 弹跳动画 ===== */
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-.bounce {
-  animation: bounce 2s ease-in-out infinite;
-}
-
 /* ===== 脉冲动画 ===== */
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
 .pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* ===== 摇晃动画 ===== */
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-  20%, 40%, 60%, 80% { transform: translateX(5px); }
-}
-.shake {
-  animation: shake 0.5s ease-in-out;
+  animation: pulse 2s ease-in-out infinite;
 }
 
 /* ===== 滚动条美化 ===== */
@@ -269,19 +172,18 @@ body.modal-active {
   background: transparent; 
 }
 ::-webkit-scrollbar-thumb { 
-  background: linear-gradient(180deg, #cbd5e1, #94a3b8); 
+  background: #cbd5e1; 
   border-radius: 4px;
-  transition: background 0.3s;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #94a3b8, #64748b);
+  background: #94a3b8;
 }
 
 /* ===== 开发者模式横幅动画 ===== */
 @keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(-10px);
   }
   to {
     opacity: 1;
@@ -289,15 +191,7 @@ body.modal-active {
   }
 }
 #dev-mode-banner:not(.hidden) {
-  animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* ===== 按钮点击波纹效果 ===== */
-@keyframes ripple {
-  to {
-    transform: scale(4);
-    opacity: 0;
-  }
+  animation: slideDown 0.3s ease-out;
 }
 </style>
 </head>
@@ -306,13 +200,13 @@ body.modal-active {
 <header class="bg-white border-b border-slate-200 z-20 flex-none shadow-sm">
 <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
 <div class="flex items-center gap-3">
-<div class="w-9 h-9 bg-slate-800 rounded-lg flex items-center justify-center text-white shadow-lg transition-all duration-300 hover:scale-110 hover:rotate-12 hover:shadow-xl">
+<div class="w-9 h-9 bg-slate-800 rounded-lg flex items-center justify-center text-white shadow-lg transition-transform duration-200 hover:scale-105">
 <i class="fa-solid fa-drafting-compass"></i>
 </div>
 <div>
-<h1 class="font-bold text-lg leading-tight tracking-tight">灵感铸造厂 <span class="text-slate-500 text-xs align-top">V7.0</span></h1>
-<div class="text-[10px] text-slate-400 font-mono flex items-center gap-1 cursor-pointer hover:text-slate-600 transition-all duration-300 hover:scale-105" onclick="toggleSettings()">
-<span id="header-status-dot" class="w-2 h-2 rounded-full bg-slate-300 transition-all duration-300"></span>
+<h1 class="font-bold text-lg leading-tight tracking-tight">灵感铸造厂 <span class="text-slate-500 text-xs align-top">V7.1</span></h1>
+<div class="text-[10px] text-slate-400 font-mono flex items-center gap-1 cursor-pointer hover:text-slate-600 transition-colors duration-200" onclick="toggleSettings()">
+<span id="header-status-dot" class="w-2 h-2 rounded-full bg-slate-300 transition-colors duration-200"></span>
 <span id="header-status-text">需配置 AI</span>
 </div>
 </div>
@@ -326,14 +220,14 @@ body.modal-active {
 <span id="step-dot-5">5.最终报告</span>
 </div>
 <div class="flex gap-2">
-<button onclick="exportCharacter()" class="text-slate-500 hover:text-slate-800 transition-all duration-300 p-2 rounded-full hover:bg-slate-100 hover:scale-110 hover:rotate-12" title="导出角色">
+<button onclick="exportCharacter()" class="text-slate-500 hover:text-slate-800 transition-all duration-200 p-2 rounded-full hover:bg-slate-100" title="导出角色">
 <i class="fa-solid fa-download text-lg"></i>
 </button>
-<button onclick="importCharacter()" class="text-slate-500 hover:text-slate-800 transition-all duration-300 p-2 rounded-full hover:bg-slate-100 hover:scale-110 hover:-rotate-12" title="导入角色">
+<button onclick="importCharacter()" class="text-slate-500 hover:text-slate-800 transition-all duration-200 p-2 rounded-full hover:bg-slate-100" title="导入角色">
 <i class="fa-solid fa-upload text-lg"></i>
 </button>
-<button onclick="toggleSettings()" class="text-slate-500 hover:text-slate-800 transition-all duration-300 p-2 rounded-full hover:bg-slate-100 relative group hover:scale-110" title="API 设置">
-<i class="fa-solid fa-gear text-lg group-hover:rotate-90 transition-transform duration-300"></i>
+<button onclick="toggleSettings()" class="text-slate-500 hover:text-slate-800 transition-all duration-200 p-2 rounded-full hover:bg-slate-100 relative group" title="API 设置">
+<i class="fa-solid fa-gear text-lg"></i>
 <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full hidden pulse" id="config-alert-dot"></span>
 </button>
 </div>
@@ -535,8 +429,8 @@ body.modal-active {
 
 <div class="flex justify-between pt-4">
 <button onclick="goToStep(1)" class="text-slate-400 hover:text-slate-600 px-4 py-2 font-medium">返回修改数值</button>
-<button onclick="finishStep2()" class="bg-slate-900 hover:bg-black text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-slate-300 transition-all duration-300 flex items-center gap-2 group hover:scale-105 hover:shadow-xl hover:shadow-slate-400">
-<span>下一步:注入灵魂</span> <i class="fa-solid fa-arrow-right group-hover:translate-x-2 transition-transform duration-300"></i>
+<button onclick="finishStep2()" class="bg-slate-900 hover:bg-black text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-slate-300 transition-all duration-200 flex items-center gap-2 group">
+<span>下一步:注入灵魂</span> <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform duration-200"></i>
 </button>
 </div>
 </div>
@@ -596,8 +490,8 @@ body.modal-active {
 
 <div class="flex justify-between pt-4">
 <button onclick="goToStep(2)" class="text-slate-400 hover:text-slate-600 px-4 py-2 font-medium">返回修改外貌</button>
-<button onclick="finishStep3()" class="bg-slate-900 hover:bg-black text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-slate-300 transition-all duration-300 flex items-center gap-2 group hover:scale-105 hover:shadow-xl hover:shadow-slate-400">
-<span>下一步：深度细化</span> <i class="fa-solid fa-arrow-right group-hover:translate-x-2 transition-transform duration-300"></i>
+<button onclick="finishStep3()" class="bg-slate-900 hover:bg-black text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-slate-300 transition-all duration-200 flex items-center gap-2 group">
+<span>下一步：深度细化</span> <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform duration-200"></i>
 </button>
 </div>
 </div>
@@ -716,40 +610,97 @@ body.modal-active {
 
 <!-- Right: Preview -->
 <aside class="hidden lg:block w-80 bg-white border-l border-slate-200 p-6 z-10 flex flex-col">
-<h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
-<i class="fa-regular fa-id-card text-slate-400"></i> 实时档案
-</h3>
-<div id="preview-card" class="bg-slate-50 rounded-lg p-5 border border-slate-200 text-sm space-y-4 flex-1 overflow-y-auto font-mono text-xs">
-<div class="border-b border-slate-200 pb-3">
-<div class="text-[10px] uppercase text-slate-400 font-bold mb-1">IDENTITY</div>
-<div class="font-bold text-base text-slate-800 mb-1" id="p-name">未命名</div>
-<div class="flex justify-between items-baseline">
-<span class="font-bold text-sm text-slate-700" id="p-archetype">???</span>
-<span class="text-slate-500" id="p-gender">-</span>
+<div class="flex items-center justify-between mb-4">
+  <h3 class="font-bold text-slate-800 flex items-center gap-2">
+    <i class="fa-regular fa-id-card text-slate-400"></i> 实时档案
+  </h3>
+  <div class="flex gap-1">
+    <button onclick="exportPreview('txt')" class="text-slate-400 hover:text-slate-600 p-1.5 rounded hover:bg-slate-100 transition-colors" title="导出 TXT">
+      <i class="fa-solid fa-file-lines text-sm"></i>
+    </button>
+    <button onclick="exportPreview('md')" class="text-slate-400 hover:text-slate-600 p-1.5 rounded hover:bg-slate-100 transition-colors" title="导出 Markdown">
+      <i class="fa-brands fa-markdown text-sm"></i>
+    </button>
+    <button onclick="exportPreview('png')" class="text-slate-400 hover:text-slate-600 p-1.5 rounded hover:bg-slate-100 transition-colors" title="导出图片">
+      <i class="fa-solid fa-image text-sm"></i>
+    </button>
+    <button onclick="copyPreview()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded hover:bg-slate-100 transition-colors" title="复制文本">
+      <i class="fa-solid fa-copy text-sm"></i>
+    </button>
+  </div>
 </div>
-<div class="mt-1 flex gap-2 text-slate-500 text-[10px]">
-<span id="p-race">种族: ?</span> | <span id="p-age">Age: ?</span> | <span id="p-height">H: ?</span>
-</div>
-<div class="mt-1 text-slate-500" id="p-alignment">阵营: ?</div>
-</div>
-<div class="border-b border-slate-200 pb-3">
-<div class="text-[10px] uppercase text-slate-400 font-bold mb-2">STATS</div>
-<div class="grid grid-cols-2 gap-y-1 gap-x-2" id="p-stats"></div>
-</div>
-<div class="border-b border-slate-200 pb-3">
-<div class="text-[10px] uppercase text-slate-400 font-bold mb-2">PERSONALITY</div>
-<div class="space-y-1" id="p-personality"></div>
-</div>
-<div>
-<div class="text-[10px] uppercase text-slate-400 font-bold mb-2">VISUALS</div>
-<ul class="space-y-1 text-slate-600 list-disc list-inside" id="p-visuals">
-<li class="italic text-slate-300">等待生成...</li>
-</ul>
-</div>
-<div class="border-t border-slate-200 pt-3 mt-3">
-<div class="text-[10px] uppercase text-slate-400 font-bold mb-2">SOUL</div>
-<div class="flex flex-wrap gap-1" id="p-soul"></div>
-</div>
+
+<div id="preview-card" class="bg-slate-50 rounded-lg p-5 border border-slate-200 text-sm space-y-4 flex-1 overflow-y-auto">
+  <!-- 照片区域 -->
+  <div class="flex justify-center mb-4">
+    <div class="relative group">
+      <div id="character-photo-container" class="w-32 h-32 rounded-lg border-2 border-dashed border-slate-300 bg-slate-100 flex items-center justify-center overflow-hidden cursor-pointer hover:border-slate-400 transition-colors" onclick="document.getElementById('photo-upload').click()">
+        <div id="photo-placeholder" class="text-center">
+          <i class="fa-solid fa-user text-4xl text-slate-300 mb-1"></i>
+          <p class="text-xs text-slate-400">点击上传照片</p>
+        </div>
+        <img id="character-photo" class="hidden w-full h-full object-cover" />
+      </div>
+      <button onclick="removePhoto()" id="remove-photo-btn" class="hidden absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors">
+        <i class="fa-solid fa-times text-xs"></i>
+      </button>
+    </div>
+    <input type="file" id="photo-upload" accept="image/*" class="hidden" onchange="handlePhotoUpload(event)" />
+  </div>
+
+  <!-- 基础信息 -->
+  <div class="border-b border-slate-200 pb-3">
+    <div class="text-[10px] uppercase text-slate-400 font-bold mb-1 flex items-center gap-1">
+      <i class="fa-solid fa-id-badge"></i> IDENTITY
+    </div>
+    <div class="font-bold text-base text-slate-800 mb-1" id="p-name">未命名</div>
+    <div class="flex justify-between items-baseline">
+      <span class="font-bold text-sm text-slate-700" id="p-archetype">???</span>
+      <span class="text-slate-500" id="p-gender">-</span>
+    </div>
+    <div class="mt-1 flex gap-2 text-slate-500 text-[10px]">
+      <span id="p-race"><i class="fa-solid fa-dna"></i> ?</span> | 
+      <span id="p-age"><i class="fa-solid fa-cake-candles"></i> ?</span> | 
+      <span id="p-height"><i class="fa-solid fa-ruler-vertical"></i> ?</span>
+    </div>
+    <div class="mt-1 text-slate-500 text-[10px]" id="p-alignment">
+      <i class="fa-solid fa-balance-scale"></i> 阵营: ?
+    </div>
+  </div>
+
+  <!-- 属性 -->
+  <div class="border-b border-slate-200 pb-3">
+    <div class="text-[10px] uppercase text-slate-400 font-bold mb-2 flex items-center gap-1">
+      <i class="fa-solid fa-chart-bar"></i> STATS
+    </div>
+    <div class="grid grid-cols-2 gap-y-1 gap-x-2 text-[10px]" id="p-stats"></div>
+  </div>
+
+  <!-- 性格 -->
+  <div class="border-b border-slate-200 pb-3">
+    <div class="text-[10px] uppercase text-slate-400 font-bold mb-2 flex items-center gap-1">
+      <i class="fa-solid fa-brain"></i> PERSONALITY
+    </div>
+    <div class="space-y-1 text-[10px]" id="p-personality"></div>
+  </div>
+
+  <!-- 外貌 -->
+  <div class="border-b border-slate-200 pb-3">
+    <div class="text-[10px] uppercase text-slate-400 font-bold mb-2 flex items-center gap-1">
+      <i class="fa-solid fa-eye"></i> APPEARANCE
+    </div>
+    <ul class="space-y-1 text-slate-600 list-none text-[10px]" id="p-visuals">
+      <li class="italic text-slate-300">等待生成...</li>
+    </ul>
+  </div>
+
+  <!-- 心理特征 -->
+  <div>
+    <div class="text-[10px] uppercase text-slate-400 font-bold mb-2 flex items-center gap-1">
+      <i class="fa-solid fa-heart"></i> TRAITS
+    </div>
+    <div class="flex flex-wrap gap-1" id="p-soul"></div>
+  </div>
 </div>
 </aside>
 </div>
@@ -1224,15 +1175,15 @@ function updatePreview() {
   
   document.getElementById('p-archetype').textContent = document.getElementById('input-archetype').value || '???';
   document.getElementById('p-gender').textContent = document.getElementById('input-gender').value;
-  document.getElementById('p-race').textContent = '种族: ' + (document.getElementById('input-race').value || '?');
-  document.getElementById('p-age').textContent = 'Age: ' + document.getElementById('input-age').value;
+  document.getElementById('p-race').innerHTML = `<i class="fa-solid fa-dna"></i> ${document.getElementById('input-race').value || '?'}`;
+  document.getElementById('p-age').innerHTML = `<i class="fa-solid fa-cake-candles"></i> ${document.getElementById('input-age').value}`;
   
   const heightEl = document.getElementById('input-height');
   if(heightEl && heightEl.value) {
-    document.getElementById('p-height').textContent = 'H: ' + heightEl.value + 'cm';
+    document.getElementById('p-height').innerHTML = `<i class="fa-solid fa-ruler-vertical"></i> ${heightEl.value}cm`;
   }
   
-  document.getElementById('p-alignment').textContent = '阵营: ' + document.getElementById('input-alignment').value;
+  document.getElementById('p-alignment').innerHTML = `<i class="fa-solid fa-balance-scale"></i> ${document.getElementById('input-alignment').value}`;
 
   const sDiv = document.getElementById('p-stats');
   sDiv.innerHTML = '';
@@ -1261,7 +1212,7 @@ function updatePreview() {
   const vList = document.getElementById('p-visuals');
   vList.innerHTML = '';
   const s = state.selections;
-  const add = (txt) => { if(txt) vList.innerHTML += `<li>${txt}</li>`; };
+  const add = (txt) => { if(txt) vList.innerHTML += `<li class="flex items-start gap-1"><i class="fa-solid fa-circle text-[4px] mt-1.5 text-slate-400"></i><span>${txt}</span></li>`; };
   
   // Helper to get selected items (handles both array and string)
   const getSelected = (key) => {
@@ -1295,6 +1246,262 @@ function updatePreview() {
         soulDiv.appendChild(tag);
       });
     }
+  });
+}
+
+// ===== PHOTO UPLOAD =====
+let characterPhoto = null;
+
+function handlePhotoUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  if (!file.type.startsWith('image/')) {
+    alert('请上传图片文件');
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    characterPhoto = e.target.result;
+    const img = document.getElementById('character-photo');
+    const placeholder = document.getElementById('photo-placeholder');
+    const removeBtn = document.getElementById('remove-photo-btn');
+    
+    img.src = characterPhoto;
+    img.classList.remove('hidden');
+    placeholder.classList.add('hidden');
+    removeBtn.classList.remove('hidden');
+  };
+  reader.readAsDataURL(file);
+}
+
+function removePhoto() {
+  characterPhoto = null;
+  const img = document.getElementById('character-photo');
+  const placeholder = document.getElementById('photo-placeholder');
+  const removeBtn = document.getElementById('remove-photo-btn');
+  
+  img.classList.add('hidden');
+  img.src = '';
+  placeholder.classList.remove('hidden');
+  removeBtn.classList.add('hidden');
+  document.getElementById('photo-upload').value = '';
+}
+
+// ===== PREVIEW EXPORT =====
+function getPreviewText() {
+  const nameEl = document.getElementById('input-name');
+  const name = nameEl ? nameEl.value : '未命名';
+  const archetype = document.getElementById('input-archetype').value || '???';
+  const gender = document.getElementById('input-gender').value;
+  const race = document.getElementById('input-race').value || '?';
+  const age = document.getElementById('input-age').value;
+  const heightEl = document.getElementById('input-height');
+  const height = heightEl && heightEl.value ? heightEl.value + 'cm' : '?';
+  const alignment = document.getElementById('input-alignment').value;
+  
+  let text = `═══════════════════════════════════════\n`;
+  text += `  角色档案 - ${name}\n`;
+  text += `═══════════════════════════════════════\n\n`;
+  
+  text += `【基础信息】\n`;
+  text += `姓名: ${name}\n`;
+  text += `职业: ${archetype}\n`;
+  text += `性别: ${gender}\n`;
+  text += `种族: ${race}\n`;
+  text += `年龄: ${age}\n`;
+  text += `身高: ${height}\n`;
+  text += `阵营: ${alignment}\n\n`;
+  
+  text += `【属性】\n`;
+  attributesList.forEach(t => {
+    const v = state.stats[t.id] || 3;
+    text += `${t.label}: ${'★'.repeat(v)}${'☆'.repeat(5-v)} (${v}/5)\n`;
+  });
+  
+  text += `\n【性格倾向】\n`;
+  personalityList.forEach(p => {
+    const v = state.personality[p.id] || 3;
+    if(v !== 3) {
+      text += `${v < 3 ? p.left : p.right}\n`;
+    }
+  });
+  
+  const s = state.selections;
+  const getSelected = (key) => {
+    if(!s[key]) return '';
+    if(Array.isArray(s[key])) return s[key].join(', ');
+    return s[key];
+  };
+  
+  text += `\n【外貌特征】\n`;
+  if(getSelected('hair-length')) text += `头发: ${getSelected('hair-length')} ${getSelected('hair-style')} (${getSelected('hair-color')})\n`;
+  if(getSelected('eye-color')) text += `眼睛: ${getSelected('eye-color')} ${getSelected('eye-shape')}\n`;
+  if(getSelected('skin-tone')) text += `肤色: ${getSelected('skin-tone')}\n`;
+  if(getSelected('facial-structure')) text += `脸型: ${getSelected('facial-structure')}\n`;
+  if(getSelected('special-marks')) text += `特殊标记: ${getSelected('special-marks')}\n`;
+  if(getSelected('body-build')) text += `体型: ${getSelected('body-build')}\n`;
+  if(getSelected('accessories')) text += `配饰: ${getSelected('accessories')}\n`;
+  if(getSelected('clothing-style')) text += `服装: ${getSelected('clothing-style')} - ${getSelected('clothing-item')}\n`;
+  
+  text += `\n【心理特征】\n`;
+  if(getSelected('phobias')) text += `恐惧: ${getSelected('phobias')}\n`;
+  if(getSelected('mental_trauma')) text += `创伤: ${getSelected('mental_trauma')}\n`;
+  if(getSelected('favorite_things')) text += `喜好: ${getSelected('favorite_things')}\n`;
+  if(getSelected('hated_things')) text += `厌恶: ${getSelected('hated_things')}\n`;
+  if(getSelected('social_reputation')) text += `评价: ${getSelected('social_reputation')}\n`;
+  if(getSelected('inventory_items')) text += `物品: ${getSelected('inventory_items')}\n`;
+  
+  text += `\n═══════════════════════════════════════\n`;
+  text += `生成时间: ${new Date().toLocaleString('zh-CN')}\n`;
+  text += `═══════════════════════════════════════\n`;
+  
+  return text;
+}
+
+function getPreviewMarkdown() {
+  const nameEl = document.getElementById('input-name');
+  const name = nameEl ? nameEl.value : '未命名';
+  const archetype = document.getElementById('input-archetype').value || '???';
+  const gender = document.getElementById('input-gender').value;
+  const race = document.getElementById('input-race').value || '?';
+  const age = document.getElementById('input-age').value;
+  const heightEl = document.getElementById('input-height');
+  const height = heightEl && heightEl.value ? heightEl.value + 'cm' : '?';
+  const alignment = document.getElementById('input-alignment').value;
+  
+  let md = `# ${name}\n\n`;
+  
+  if(characterPhoto) {
+    md += `![角色照片](${characterPhoto})\n\n`;
+  }
+  
+  md += `## 基础信息\n\n`;
+  md += `- **姓名**: ${name}\n`;
+  md += `- **职业**: ${archetype}\n`;
+  md += `- **性别**: ${gender}\n`;
+  md += `- **种族**: ${race}\n`;
+  md += `- **年龄**: ${age}\n`;
+  md += `- **身高**: ${height}\n`;
+  md += `- **阵营**: ${alignment}\n\n`;
+  
+  md += `## 属性\n\n`;
+  md += `| 属性 | 等级 |\n`;
+  md += `|------|------|\n`;
+  attributesList.forEach(t => {
+    const v = state.stats[t.id] || 3;
+    md += `| ${t.label} | ${'★'.repeat(v)}${'☆'.repeat(5-v)} (${v}/5) |\n`;
+  });
+  
+  md += `\n## 性格倾向\n\n`;
+  personalityList.forEach(p => {
+    const v = state.personality[p.id] || 3;
+    if(v !== 3) {
+      md += `- ${v < 3 ? p.left : p.right}\n`;
+    }
+  });
+  
+  const s = state.selections;
+  const getSelected = (key) => {
+    if(!s[key]) return '';
+    if(Array.isArray(s[key])) return s[key].join(', ');
+    return s[key];
+  };
+  
+  md += `\n## 外貌特征\n\n`;
+  if(getSelected('hair-length')) md += `- **头发**: ${getSelected('hair-length')} ${getSelected('hair-style')} (${getSelected('hair-color')})\n`;
+  if(getSelected('eye-color')) md += `- **眼睛**: ${getSelected('eye-color')} ${getSelected('eye-shape')}\n`;
+  if(getSelected('skin-tone')) md += `- **肤色**: ${getSelected('skin-tone')}\n`;
+  if(getSelected('facial-structure')) md += `- **脸型**: ${getSelected('facial-structure')}\n`;
+  if(getSelected('special-marks')) md += `- **特殊标记**: ${getSelected('special-marks')}\n`;
+  if(getSelected('body-build')) md += `- **体型**: ${getSelected('body-build')}\n`;
+  if(getSelected('accessories')) md += `- **配饰**: ${getSelected('accessories')}\n`;
+  if(getSelected('clothing-style')) md += `- **服装**: ${getSelected('clothing-style')} - ${getSelected('clothing-item')}\n`;
+  
+  md += `\n## 心理特征\n\n`;
+  if(getSelected('phobias')) md += `- **恐惧**: ${getSelected('phobias')}\n`;
+  if(getSelected('mental_trauma')) md += `- **创伤**: ${getSelected('mental_trauma')}\n`;
+  if(getSelected('favorite_things')) md += `- **喜好**: ${getSelected('favorite_things')}\n`;
+  if(getSelected('hated_things')) md += `- **厌恶**: ${getSelected('hated_things')}\n`;
+  if(getSelected('social_reputation')) md += `- **评价**: ${getSelected('social_reputation')}\n`;
+  if(getSelected('inventory_items')) md += `- **物品**: ${getSelected('inventory_items')}\n`;
+  
+  md += `\n---\n\n`;
+  md += `*生成时间: ${new Date().toLocaleString('zh-CN')}*\n`;
+  
+  return md;
+}
+
+function exportPreview(format) {
+  const nameEl = document.getElementById('input-name');
+  const name = nameEl ? nameEl.value : '未命名';
+  
+  if(format === 'txt') {
+    const text = getPreviewText();
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${name}_档案_${Date.now()}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  } else if(format === 'md') {
+    const md = getPreviewMarkdown();
+    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${name}_档案_${Date.now()}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+  } else if(format === 'png') {
+    exportPreviewAsPNG();
+  }
+}
+
+async function exportPreviewAsPNG() {
+  const card = document.getElementById('preview-card');
+  
+  try {
+    // 使用 html2canvas 库（需要先加载）
+    if(typeof html2canvas === 'undefined') {
+      // 动态加载 html2canvas
+      const script = document.createElement('script');
+      script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+      script.onload = () => exportPreviewAsPNG();
+      document.head.appendChild(script);
+      return;
+    }
+    
+    const canvas = await html2canvas(card, {
+      backgroundColor: '#f8fafc',
+      scale: 2,
+      logging: false
+    });
+    
+    const nameEl = document.getElementById('input-name');
+    const name = nameEl ? nameEl.value : '未命名';
+    
+    canvas.toBlob((blob) => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${name}_档案_${Date.now()}.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  } catch(e) {
+    alert('导出图片失败：' + e.message);
+  }
+}
+
+function copyPreview() {
+  const text = getPreviewText();
+  navigator.clipboard.writeText(text).then(() => {
+    alert('已复制到剪贴板！');
+  }).catch(() => {
+    alert('复制失败，请手动复制');
   });
 }
 
@@ -2350,7 +2557,7 @@ function checkDevMode() {
 
 // ===== INIT =====
 window.onload = () => {
-  console.log("=== Character Forge V7.0 Initializing ===");
+  console.log("=== Character Forge V7.1 Initializing ===");
   renderStep1();
   updateUrlPreview();
   

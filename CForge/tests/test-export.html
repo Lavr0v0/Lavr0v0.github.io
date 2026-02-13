@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>导出功能测试 - Character Forge V7.1</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 p-8">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-2xl font-bold mb-6">导出功能测试</h1>
+    
+    <div class="bg-white rounded-lg p-6 mb-6">
+      <h2 class="text-lg font-bold mb-4">测试步骤</h2>
+      <ol class="list-decimal list-inside space-y-2 text-sm">
+        <li>打开 <code class="bg-slate-100 px-2 py-1 rounded">index.html</code></li>
+        <li>填写角色基础信息（姓名、职业等）</li>
+        <li>在右侧预览面板点击照片上传区域，上传一张测试图片</li>
+        <li>测试以下导出功能：
+          <ul class="list-disc list-inside ml-6 mt-2 space-y-1">
+            <li><i class="fa-solid fa-file-lines"></i> 导出 TXT - 应生成带边框的纯文本文件</li>
+            <li><i class="fa-brands fa-markdown"></i> 导出 Markdown - 应生成包含照片的 .md 文件</li>
+            <li><i class="fa-solid fa-image"></i> 导出图片 - 应生成预览卡片的 PNG 截图</li>
+            <li><i class="fa-solid fa-copy"></i> 复制文本 - 应复制纯文本到剪贴板</li>
+          </ul>
+        </li>
+      </ol>
+    </div>
+
+    <div class="bg-white rounded-lg p-6 mb-6">
+      <h2 class="text-lg font-bold mb-4">预期结果</h2>
+      <div class="space-y-4 text-sm">
+        <div class="border-l-4 border-blue-500 pl-4">
+          <h3 class="font-bold mb-1">TXT 导出</h3>
+          <ul class="list-disc list-inside space-y-1 text-slate-600">
+            <li>文件名格式: <code>[角色名]_档案_[时间戳].txt</code></li>
+            <li>包含 ═══ 边框装饰</li>
+            <li>包含所有角色信息（基础、属性、性格、外貌、心理）</li>
+            <li>属性显示为 ★☆ 星级</li>
+          </ul>
+        </div>
+
+        <div class="border-l-4 border-green-500 pl-4">
+          <h3 class="font-bold mb-1">Markdown 导出</h3>
+          <ul class="list-disc list-inside space-y-1 text-slate-600">
+            <li>文件名格式: <code>[角色名]_档案_[时间戳].md</code></li>
+            <li>如果上传了照片，应在顶部显示图片（Base64 编码）</li>
+            <li>使用 Markdown 格式（标题、列表、表格）</li>
+            <li>属性以表格形式展示</li>
+          </ul>
+        </div>
+
+        <div class="border-l-4 border-purple-500 pl-4">
+          <h3 class="font-bold mb-1">PNG 导出</h3>
+          <ul class="list-disc list-inside space-y-1 text-slate-600">
+            <li>文件名格式: <code>[角色名]_档案_[时间戳].png</code></li>
+            <li>首次使用会自动加载 html2canvas 库</li>
+            <li>生成预览卡片的高清截图（2x scale）</li>
+            <li>包含上传的照片（如果有）</li>
+          </ul>
+        </div>
+
+        <div class="border-l-4 border-orange-500 pl-4">
+          <h3 class="font-bold mb-1">复制文本</h3>
+          <ul class="list-disc list-inside space-y-1 text-slate-600">
+            <li>复制与 TXT 导出相同的格式</li>
+            <li>显示"已复制到剪贴板"提示</li>
+            <li>可直接粘贴到任何文本编辑器</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg p-6">
+      <h2 class="text-lg font-bold mb-4">功能清单</h2>
+      <div class="space-y-2">
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">照片上传功能正常（点击上传、显示预览）</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">照片删除功能正常（点击 X 按钮）</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">TXT 导出成功下载</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">Markdown 导出成功下载且包含照片</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">PNG 导出成功下载且包含照片</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">复制文本功能正常</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">所有导出按钮 hover 效果正常</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">图标显示正常（Font Awesome）</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div class="flex items-start gap-2">
+        <i class="fa-solid fa-info-circle text-blue-500 mt-0.5"></i>
+        <div class="text-sm text-blue-800">
+          <p class="font-bold mb-1">注意事项</p>
+          <ul class="list-disc list-inside space-y-1">
+            <li>PNG 导出首次使用需要加载 html2canvas 库，可能需要几秒钟</li>
+            <li>照片会以 Base64 格式嵌入 Markdown 文件中</li>
+            <li>确保浏览器允许下载多个文件</li>
+            <li>测试时建议使用小尺寸图片（< 1MB）</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
