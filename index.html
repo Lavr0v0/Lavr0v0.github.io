@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lavro | Navigation</title>
+    <!-- 引入 JetBrains Mono 字体，这是最受欢迎的编程字体之一 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- 配置自定义颜色以匹配 Solarized Light 主题 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        // Solarized Light Palette
+                        base03: '#002b36',
+                        base02: '#073642',
+                        base01: '#586e75',
+                        base00: '#657b83',
+                        base0: '#839496',
+                        base1: '#93a1a1',
+                        base2: '#eee8d5',
+                        base3: '#fdf6e3', // 米色背景
+                        yellow: '#b58900',
+                        orange: '#cb4b16',
+                        red: '#dc322f',
+                        magenta: '#d33682',
+                        violet: '#6c71c4',
+                        blue: '#268bd2',
+                        cyan: '#2aa198',
+                        green: '#859900',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #fdf6e3; /* Solarized Base3 */
+            color: #657b83; /* Solarized Base00 */
+        }
+        
+        /* 光标闪烁动画 */
+        .cursor-blink {
+            animation: blink 1s step-end infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* 链接悬停时的微互动 */
+        .nav-item {
+            transition: all 0.2s ease;
+        }
+        .nav-item:hover {
+            transform: translateX(8px);
+            border-left-color: #268bd2; /* Blue */
+            background-color: rgba(238, 232, 213, 0.5); /* Base2 with opacity */
+        }
+    </style>
+</head>
+<body class="font-mono min-h-screen flex items-center justify-center p-6 selection:bg-base2 selection:text-base01">
+
+    <main class="w-full max-w-2xl">
+        <!-- 头部区域 -->
+        <header class="mb-12">
+            <div class="text-sm text-base1 mb-2">
+                <span class="text-green">➜</span> <span class="text-blue">~</span> <span class="text-base1">whoami</span>
+            </div>
+            
+            <h1 class="text-4xl md:text-5xl font-bold text-base01 mb-4">
+                Lavro<span class="text-orange">.dev</span><span class="cursor-blink inline-block w-3 h-8 md:h-10 bg-base01 ml-1 align-middle"></span>
+            </h1>
+            
+            <div class="text-base00 leading-relaxed space-y-2 border-l-2 border-base2 pl-4">
+                <p>
+                    <span class="text-base1 opacity-50">1</span> 
+                    <span class="text-magenta">class</span> <span class="text-yellow">Lavro</span> {
+                </p>
+                <p>
+                    <span class="text-base1 opacity-50">2</span> 
+                    &nbsp;&nbsp;<span class="text-base1">// 欢迎来到我的导航页</span>
+                </p>
+                <p>
+                    <span class="text-base1 opacity-50">3</span> 
+                    &nbsp;&nbsp;<span class="text-base1">// 保持简洁，保持好奇</span>
+                </p>
+                <p>
+                    <span class="text-base1 opacity-50">4</span> 
+                    }
+                </p>
+            </div>
+        </header>
+
+        <!-- 导航链接区域 -->
+        <section>
+            <h2 class="text-sm uppercase tracking-widest text-base1 mb-6 border-b border-base2 pb-2">Navigation Index</h2>
+            
+            <div class="space-y-3">
+                
+                <!-- 链接 1: 博客 -->
+                <a href="https://your-blog-link.com" target="_blank" class="nav-item block border-l-4 border-base2 pl-4 py-3 group cursor-pointer">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-violet">const</span> 
+                            <span class="text-blue">blog</span> 
+                            <span class="text-base01">=</span> 
+                            <span class="text-cyan">"我的博客"</span>;
+                        </div>
+                        <span class="text-base2 group-hover:text-base1 text-xs opacity-0 group-hover:opacity-100 transition-opacity">./blog</span>
+                    </div>
+                </a>
+
+                <!-- 链接 2: GitHub -->
+                <a href="https://github.com/your-username" target="_blank" class="nav-item block border-l-4 border-base2 pl-4 py-3 group cursor-pointer">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-violet">import</span> 
+                            <span class="text-blue">Code</span> 
+                            <span class="text-base01">from</span> 
+                            <span class="text-cyan">"GitHub"</span>;
+                        </div>
+                        <span class="text-base2 group-hover:text-base1 text-xs opacity-0 group-hover:opacity-100 transition-opacity">git clone</span>
+                    </div>
+                </a>
+
+                <!-- 链接 3: 项目 -->
+                <a href="#" class="nav-item block border-l-4 border-base2 pl-4 py-3 group cursor-pointer">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-violet">let</span> 
+                            <span class="text-blue">projects</span> 
+                            <span class="text-base01">=</span> 
+                            <span class="text-green">[ ...Works ]</span>;
+                        </div>
+                        <span class="text-base2 group-hover:text-base1 text-xs opacity-0 group-hover:opacity-100 transition-opacity">./dist</span>
+                    </div>
+                </a>
+
+                <!-- 链接 4: 关于/联系 -->
+                <a href="mailto:your-email@example.com" class="nav-item block border-l-4 border-base2 pl-4 py-3 group cursor-pointer">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-yellow">@Connect</span>(<span class="text-cyan">"Email"</span>)
+                        </div>
+                        <span class="text-base2 group-hover:text-base1 text-xs opacity-0 group-hover:opacity-100 transition-opacity">send()</span>
+                    </div>
+                </a>
+
+            </div>
+        </section>
+
+        <!-- 底部 -->
+        <footer class="mt-16 text-center text-xs text-base1">
+            <p>© 2024 Lavro. All systems operational.</p>
+        </footer>
+    </main>
+
+    <script>
+        // 可选：添加简单的控制台彩蛋
+        console.log(
+            "%c Hello Lavro! ",
+            "background: #2aa198; color: #fdf6e3; padding: 4px; border-radius: 4px;"
+        );
+    </script>
+</body>
+</html>
