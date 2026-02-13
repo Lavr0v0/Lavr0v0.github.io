@@ -5,6 +5,9 @@ on:
   push:
     paths:
       - "projects.json"
+  schedule:
+    - cron: "*/10 * * * *"
+
 
 jobs:
   sync:
@@ -69,3 +72,4 @@ jobs:
 
           # 直接用 PAT 推送（绕过 origin）
           git push "https://x-access-token:${GH_TOKEN}@github.com/Lavr0v0/Lavr0v0.github.io.git" HEAD:main
+
