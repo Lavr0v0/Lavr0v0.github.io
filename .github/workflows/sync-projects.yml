@@ -59,7 +59,9 @@ jobs:
           # 用 PAT 推送，避免 github-actions[bot] 403
           git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/Lavr0v0/Lavr0v0.github.io.git"
           git remote set-url --push origin "https://x-access-token:${GH_TOKEN}@github.com/Lavr0v0/Lavr0v0.github.io.git"
+          git remote -v
           git push origin HEAD:main
+
 
 
 
