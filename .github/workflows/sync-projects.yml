@@ -45,22 +45,16 @@ jobs:
               "$work/${source}/" "${target}/"
           done
 
-
       - name: Commit & push if changed
         env:
           GH_TOKEN: ${{ secrets.SITE_SYNC_TOKEN }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          git add .
-          git commit -m "Sync projects" || echo "No changes"
-
-          # 用 PAT 推送，避免 github-actions[bot] 403
+          echo "token_length=${#GH_TOKEN}"
           git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/Lavr0v0/Lavr0v0.github.io.git"
           git remote set-url --push origin "https://x-access-token:${GH_TOKEN}@github.com/Lavr0v0/Lavr0v0.github.io.git"
           git remote -v
           git push origin HEAD:main
+
 
 
 
