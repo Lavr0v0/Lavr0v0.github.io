@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>lavro.org</title>
+    <!-- 添加 Favicon -->
+    <link rel="icon" type="image/png" href="/favicon.png">
+    
     <!-- 引入 JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,7 +15,7 @@
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- 配置 Solarized Light 主题 -->
+    <!-- 配置 Solarized Dark 主题颜色 -->
     <script>
         tailwind.config = {
             theme: {
@@ -21,14 +24,15 @@
                         mono: ['"JetBrains Mono"', 'monospace'],
                     },
                     colors: {
-                        base03: '#002b36',
-                        base02: '#073642',
-                        base01: '#586e75',
-                        base00: '#657b83',
-                        base0: '#839496',
-                        base1: '#93a1a1',
+                        // Solarized Dark Palette
+                        base03: '#002b36', // Dark Background
+                        base02: '#073642', // Lighter Background (Selection)
+                        base01: '#586e75', // Comments
+                        base00: '#657b83', 
+                        base0: '#839496',  // Body Text
+                        base1: '#93a1a1',  // Lighter Text
                         base2: '#eee8d5',
-                        base3: '#fdf6e3',
+                        base3: '#fdf6e3',  // Lightest (Title)
                         yellow: '#b58900',
                         orange: '#cb4b16',
                         red: '#dc322f',
@@ -45,17 +49,17 @@
 
     <style>
         body {
-            background-color: #fdf6e3;
-            color: #657b83;
+            background-color: #002b36; /* base03: 深色背景 */
+            color: #839496; /* base0: 主体文字 */
         }
         
-        /* 光标动画 */
+        /* 光标动画 - 改为亮色 */
         .cursor::after {
             content: ' ';
             display: inline-block;
             width: 0.6em;
             height: 1.2em;
-            background-color: #586e75;
+            background-color: #93a1a1; /* base1 */
             vertical-align: bottom;
             animation: blink 1s step-end infinite;
             margin-left: 2px;
@@ -66,17 +70,16 @@
             50% { opacity: 0; }
         }
 
-        /* 隐藏未打字的内容 */
         .typing-hidden {
             display: none;
         }
 
-        /* 链接交互效果：整行高亮 */
+        /* 链接交互效果：深色高亮 */
         .code-line {
             transition: background-color 0.1s;
         }
         .code-line:hover {
-            background-color: #eee8d5; /* base2 */
+            background-color: #073642; /* base02: 选中行背景 */
             cursor: pointer;
         }
         .code-line:hover .link-text {
@@ -91,8 +94,8 @@
         
         <!-- 顶部标题 -->
         <div class="mb-8">
-            <h1 class="text-3xl font-bold text-base03">
-                lavro.org<span class="text-base1 text-lg font-normal ml-2">// config</span>
+            <h1 class="text-3xl font-bold text-base3">
+                lavro.org<span class="text-base01 text-lg font-normal ml-2">// config</span>
             </h1>
         </div>
 
@@ -101,26 +104,26 @@
             
             <!-- 行 1 -->
             <div>
-                <span class="text-base1 select-none mr-4">1</span>
-                <span class="text-violet">const</span> <span class="text-blue">me</span> <span class="text-base01">=</span> <span class="text-base01">{</span>
+                <span class="text-base01 select-none mr-4">1</span>
+                <span class="text-green">const</span> <span class="text-blue">me</span> <span class="text-base0">=</span> <span class="text-base0">{</span>
             </div>
 
-            <!-- 动态生成的链接区域 (为了打字机效果，初始隐藏或由JS生成) -->
+            <!-- 动态生成的链接区域 -->
             <div id="typewriter-area">
                 <!-- 内容将通过 JS 逐行显示 -->
             </div>
 
             <!-- 闭合括号 -->
             <div class="typing-hidden" id="closing-bracket">
-                <span class="text-base1 select-none mr-4">6</span>
-                <span class="text-base01">};</span>
+                <span class="text-base01 select-none mr-4">6</span>
+                <span class="text-base0">};</span>
                 <span class="cursor"></span>
             </div>
 
         </div>
 
         <!-- 极简底部 -->
-        <footer class="mt-12 text-xs text-base1 opacity-0 transition-opacity duration-1000" id="footer">
+        <footer class="mt-12 text-xs text-base01 opacity-0 transition-opacity duration-1000" id="footer">
             <p>-- INSERT MODE --</p>
         </footer>
 
@@ -155,26 +158,23 @@
                 
                 // 构建 HTML
                 div.innerHTML = `
-                    <span class="text-base1 select-none mr-4 opacity-50 group-hover:opacity-100 w-6 text-right inline-block">${lineNum}</span>
+                    <span class="text-base01 select-none mr-4 opacity-50 group-hover:opacity-100 w-6 text-right inline-block">${lineNum}</span>
                     <div class="pl-4">
-                        <span class="text-base00">${item.key}:</span> 
-                        <span class="link-text text-cyan group-hover:text-blue transition-colors ml-2">${item.val}</span><span class="text-base01">,</span>
+                        <span class="text-base0">${item.key}:</span> 
+                        <span class="link-text text-cyan group-hover:text-blue transition-colors ml-2">${item.val}</span><span class="text-base0">,</span>
                     </div>
                 `;
                 
                 container.appendChild(div);
                 
                 lineIndex++;
-                // 随机延迟模拟打字节奏
                 setTimeout(typeLine, 100); 
             } else {
-                // 动画结束，显示闭合括号和页脚
                 closing.classList.remove('typing-hidden');
                 footer.classList.remove('opacity-0');
             }
         }
 
-        // 页面加载后稍微延迟开始动画
         setTimeout(typeLine, 500);
 
     </script>
