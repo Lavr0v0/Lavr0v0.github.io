@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>灵感铸造厂 V7.1 - Ultimate Edition</title>
+<title>灵感铸造厂 V7.2 - Ultimate Edition</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <style>
@@ -204,7 +204,7 @@ body.modal-active {
 <i class="fa-solid fa-drafting-compass"></i>
 </div>
 <div>
-<h1 class="font-bold text-lg leading-tight tracking-tight">灵感铸造厂 <span class="text-slate-500 text-xs align-top">V7.1</span></h1>
+<h1 class="font-bold text-lg leading-tight tracking-tight">灵感铸造厂 <span class="text-slate-500 text-xs align-top">V7.2</span></h1>
 <div class="text-[10px] text-slate-400 font-mono flex items-center gap-1 cursor-pointer hover:text-slate-600 transition-colors duration-200" onclick="toggleSettings()">
 <span id="header-status-dot" class="w-2 h-2 rounded-full bg-slate-300 transition-colors duration-200"></span>
 <span id="header-status-text">需配置 AI</span>
@@ -256,9 +256,9 @@ body.modal-active {
 <h3 class="text-xs font-bold text-slate-400 uppercase mb-4 tracking-wider border-b pb-2">基础信息</h3>
 <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
 <div class="col-span-2 md:col-span-3">
-<label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">姓名</label>
+<label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">姓名 <span class="text-red-500">*</span></label>
 <div class="flex gap-2">
-<input type="text" id="input-name" class="w-full text-sm border-slate-300 rounded focus:border-slate-500 focus:ring-0 py-1.5 px-2 bg-slate-50" placeholder="角色姓名">
+<input type="text" id="input-name" class="w-full text-sm border-slate-300 rounded focus:border-slate-500 focus:ring-0 py-1.5 px-2 bg-slate-50" placeholder="角色姓名" required>
 <button onclick="generateSingleField('name')" class="px-3 bg-slate-800 hover:bg-black text-white rounded text-xs flex items-center gap-1 min-w-[80px] justify-center">
 <i class="fa-solid fa-magic"></i> 生成
 </button>
@@ -305,9 +305,9 @@ body.modal-active {
 </select>
 </div>
 <div class="col-span-2 md:col-span-6">
-<label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">核心身份 / 职业</label>
+<label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase">核心身份 / 职业 <span class="text-red-500">*</span></label>
 <div class="flex gap-2">
-<input type="text" id="input-archetype" class="w-full text-sm border-slate-300 rounded focus:border-slate-500 focus:ring-0 py-1.5 px-2 bg-slate-50" placeholder="例如：落魄的赛博侦探">
+<input type="text" id="input-archetype" class="w-full text-sm border-slate-300 rounded focus:border-slate-500 focus:ring-0 py-1.5 px-2 bg-slate-50" placeholder="例如：落魄的赛博侦探" required>
 <button onclick="generateSingleField('archetype')" class="px-3 bg-slate-800 hover:bg-black text-white rounded text-xs flex items-center gap-1 min-w-[80px] justify-center">
 <i class="fa-solid fa-magic"></i> 生成
 </button>
@@ -444,6 +444,7 @@ body.modal-active {
 <h3 class="font-bold text-slate-800 text-sm">AI 深度推演</h3>
 <p class="text-xs text-slate-500 mt-1">根据【<span id="summary-archetype" class="font-bold"></span>】的设定，AI 预测了以下深层特征。</p>
 <p class="text-xs text-purple-600 mt-1">💡 可以选择多个选项</p>
+<p class="text-xs text-blue-600 mt-2">💾 完成此步骤后可导出<strong>基础版</strong>（不含 AI 深度细化内容）</p>
 </div>
 </div>
 </div>
@@ -490,9 +491,14 @@ body.modal-active {
 
 <div class="flex justify-between pt-4">
 <button onclick="goToStep(2)" class="text-slate-400 hover:text-slate-600 px-4 py-2 font-medium">返回修改外貌</button>
+<div class="flex gap-3">
+<button onclick="exportCharacter('basic')" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-blue-200 transition flex items-center gap-2" title="导出基础信息（不含AI生成内容）">
+<i class="fa-solid fa-download"></i> <span>导出基础版</span>
+</button>
 <button onclick="finishStep3()" class="bg-slate-900 hover:bg-black text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-slate-300 transition-all duration-200 flex items-center gap-2 group">
 <span>下一步：深度细化</span> <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform duration-200"></i>
 </button>
+</div>
 </div>
 </div>
 
@@ -526,6 +532,7 @@ body.modal-active {
 <div>
 <h3 class="font-bold text-green-900 text-sm">最终报告生成</h3>
 <p class="text-xs text-green-700 mt-1">选择报告格式，AI 将生成完整的角色档案</p>
+<p class="text-xs text-blue-700 mt-2">💾 完成报告后可导出<strong>完整版</strong>（包含所有 AI 生成内容）</p>
 </div>
 </div>
 </div>
@@ -600,9 +607,14 @@ body.modal-active {
 
 <div class="flex justify-between pt-4">
 <button onclick="goToStep(4)" class="text-slate-400 hover:text-slate-600 px-4 py-2 font-medium">返回细化</button>
+<div class="flex gap-3">
+<button onclick="exportCharacter('full')" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-green-200 transition flex items-center gap-2" title="导出完整信息（含AI生成内容）">
+<i class="fa-solid fa-download"></i> <span>导出完整版</span>
+</button>
 <button onclick="goToStep(1)" class="bg-slate-600 hover:bg-slate-700 text-white px-6 py-3 rounded-xl font-bold transition">
 <i class="fa-solid fa-rotate-left"></i> 重新开始
 </button>
+</div>
 </div>
 </div>
 
@@ -1095,6 +1107,26 @@ async function fetchAIOptions(category) {
 }
 
 async function finishStep1() {
+  // 验证必填项
+  const name = document.getElementById('input-name').value.trim();
+  const archetype = document.getElementById('input-archetype').value.trim();
+  
+  if (!name) {
+    alert('❌ 请填写角色姓名');
+    document.getElementById('input-name').focus();
+    document.getElementById('input-name').classList.add('border-red-500');
+    setTimeout(() => document.getElementById('input-name').classList.remove('border-red-500'), 2000);
+    return;
+  }
+  
+  if (!archetype) {
+    alert('❌ 请填写核心身份/职业');
+    document.getElementById('input-archetype').focus();
+    document.getElementById('input-archetype').classList.add('border-red-500');
+    setTimeout(() => document.getElementById('input-archetype').classList.remove('border-red-500'), 2000);
+    return;
+  }
+  
   goToStep(2);
   // Load local presets immediately
   renderSection('opt-hair-length', 'hair-length');
@@ -2109,13 +2141,15 @@ function getFullProfile() {
 }
 
 // ===== EXPORT / IMPORT =====
-function exportCharacter() {
+function exportCharacter(level = 'full') {
   const nameEl = document.getElementById('input-name');
   const heightEl = document.getElementById('input-height');
   
   const data = {
-    version: "7.0",
+    version: "7.2",  // 版本号更新
+    exportLevel: level, // 'basic' or 'full'
     timestamp: new Date().toISOString(),
+    currentStep: state.step,  // 保存当前步骤
     basic: {
       name: nameEl ? nameEl.value : '',
       gender: document.getElementById('input-gender').value,
@@ -2128,17 +2162,45 @@ function exportCharacter() {
     stats: state.stats,
     personality: state.personality,
     selections: state.selections,
-    questionAnswers: questionAnswers  // Include Step 4 Q&A data
+    photo: characterPhoto  // 保存照片（Base64）
   };
+  
+  // 只有完整版才包含 AI 生成的内容
+  if (level === 'full') {
+    data.questionAnswers = questionAnswers;  // Step 4 Q&A data
+    data.currentQuestions = currentQuestions;  // Step 4 问题列表
+    data.currentQuestionIndex = currentQuestionIndex;  // Step 4 当前问题索引
+    data.aiGenerated = true;
+  } else {
+    data.aiGenerated = false;
+  }
   
   const json = JSON.stringify(data, null, 2);
   const blob = new Blob([json], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `character_${data.basic.archetype || 'unnamed'}_${Date.now()}.json`;
+  
+  const levelLabel = level === 'full' ? '完整版' : '基础版';
+  const timestamp = new Date().toLocaleString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  }).replace(/[/:]/g, '-').replace(/\s/g, '_');
+  
+  a.download = `${data.basic.name || 'unnamed'}_${levelLabel}_${timestamp}.json`;
   a.click();
   URL.revokeObjectURL(url);
+  
+  // 显示提示
+  const message = level === 'full' 
+    ? '✅ 完整版角色已导出（包含 AI 生成内容）' 
+    : '✅ 基础版角色已导出（仅包含基础信息）';
+  
+  showToast(message, 'green');
 }
 
 function importCharacter() {
@@ -2153,6 +2215,10 @@ function importCharacter() {
     reader.onload = (event) => {
       try {
         const data = JSON.parse(event.target.result);
+        
+        // 检查导出等级
+        const exportLevel = data.exportLevel || 'full';
+        const hasAIContent = data.aiGenerated !== false;
         
         // Restore basic info
         const nameEl = document.getElementById('input-name');
@@ -2182,22 +2248,97 @@ function importCharacter() {
         // Restore selections
         state.selections = data.selections || {};
         
-        // Restore Step 4 Q&A answers (if available)
-        if(data.questionAnswers) {
+        // Restore photo (if available)
+        if(data.photo) {
+          characterPhoto = data.photo;
+          const img = document.getElementById('character-photo');
+          const placeholder = document.getElementById('photo-placeholder');
+          const removeBtn = document.getElementById('remove-photo-btn');
+          
+          if(img && placeholder && removeBtn) {
+            img.src = characterPhoto;
+            img.classList.remove('hidden');
+            placeholder.classList.add('hidden');
+            removeBtn.classList.remove('hidden');
+          }
+        } else {
+          // 清除照片
+          removePhoto();
+        }
+        
+        // Restore Step 4 Q&A answers (if available in full version)
+        if(hasAIContent && data.questionAnswers) {
           Object.keys(questionAnswers).forEach(key => delete questionAnswers[key]);
           Object.assign(questionAnswers, data.questionAnswers);
+          
+          // Restore Step 4 questions and index
+          if(data.currentQuestions) {
+            currentQuestions = data.currentQuestions;
+          }
+          if(data.currentQuestionIndex !== undefined) {
+            currentQuestionIndex = data.currentQuestionIndex;
+          }
+        }
+        
+        // Restore current step (optional, can be useful)
+        if(data.currentStep && data.currentStep > 1) {
+          // 询问用户是否跳转到保存的步骤
+          const shouldJump = confirm(`检测到角色保存在 Step ${data.currentStep}，是否跳转到该步骤？\n\n点击"确定"跳转，点击"取消"从 Step 1 开始。`);
+          if(shouldJump) {
+            goToStep(data.currentStep);
+          } else {
+            goToStep(1);
+          }
+        } else {
+          goToStep(1);
         }
         
         updatePreview();
-        alert('角色导入成功！');
+        
+        // 显示导入成功提示
+        const levelLabel = exportLevel === 'full' ? '完整版' : '基础版';
+        const photoInfo = data.photo ? '（含照片）' : '';
+        const message = hasAIContent 
+          ? `✅ ${levelLabel}角色导入成功${photoInfo}` 
+          : `✅ ${levelLabel}角色导入成功${photoInfo}`;
+        
+        showToast(message, 'blue');
       } catch(e) {
-        alert('导入失败：文件格式错误');
+        alert('❌ 导入失败：文件格式错误\n\n' + e.message);
         console.error(e);
       }
     };
     reader.readAsText(file);
   };
   input.click();
+}
+
+// ===== TOAST NOTIFICATION =====
+function showToast(message, color = 'green') {
+  const colorClasses = {
+    'green': 'bg-green-600',
+    'blue': 'bg-blue-600',
+    'red': 'bg-red-600',
+    'yellow': 'bg-yellow-600'
+  };
+  
+  const bgColor = colorClasses[color] || colorClasses['green'];
+  
+  const toast = document.createElement('div');
+  toast.className = `fixed top-20 right-4 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-opacity duration-300`;
+  toast.innerHTML = `<i class="fa-solid fa-check-circle mr-2"></i>${message}`;
+  document.body.appendChild(toast);
+  
+  // 淡入效果
+  setTimeout(() => {
+    toast.style.opacity = '1';
+  }, 10);
+  
+  // 3秒后淡出并移除
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
 }
 
 // ===== AI PROMPT GENERATION =====
@@ -2557,7 +2698,7 @@ function checkDevMode() {
 
 // ===== INIT =====
 window.onload = () => {
-  console.log("=== Character Forge V7.1 Initializing ===");
+  console.log("=== Character Forge V7.2 Initializing ===");
   renderStep1();
   updateUrlPreview();
   

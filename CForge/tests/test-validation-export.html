@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>必填项验证 & 分级导出测试 - Character Forge V7.1</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 p-8">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-2xl font-bold mb-6">必填项验证 & 分级导出测试</h1>
+    
+    <!-- 测试 1: 必填项验证 -->
+    <div class="bg-white rounded-lg p-6 mb-6">
+      <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-check-circle text-green-500"></i>
+        测试 1: 必填项验证
+      </h2>
+      
+      <div class="space-y-4">
+        <div class="border-l-4 border-blue-500 pl-4 bg-blue-50 p-3 rounded">
+          <h3 class="font-bold text-sm mb-2">测试步骤</h3>
+          <ol class="list-decimal list-inside space-y-1 text-sm">
+            <li>打开 <code class="bg-slate-100 px-2 py-1 rounded">index.html</code></li>
+            <li>在 Step 1 中，<strong>不填写</strong>姓名和职业</li>
+            <li>点击"确认并生成外貌"按钮</li>
+            <li>应该看到错误提示：<code>❌ 请填写角色姓名</code></li>
+            <li>填写姓名，但<strong>不填写</strong>职业</li>
+            <li>再次点击按钮</li>
+            <li>应该看到错误提示：<code>❌ 请填写核心身份/职业</code></li>
+            <li>填写职业后，应该能正常进入 Step 2</li>
+          </ol>
+        </div>
+
+        <div class="border-l-4 border-green-500 pl-4 bg-green-50 p-3 rounded">
+          <h3 class="font-bold text-sm mb-2">预期结果</h3>
+          <ul class="list-disc list-inside space-y-1 text-sm text-slate-700">
+            <li>姓名字段标记为必填（红色星号 *）</li>
+            <li>职业字段标记为必填（红色星号 *）</li>
+            <li>未填写时显示错误提示</li>
+            <li>输入框短暂显示红色边框（2秒）</li>
+            <li>焦点自动移到未填写的字段</li>
+            <li>填写完整后可以正常进入下一步</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 测试 2: 分级导出 - 基础版 -->
+    <div class="bg-white rounded-lg p-6 mb-6">
+      <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-download text-blue-500"></i>
+        测试 2: 分级导出 - 基础版（Step 3）
+      </h2>
+      
+      <div class="space-y-4">
+        <div class="border-l-4 border-blue-500 pl-4 bg-blue-50 p-3 rounded">
+          <h3 class="font-bold text-sm mb-2">测试步骤</h3>
+          <ol class="list-decimal list-inside space-y-1 text-sm">
+            <li>完成 Step 1（填写基础信息）</li>
+            <li>完成 Step 2（选择外貌特征）</li>
+            <li>完成 Step 3（选择心理特征）</li>
+            <li>在 Step 3 底部，点击<strong>"导出基础版"</strong>按钮（蓝色）</li>
+            <li>应该下载一个 JSON 文件</li>
+            <li>文件名格式：<code>character_[姓名]_基础版_[时间戳].json</code></li>
+            <li>打开 JSON 文件检查内容</li>
+          </ol>
+        </div>
+
+        <div class="border-l-4 border-green-500 pl-4 bg-green-50 p-3 rounded">
+          <h3 class="font-bold text-sm mb-2">预期结果</h3>
+          <ul class="list-disc list-inside space-y-1 text-sm text-slate-700">
+            <li>文件成功下载</li>
+            <li>显示绿色提示：<code>✅ 基础版角色已导出（仅包含基础信息）</code></li>
+            <li>JSON 包含字段：
+              <ul class="list-disc list-inside ml-6 mt-1">
+                <li><code>version: "7.1"</code></li>
+                <li><code>exportLevel: "basic"</code></li>
+                <li><code>aiGenerated: false</code></li>
+                <li><code>basic</code>（基础信息）</li>
+                <li><code>stats</code>（属性）</li>
+                <li><code>personality</code>（性格）</li>
+                <li><code>selections</code>（选择）</li>
+              </ul>
+            </li>
+            <li><strong>不包含</strong> <code>questionAnswers</code>（Step 4 问答）</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 测试 3: 分级导出 - 完整版 -->
+    <div class="bg-white rounded-lg p-6 mb-6">
+      <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-download text-green-500"></i>
+        测试 3: 分级导出 - 完整版（Step 5）
+      </h2>
+      
+      <div class="space-y-4">
+        <div class="border-l-4 border-blue-500 pl-4 bg-blue-50 p-3 rounded">
+          <h3 class="font-bold text-sm mb-2">测试步骤</h3>
+          <ol class="list-decimal list-inside space-y-1 text-sm">
+            <li>继续完成 Step 4（AI 深度细化）</li>
+            <li>进入 Step 5（最终报告）</li>
+            <li>在 Step 5 底部，点击<strong>"导出完整版"</strong>按钮（绿色）</li>
+            <li>应该下载一个 JSON 文件</li>
+            <li>文件名格式：<code>character_[姓名]_完整版_[时间戳].json</code></li>
+            <li>打开 JSON 文件检查内容</li>
+          </ol>
+        </div>
+
+        <div class="border-l-4 border-green-500 pl-4 bg-green-50 p-3 rounded">
+          <h3 class="font-bold text-sm mb-2">预期结果</h3>
+          <ul class="list-disc list-inside space-y-1 text-sm text-slate-700">
+            <li>文件成功下载</li>
+            <li>显示绿色提示：<code>✅ 完整版角色已导出（包含 AI 生成内容）</code></li>
+            <li>JSON 包含字段：
+              <ul class="list-disc list-inside ml-6 mt-1">
+                <li><code>version: "7.1"</code></li>
+                <li><code>exportLevel: "full"</code></li>
+                <li><code>aiGenerated: true</code></li>
+                <li><code>basic</code>（基础信息）</li>
+                <li><code>stats</code>（属性）</li>
+                <li><code>personality</code>（性格）</li>
+                <li><code>selections</code>（选择）</li>
+                <li><code>questionAnswers</code>（Step 4 问答）✅</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 测试 4: 导入功能 -->
+    <div class="bg-white rounded-lg p-6 mb-6">
+      <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-upload text-purple-500"></i>
+        测试 4: 导入功能
+      </h2>
+      
+      <div class="space-y-4">
+        <div class="border-l-4 border-blue-500 pl-4 bg-blue-50 p-3 rounded">
+          <h3 class="font-bold text-sm mb-2">测试步骤</h3>
+          <ol class="list-decimal list-inside space-y-1 text-sm">
+            <li>点击右上角"导入角色"按钮</li>
+            <li>选择之前导出的<strong>基础版</strong> JSON 文件</li>
+            <li>应该看到蓝色提示：<code>✅ 基础版角色导入成功（仅基础信息）</code></li>
+            <li>验证数据已恢复（姓名、职业、属性等）</li>
+            <li>再次点击"导入角色"</li>
+            <li>选择之前导出的<strong>完整版</strong> JSON 文件</li>
+            <li>应该看到蓝色提示：<code>✅ 完整版角色导入成功（包含 AI 生成内容）</code></li>
+            <li>验证所有数据已恢复（包括 Step 4 问答）</li>
+          </ol>
+        </div>
+
+        <div class="border-l-4 border-green-500 pl-4 bg-green-50 p-3 rounded">
+          <h3 class="font-bold text-sm mb-2">预期结果</h3>
+          <ul class="list-disc list-inside space-y-1 text-sm text-slate-700">
+            <li>基础版导入：恢复基础信息、属性、性格、选择</li>
+            <li>完整版导入：额外恢复 Step 4 问答内容</li>
+            <li>显示对应的导入成功提示</li>
+            <li>预览面板实时更新</li>
+            <li>可以继续编辑或导出</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 功能清单 -->
+    <div class="bg-white rounded-lg p-6">
+      <h2 class="text-lg font-bold mb-4">功能清单</h2>
+      <div class="space-y-2">
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">姓名字段显示红色星号（必填标记）</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">职业字段显示红色星号（必填标记）</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">未填写姓名时显示错误提示</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">未填写职业时显示错误提示</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">错误时输入框显示红色边框</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">Step 3 显示"导出基础版"按钮（蓝色）</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">Step 5 显示"导出完整版"按钮（绿色）</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">基础版导出成功（不含 AI 内容）</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">完整版导出成功（含 AI 内容）</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">导出时显示成功提示（绿色 toast）</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">基础版导入成功</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">完整版导入成功</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">导入时显示成功提示（蓝色 toast）</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">文件名包含正确的版本标签</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 对比表格 -->
+    <div class="bg-white rounded-lg p-6 mt-6">
+      <h2 class="text-lg font-bold mb-4">基础版 vs 完整版对比</h2>
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b-2 border-slate-300">
+            <th class="text-left py-2">特性</th>
+            <th class="text-center py-2">基础版</th>
+            <th class="text-center py-2">完整版</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-b border-slate-200">
+            <td class="py-2">导出时机</td>
+            <td class="text-center">Step 3 后</td>
+            <td class="text-center">Step 5 后</td>
+          </tr>
+          <tr class="border-b border-slate-200">
+            <td class="py-2">基础信息</td>
+            <td class="text-center">✅</td>
+            <td class="text-center">✅</td>
+          </tr>
+          <tr class="border-b border-slate-200">
+            <td class="py-2">属性 & 性格</td>
+            <td class="text-center">✅</td>
+            <td class="text-center">✅</td>
+          </tr>
+          <tr class="border-b border-slate-200">
+            <td class="py-2">外貌 & 心理选择</td>
+            <td class="text-center">✅</td>
+            <td class="text-center">✅</td>
+          </tr>
+          <tr class="border-b border-slate-200">
+            <td class="py-2">Step 4 问答内容</td>
+            <td class="text-center">❌</td>
+            <td class="text-center">✅</td>
+          </tr>
+          <tr class="border-b border-slate-200">
+            <td class="py-2">AI 生成标记</td>
+            <td class="text-center">false</td>
+            <td class="text-center">true</td>
+          </tr>
+          <tr class="border-b border-slate-200">
+            <td class="py-2">文件大小</td>
+            <td class="text-center">较小</td>
+            <td class="text-center">较大</td>
+          </tr>
+          <tr class="border-b border-slate-200">
+            <td class="py-2">适用场景</td>
+            <td class="text-center">快速备份</td>
+            <td class="text-center">完整存档</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div class="flex items-start gap-2">
+        <i class="fa-solid fa-info-circle text-blue-500 mt-0.5"></i>
+        <div class="text-sm text-blue-800">
+          <p class="font-bold mb-1">注意事项</p>
+          <ul class="list-disc list-inside space-y-1">
+            <li>必填项验证只在 Step 1 生效</li>
+            <li>基础版适合快速分享角色框架</li>
+            <li>完整版适合保存完整创作过程</li>
+            <li>导入时会自动识别版本类型</li>
+            <li>Toast 提示会在 3 秒后自动消失</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

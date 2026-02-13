@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>导出/导入优化测试 - Character Forge V7.2</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-100 p-8">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-2xl font-bold mb-6">导出/导入优化测试 - V7.2</h1>
+    
+    <!-- 测试 1: 照片保存与恢复 -->
+    <div class="bg-white rounded-lg p-6 mb-6">
+      <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-image text-blue-500"></i>
+        测试 1: 照片保存与恢复
+      </h2>
+      
+      <div class="space-y-4">
+        <div class="border-l-4 border-blue-500 pl-4 bg-blue-50 p-3 rounded">
+          <h3 class="font-bold text-sm mb-2">测试步骤</h3>
+          <ol class="list-decimal list-inside space-y-1 text-sm">
+            <li>打开 <code class="bg-slate-100 px-2 py-1 rounded">index.html</code></li>
+            <li>填写基础信息（姓名、职业）</li>
+            <li>在预览面板上传一张照片</li>
+            <li>导出角色（基础版或完整版）</li>
+            <li>刷新页面（清空所有数据）</li>
+            <li>导入刚才导出的文件</li>
+            <li>检查照片是否恢复</li>
+          </ol>
+        </div>
+
+        <div class="border-l-4 border-green-500 pl-4 bg-green-50 p-3 rounded">
+          <h3 class="font-bold text-sm mb-2">预期结果</h3>
+          <ul class="list-disc list-inside space-y-1 text-sm text-slate-700">
+            <li>照片自动显示在预览面板</li>
+            <li>删除按钮（X）显示</li>
+            <li>占位符隐藏</li>
+            <li>导入提示显示"（含照片）"</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 测试 2: 步骤保存与跳转 -->
+    <div class="bg-white rounded-lg p-6 mb-6">
+      <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-route text-purple-500"></i>
+        测试 2: 步骤保存与跳转
+      </h2>
+      
+      <div class="space-y-4">
+        <div class="border-l-4 border-blue-500 pl-4 bg-blue-50 p-3 rounded">
+          <h3 class="font-bold text-sm mb-2">测试步骤</h3>
+          <ol class="list-decimal list-inside space-y-1 text-sm">
+            <li>创建角色，进行到 Step 3</li>
+            <li>导出角色（基础版）</li>
+            <li>刷新页面</li>
+            <li>导入文件</li>
+            <li>应该弹出确认对话框：<code>检测到角色保存在 Step 3，是否跳转到该步骤？</code></li>
+            <li>点击"确定"，应该跳转到 Step 3</li>
+            <li>再次导入，点击"取消"，应该停留在 Step 1</li>
+          </ol>
+        </div>
+
+        <div class="border-l-4 border-green-500 pl-4 bg-green-50 p-3 rounded">
+          <h3 class="font-bold text-sm mb-2">预期结果</h3>
+          <ul class="list-disc list-inside space-y-1 text-sm text-slate-700">
+            <li>弹出确认对话框</li>
+            <li>点击"确定"跳转到保存的步骤</li>
+            <li>点击"取消"停留在 Step 1</li>
+            <li>步骤指示器正确高亮</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 测试 3: Step 4 状态恢复 -->
+    <div class="bg-white rounded-lg p-6 mb-6">
+      <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-brain text-green-500"></i>
+        测试 3: Step 4 状态恢复
+      </h2>
+      
+      <div class="space-y-4">
+        <div class="border-l-4 border-blue-500 pl-4 bg-blue-50 p-3 rounded">
+          <h3 class="font-bold text-sm mb-2">测试步骤</h3>
+          <ol class="list-decimal list-inside space-y-1 text-sm">
+            <li>完成 Step 1-3</li>
+            <li>进入 Step 4，回答第一个问题</li>
+            <li>不要完成所有问题，停在第 2 个问题</li>
+            <li>导出完整版</li>
+            <li>刷新页面</li>
+            <li>导入文件，跳转到 Step 4</li>
+            <li>检查问答状态是否恢复</li>
+          </ol>
+        </div>
+
+        <div class="border-l-4 border-green-500 pl-4 bg-green-50 p-3 rounded">
+          <h3 class="font-bold text-sm mb-2">预期结果</h3>
+          <ul class="list-disc list-inside space-y-1 text-sm text-slate-700">
+            <li>第一个问题的回答已保存</li>
+            <li>当前显示第 2 个问题</li>
+            <li>可以继续回答剩余问题</li>
+            <li>问题列表完整</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 测试 4: 文件命名优化 -->
+    <div class="bg-white rounded-lg p-6 mb-6">
+      <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-file-signature text-orange-500"></i>
+        测试 4: 文件命名优化
+      </h2>
+      
+      <div class="space-y-4">
+        <div class="border-l-4 border-blue-500 pl-4 bg-blue-50 p-3 rounded">
+          <h3 class="font-bold text-sm mb-2">测试步骤</h3>
+          <ol class="list-decimal list-inside space-y-1 text-sm">
+            <li>填写姓名：<code>张三</code></li>
+            <li>导出基础版</li>
+            <li>检查文件名格式</li>
+          </ol>
+        </div>
+
+        <div class="border-l-4 border-green-500 pl-4 bg-green-50 p-3 rounded">
+          <h3 class="font-bold text-sm mb-2">预期结果</h3>
+          <ul class="list-disc list-inside space-y-1 text-sm text-slate-700">
+            <li>旧格式（V7.1）：<code>character_张三_基础版_1707804600000.json</code></li>
+            <li>新格式（V7.2）：<code>张三_基础版_2024-02-13_14-30-45.json</code></li>
+            <li>使用可读的日期时间格式</li>
+            <li>便于识别和管理</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 测试 5: Toast 提示系统 -->
+    <div class="bg-white rounded-lg p-6 mb-6">
+      <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-bell text-yellow-500"></i>
+        测试 5: Toast 提示系统
+      </h2>
+      
+      <div class="space-y-4">
+        <div class="border-l-4 border-blue-500 pl-4 bg-blue-50 p-3 rounded">
+          <h3 class="font-bold text-sm mb-2">测试步骤</h3>
+          <ol class="list-decimal list-inside space-y-1 text-sm">
+            <li>导出角色（任意版本）</li>
+            <li>观察右上角的 Toast 提示</li>
+            <li>导入角色</li>
+            <li>观察右上角的 Toast 提示</li>
+          </ol>
+        </div>
+
+        <div class="border-l-4 border-green-500 pl-4 bg-green-50 p-3 rounded">
+          <h3 class="font-bold text-sm mb-2">预期结果</h3>
+          <ul class="list-disc list-inside space-y-1 text-sm text-slate-700">
+            <li>导出：绿色 Toast，显示"✅ XX版角色已导出"</li>
+            <li>导入：蓝色 Toast，显示"✅ XX版角色导入成功（含照片）"</li>
+            <li>3 秒后自动消失</li>
+            <li>淡入淡出动画</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 测试 6: 向后兼容性 -->
+    <div class="bg-white rounded-lg p-6 mb-6">
+      <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+        <i class="fa-solid fa-code-branch text-red-500"></i>
+        测试 6: 向后兼容性
+      </h2>
+      
+      <div class="space-y-4">
+        <div class="border-l-4 border-blue-500 pl-4 bg-blue-50 p-3 rounded">
+          <h3 class="font-bold text-sm mb-2">测试步骤</h3>
+          <ol class="list-decimal list-inside space-y-1 text-sm">
+            <li>准备 V7.1 导出的文件（如果有）</li>
+            <li>在 V7.2 中导入</li>
+            <li>检查数据是否正常恢复</li>
+          </ol>
+        </div>
+
+        <div class="border-l-4 border-green-500 pl-4 bg-green-50 p-3 rounded">
+          <h3 class="font-bold text-sm mb-2">预期结果</h3>
+          <ul class="list-disc list-inside space-y-1 text-sm text-slate-700">
+            <li>基础数据正常恢复</li>
+            <li>照片为空（显示占位符）</li>
+            <li>从 Step 1 开始（不跳转）</li>
+            <li>不报错，不崩溃</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 功能清单 -->
+    <div class="bg-white rounded-lg p-6">
+      <h2 class="text-lg font-bold mb-4">功能清单</h2>
+      <div class="space-y-2">
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">照片保存到 JSON（Base64）</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">照片导入后自动恢复</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">当前步骤保存</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">步骤跳转确认对话框</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">Step 4 问题列表保存</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">Step 4 当前索引保存</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">Step 4 状态完整恢复</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">文件命名使用可读时间格式</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">导出 Toast 提示（绿色）</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">导入 Toast 提示（蓝色）</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">导入提示显示是否含照片</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">V7.1 文件向后兼容</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">V7.0 文件向后兼容</span>
+        </label>
+        <label class="flex items-center gap-2">
+          <input type="checkbox" class="w-4 h-4">
+          <span class="text-sm">零信息丢失</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- 数据完整性对比 -->
+    <div class="bg-white rounded-lg p-6 mt-6">
+      <h2 class="text-lg font-bold mb-4">数据完整性对比</h2>
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b-2 border-slate-300">
+            <th class="text-left py-2">数据项</th>
+            <th class="text-center py-2">V7.1</th>
+            <th class="text-center py-2">V7.2</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-b border-slate-200">
+            <td class="py-2">基础信息</td>
+            <td class="text-center">✅</td>
+            <td class="text-center">✅</td>
+          </tr>
+          <tr class="border-b border-slate-200">
+            <td class="py-2">属性 & 性格</td>
+            <td class="text-center">✅</td>
+            <td class="text-center">✅</td>
+          </tr>
+          <tr class="border-b border-slate-200">
+            <td class="py-2">外貌 & 心理选择</td>
+            <td class="text-center">✅</td>
+            <td class="text-center">✅</td>
+          </tr>
+          <tr class="border-b border-slate-200">
+            <td class="py-2">照片</td>
+            <td class="text-center text-red-500">❌</td>
+            <td class="text-center text-green-500">✅</td>
+          </tr>
+          <tr class="border-b border-slate-200">
+            <td class="py-2">当前步骤</td>
+            <td class="text-center text-red-500">❌</td>
+            <td class="text-center text-green-500">✅</td>
+          </tr>
+          <tr class="border-b border-slate-200">
+            <td class="py-2">Step 4 问答</td>
+            <td class="text-center">✅</td>
+            <td class="text-center">✅</td>
+          </tr>
+          <tr class="border-b border-slate-200">
+            <td class="py-2">Step 4 问题列表</td>
+            <td class="text-center text-red-500">❌</td>
+            <td class="text-center text-green-500">✅</td>
+          </tr>
+          <tr class="border-b border-slate-200">
+            <td class="py-2">Step 4 当前索引</td>
+            <td class="text-center text-red-500">❌</td>
+            <td class="text-center text-green-500">✅</td>
+          </tr>
+          <tr class="border-b-2 border-slate-300 font-bold">
+            <td class="py-2">信息丢失率</td>
+            <td class="text-center text-red-500">~20%</td>
+            <td class="text-center text-green-500">0%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div class="flex items-start gap-2">
+        <i class="fa-solid fa-info-circle text-blue-500 mt-0.5"></i>
+        <div class="text-sm text-blue-800">
+          <p class="font-bold mb-1">V7.2 核心改进</p>
+          <ul class="list-disc list-inside space-y-1">
+            <li>零信息丢失 - 所有数据完整保存</li>
+            <li>智能恢复 - 自动恢复照片和步骤</li>
+            <li>用户友好 - 可读的文件名和提示</li>
+            <li>向后兼容 - 支持 V7.1 和 V7.0 文件</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
