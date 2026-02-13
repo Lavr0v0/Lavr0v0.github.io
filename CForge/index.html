@@ -9,27 +9,296 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
-body { font-family: 'Noto Sans SC', sans-serif; background-color: #f1f5f9; }
-.step-panel { display: none; opacity: 0; transition: opacity 0.3s ease-in-out; }
-.step-panel.active { display: block; opacity: 1; }
-.option-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-.option-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-.option-btn:active:not(:disabled) { transform: translateY(0); }
-.option-btn.selected { background-color: #0f172a; color: white; border-color: #0f172a; box-shadow: 0 0 0 2px #94a3b8; }
-.ai-loading { animation: pulse-blue 1.5s infinite; pointer-events: none; opacity: 0.7; }
-@keyframes pulse-blue { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
-.dot-group { display: flex; gap: 3px; cursor: pointer; }
-.dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid #94a3b8; background-color: white; transition: all 0.1s;}
-.dot.active { background-color: #334155; border-color: #334155; }
-.dot:hover { border-color: #64748b; background-color: #e2e8f0; }
-input[type=range].spectrum-slider {-webkit-appearance: none; width: 100%; background: transparent;}
-input[type=range].spectrum-slider::-webkit-slider-thumb {-webkit-appearance: none; height: 14px; width: 14px;border-radius: 50%; background: #334155;cursor: pointer; margin-top: -5px;box-shadow: 0 0 0 2px white, 0 0 0 3px #cbd5e1;}
-input[type=range].spectrum-slider::-webkit-slider-runnable-track {width: 100%; height: 4px; cursor: pointer;background: #e2e8f0; border-radius: 2px;}
-.modal { transition: opacity 0.25s ease; }
-body.modal-active { overflow: hidden; }
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+body { 
+  font-family: 'Noto Sans SC', sans-serif; 
+  background-color: #f1f5f9; 
+}
+
+/* ===== 页面切换动画 ===== */
+.step-panel { 
+  display: none; 
+  opacity: 0; 
+  transform: translateY(20px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.step-panel.active { 
+  display: block; 
+  opacity: 1; 
+  transform: translateY(0);
+  animation: slideInUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== 按钮动画 ===== */
+.option-btn { 
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+.option-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+.option-btn:active::before {
+  width: 300px;
+  height: 300px;
+}
+.option-btn:hover:not(:disabled) { 
+  transform: translateY(-3px) scale(1.02); 
+  box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.15);
+}
+.option-btn:active:not(:disabled) { 
+  transform: translateY(-1px) scale(0.98);
+  transition: all 0.1s;
+}
+.option-btn.selected { 
+  background-color: #0f172a; 
+  color: white; 
+  border-color: #0f172a; 
+  box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.3);
+  animation: selectPulse 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes selectPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* ===== AI 加载动画 ===== */
+.ai-loading { 
+  animation: aiPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; 
+  pointer-events: none;
+  position: relative;
+}
+.ai-loading::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(45deg, #3b82f6, #8b5cf6, #ec4899, #3b82f6);
+  background-size: 300% 300%;
+  animation: gradientShift 3s ease infinite;
+  opacity: 0.3;
+  z-index: -1;
+}
+
+@keyframes aiPulse { 
+  0%, 100% { opacity: 0.5; transform: scale(1); } 
+  50% { opacity: 1; transform: scale(1.02); } 
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ===== 属性点动画 ===== */
+.dot-group { 
+  display: flex; 
+  gap: 4px; 
+  cursor: pointer; 
+}
+.dot { 
+  width: 12px; 
+  height: 12px; 
+  border-radius: 50%; 
+  border: 2px solid #94a3b8; 
+  background-color: white; 
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+.dot::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: rgba(51, 65, 85, 0.1);
+  transform: scale(0);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.dot:hover::before {
+  transform: scale(1);
+}
+.dot.active { 
+  background-color: #334155; 
+  border-color: #334155;
+  transform: scale(1.15);
+  box-shadow: 0 0 0 3px rgba(51, 65, 85, 0.2);
+}
+.dot:hover { 
+  border-color: #64748b; 
+  background-color: #e2e8f0;
+  transform: scale(1.2);
+}
+
+/* ===== 滑块动画 ===== */
+input[type=range].spectrum-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%; 
+  background: transparent;
+}
+input[type=range].spectrum-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 16px; 
+  width: 16px;
+  border-radius: 50%; 
+  background: #334155;
+  cursor: pointer; 
+  margin-top: -6px;
+  box-shadow: 0 0 0 3px white, 0 0 0 4px #cbd5e1, 0 2px 8px rgba(0,0,0,0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+input[type=range].spectrum-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 0 3px white, 0 0 0 5px #94a3b8, 0 4px 12px rgba(0,0,0,0.15);
+}
+input[type=range].spectrum-slider::-webkit-slider-thumb:active {
+  transform: scale(1.1);
+}
+input[type=range].spectrum-slider::-webkit-slider-runnable-track {
+  width: 100%; 
+  height: 4px; 
+  cursor: pointer;
+  background: linear-gradient(to right, #e2e8f0 0%, #cbd5e1 50%, #e2e8f0 100%); 
+  border-radius: 2px;
+  transition: background 0.3s;
+}
+input[type=range].spectrum-slider:hover::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, #cbd5e1 0%, #94a3b8 50%, #cbd5e1 100%);
+}
+
+/* ===== 模态框动画 ===== */
+.modal { 
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(0px);
+}
+.modal:not(.pointer-events-none) {
+  backdrop-filter: blur(4px);
+}
+.modal-content {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+body.modal-active { 
+  overflow: hidden; 
+}
+
+/* ===== 卡片悬停动画 ===== */
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== 加载旋转动画 ===== */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.fa-spinner {
+  animation: spin 1s linear infinite;
+}
+
+/* ===== 淡入动画 ===== */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* ===== 弹跳动画 ===== */
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.bounce {
+  animation: bounce 2s ease-in-out infinite;
+}
+
+/* ===== 脉冲动画 ===== */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ===== 摇晃动画 ===== */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+.shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* ===== 滚动条美化 ===== */
+::-webkit-scrollbar { 
+  width: 8px; 
+  height: 8px;
+}
+::-webkit-scrollbar-track { 
+  background: transparent; 
+}
+::-webkit-scrollbar-thumb { 
+  background: linear-gradient(180deg, #cbd5e1, #94a3b8); 
+  border-radius: 4px;
+  transition: background 0.3s;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #94a3b8, #64748b);
+}
+
+/* ===== 开发者模式横幅动画 ===== */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+#dev-mode-banner:not(.hidden) {
+  animation: slideDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== 按钮点击波纹效果 ===== */
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
 </style>
 </head>
 <body class="h-screen flex flex-col text-slate-800 overflow-hidden">
@@ -37,13 +306,13 @@ body.modal-active { overflow: hidden; }
 <header class="bg-white border-b border-slate-200 z-20 flex-none shadow-sm">
 <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
 <div class="flex items-center gap-3">
-<div class="w-9 h-9 bg-slate-800 rounded-lg flex items-center justify-center text-white shadow-lg">
+<div class="w-9 h-9 bg-slate-800 rounded-lg flex items-center justify-center text-white shadow-lg transition-all duration-300 hover:scale-110 hover:rotate-12 hover:shadow-xl">
 <i class="fa-solid fa-drafting-compass"></i>
 </div>
 <div>
 <h1 class="font-bold text-lg leading-tight tracking-tight">灵感铸造厂 <span class="text-slate-500 text-xs align-top">V7.0</span></h1>
-<div class="text-[10px] text-slate-400 font-mono flex items-center gap-1 cursor-pointer hover:text-slate-600" onclick="toggleSettings()">
-<span id="header-status-dot" class="w-2 h-2 rounded-full bg-slate-300"></span>
+<div class="text-[10px] text-slate-400 font-mono flex items-center gap-1 cursor-pointer hover:text-slate-600 transition-all duration-300 hover:scale-105" onclick="toggleSettings()">
+<span id="header-status-dot" class="w-2 h-2 rounded-full bg-slate-300 transition-all duration-300"></span>
 <span id="header-status-text">需配置 AI</span>
 </div>
 </div>
@@ -57,15 +326,15 @@ body.modal-active { overflow: hidden; }
 <span id="step-dot-5">5.最终报告</span>
 </div>
 <div class="flex gap-2">
-<button onclick="exportCharacter()" class="text-slate-500 hover:text-slate-800 transition p-2 rounded-full hover:bg-slate-100" title="导出角色">
+<button onclick="exportCharacter()" class="text-slate-500 hover:text-slate-800 transition-all duration-300 p-2 rounded-full hover:bg-slate-100 hover:scale-110 hover:rotate-12" title="导出角色">
 <i class="fa-solid fa-download text-lg"></i>
 </button>
-<button onclick="importCharacter()" class="text-slate-500 hover:text-slate-800 transition p-2 rounded-full hover:bg-slate-100" title="导入角色">
+<button onclick="importCharacter()" class="text-slate-500 hover:text-slate-800 transition-all duration-300 p-2 rounded-full hover:bg-slate-100 hover:scale-110 hover:-rotate-12" title="导入角色">
 <i class="fa-solid fa-upload text-lg"></i>
 </button>
-<button onclick="toggleSettings()" class="text-slate-500 hover:text-slate-800 transition p-2 rounded-full hover:bg-slate-100 relative group" title="API 设置">
-<i class="fa-solid fa-gear text-lg"></i>
-<span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full hidden" id="config-alert-dot"></span>
+<button onclick="toggleSettings()" class="text-slate-500 hover:text-slate-800 transition-all duration-300 p-2 rounded-full hover:bg-slate-100 relative group hover:scale-110" title="API 设置">
+<i class="fa-solid fa-gear text-lg group-hover:rotate-90 transition-transform duration-300"></i>
+<span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full hidden pulse" id="config-alert-dot"></span>
 </button>
 </div>
 </div>
@@ -89,7 +358,7 @@ body.modal-active { overflow: hidden; }
 </div>
 
 <!-- Basic Info Grid -->
-<div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+<div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 card-hover">
 <h3 class="text-xs font-bold text-slate-400 uppercase mb-4 tracking-wider border-b pb-2">基础信息</h3>
 <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
 <div class="col-span-2 md:col-span-3">
@@ -155,11 +424,11 @@ body.modal-active { overflow: hidden; }
 
 <!-- Attributes & Personality -->
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-<div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+<div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 card-hover">
 <h3 class="text-xs font-bold text-slate-400 uppercase mb-4 tracking-wider border-b pb-2">个人特质 (Attributes)</h3>
 <div class="grid grid-cols-2 gap-x-8 gap-y-3" id="attributes-container"></div>
 </div>
-<div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+<div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 card-hover">
 <h3 class="text-xs font-bold text-slate-400 uppercase mb-4 tracking-wider border-b pb-2">性格倾向 (Personality)</h3>
 <div class="space-y-3" id="personality-container"></div>
 </div>
@@ -266,8 +535,8 @@ body.modal-active { overflow: hidden; }
 
 <div class="flex justify-between pt-4">
 <button onclick="goToStep(1)" class="text-slate-400 hover:text-slate-600 px-4 py-2 font-medium">返回修改数值</button>
-<button onclick="finishStep2()" class="bg-slate-900 hover:bg-black text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-slate-300 transition flex items-center gap-2 group">
-<span>下一步:注入灵魂</span> <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+<button onclick="finishStep2()" class="bg-slate-900 hover:bg-black text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-slate-300 transition-all duration-300 flex items-center gap-2 group hover:scale-105 hover:shadow-xl hover:shadow-slate-400">
+<span>下一步:注入灵魂</span> <i class="fa-solid fa-arrow-right group-hover:translate-x-2 transition-transform duration-300"></i>
 </button>
 </div>
 </div>
@@ -327,8 +596,8 @@ body.modal-active { overflow: hidden; }
 
 <div class="flex justify-between pt-4">
 <button onclick="goToStep(2)" class="text-slate-400 hover:text-slate-600 px-4 py-2 font-medium">返回修改外貌</button>
-<button onclick="finishStep3()" class="bg-slate-900 hover:bg-black text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-slate-300 transition flex items-center gap-2 group">
-<span>下一步：深度细化</span> <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+<button onclick="finishStep3()" class="bg-slate-900 hover:bg-black text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-slate-300 transition-all duration-300 flex items-center gap-2 group hover:scale-105 hover:shadow-xl hover:shadow-slate-400">
+<span>下一步：深度细化</span> <i class="fa-solid fa-arrow-right group-hover:translate-x-2 transition-transform duration-300"></i>
 </button>
 </div>
 </div>
