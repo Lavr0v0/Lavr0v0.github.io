@@ -30,8 +30,9 @@ jobs:
 
             echo "==> $repo ($branch): $source -> $target"
 
-            rm -rf _src
-            git clone --depth 1 --branch "$branch" "https://x-access-token:${GH_TOKEN}@github.com/${repo}.git" _src
+            work="$RUNNER_TEMP/src"
+            rm -rf "$work"
+            git clone --depth 1 --branch "$branch" "https://x-access-token:${GH_TOKEN}@github.com/${repo}.git" "$work"
 
             rm -rf "$target"
             mkdir -p "$target"
@@ -41,8 +42,9 @@ jobs:
               --exclude ".github" \
               --exclude ".DS_Store" \
               --exclude "node_modules" \
-              "_src/${source}/" "${target}/"
+              "$work/${source}/" "${target}/"
           done
+
 
       - name: Commit & push if changed
         env:
@@ -57,5 +59,6 @@ jobs:
           # 用 PAT 推送（而不是 github-actions[bot]）
           git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/Lavr0v0/Lavr0v0.github.io.git"
           git push
+
 
 
