@@ -4,5 +4,11 @@
     "branch": "main",
     "source": ".",
     "target": "CForge"
+  },
+  {
+    "repo": "Lavr0v0/Life_simulator",
+    "branch": "main",
+    "source": "pages",
+    "target": "LSimulator"
   }
 ]
