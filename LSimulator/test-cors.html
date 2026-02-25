@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORS 测试</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #1a1a2e; color: #eee; }
+        button { padding: 10px 20px; margin: 10px 5px; cursor: pointer; }
+        .result { margin: 10px 0; padding: 10px; background: #2a2a3e; border-radius: 5px; }
+        .success { color: #4ade80; }
+        .error { color: #f87171; }
+        pre { background: #0a0a1a; padding: 10px; border-radius: 5px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔍 CORS 连通性测试</h1>
+    <p>当前页面 origin: <strong id="origin"></strong></p>
+    <p>后端地址: <strong>https://life-simulator-api.onrender.com</strong></p>
+    
+    <div>
+        <button onclick="testHealth()">测试 /api/health</button>
+        <button onclick="testSetKey()">测试 /api/set-key</button>
+        <button onclick="testConnection()">测试 /api/test-connection</button>
+    </div>
+    
+    <div id="results"></div>
+
+    <script>
+        document.getElementById('origin').textContent = window.location.origin;
+        const API_BASE = 'https://life-simulator-api.onrender.com';
+        const results = document.getElementById('results');
+
+        function log(msg, isError = false) {
+            const div = document.createElement('div');
+            div.className = 'result ' + (isError ? 'error' : 'success');
+            div.innerHTML = msg;
+            results.appendChild(div);
+        }
+
+        async function testHealth() {
+            results.innerHTML = '';
+            log('⏳ 测试 /api/health...');
+            try {
+                const res = await fetch(`${API_BASE}/api/health`, { method: 'GET' });
+                const data = await res.json();
+                log(`✅ 成功: ${res.status}<pre>${JSON.stringify(data, null, 2)}</pre>`);
+            } catch (err) {
+                log(`❌ 失败: ${err.message}<br>可能原因：CORS 拦截或网络错误`, true);
+                console.error(err);
+            }
+        }
+
+        async function testSetKey() {
+            results.innerHTML = '';
+            log('⏳ 测试 /api/set-key...');
+            try {
+                const res = await fetch(`${API_BASE}/api/set-key`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        provider: 'deepseek',
+                        model: 'deepseek-chat',
+                        apiKey: 'test-key-12345'
+                    })
+                });
+                const data = await res.json();
+                log(`✅ 成功: ${res.status}<pre>${JSON.stringify(data, null, 2)}</pre>`);
+            } catch (err) {
+                log(`❌ 失败: ${err.message}<br>可能原因：CORS 拦截或网络错误`, true);
+                console.error(err);
+            }
+        }
+
+        async function testConnection() {
+            results.innerHTML = '';
+            log('⏳ 测试 /api/test-connection...');
+            try {
+                const res = await fetch(`${API_BASE}/api/test-connection`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        provider: 'deepseek',
+                        model: 'deepseek-chat',
+                        apiKey: 'test-key-12345'
+                    })
+                });
+                const data = await res.json();
+                log(`✅ 成功: ${res.status}<pre>${JSON.stringify(data, null, 2)}</pre>`);
+            } catch (err) {
+                log(`❌ 失败: ${err.message}<br>可能原因：CORS 拦截或网络错误`, true);
+                console.error(err);
+            }
+        }
+    </script>
+</body>
+</html>
