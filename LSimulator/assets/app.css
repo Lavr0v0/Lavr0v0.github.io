@@ -230,6 +230,36 @@ h3 { font-size: 13px; font-weight: 600; color: var(--text); margin: 14px 0 8px; 
     margin-top: 6px;
 }
 
+/* Test Connection Button */
+.test-conn-btn {
+    width: 100%;
+    padding: 9px 14px;
+    margin: 8px 0 0;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    background: rgba(91,141,239,0.1);
+    border: 1px solid rgba(91,141,239,0.3);
+    border-radius: 8px;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.test-conn-btn:hover:not(:disabled) {
+    background: rgba(91,141,239,0.2);
+    border-color: var(--primary);
+    transform: none;
+    box-shadow: none;
+}
+
+.test-conn-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.test-conn-btn::after { display: none; }
+
 /* Dev Mode Dialog */
 .dev-overlay {
     position: fixed; inset: 0; z-index: 200;

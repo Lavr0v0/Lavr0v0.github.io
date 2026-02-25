@@ -100,7 +100,29 @@ function initStartScreen() {
     const aiHint = document.getElementById('ai-config-hint');
     const devModeBtn = document.getElementById('dev-mode-btn');
     const startBtn = document.getElementById('start-game');
+    const testConnBtn = document.getElementById('test-connection-btn');
     let useBuiltinKey = false;
+
+    // 连通性测试通过后才能开始
+    function setAuthed(val) {
+        isAuthed = val;
+        startBtn.disabled = !val;
+        startBtn.style.opacity = val ? '1' : '0.4';
+    }
+
+    function enableTestBtn() {
+        testConnBtn.disabled = false;
+    }
+    function disableTestBtn() {
+        testConnBtn.disabled = true;
+    }
+
+    // 任何配置变更都重置验证状态
+    function resetAuth() {
+        setAuthed(false);
+        aiHint.textContent = '请点击「测试连接」验证配置';
+        aiHint.style.color = '';
+    }
 
     function updateModelOptions() {
         const provider = PROVIDERS[providerSelect.value];
@@ -133,6 +155,8 @@ function initStartScreen() {
                 modelSelect.selectedIndex = 0;
             }
         }
+        // 切换模型后需要重新测试
+        if (isAuthed) resetAuth();
     });
 
     providerSelect.addEventListener('change', () => {
@@ -144,11 +168,9 @@ function initStartScreen() {
             aiKeyInput.value = '';
             aiKeyInput.placeholder = '输入你的 API Key';
             devModeBtn.classList.remove('active');
-            aiHint.textContent = '选择 AI 提供商，填入你的 API Key';
-            aiHint.style.color = '';
-            startBtn.disabled = true;
-            startBtn.style.opacity = '0.4';
         }
+        resetAuth();
+        disableTestBtn();
     });
 
     // 从 localStorage 恢复
@@ -162,29 +184,24 @@ function initStartScreen() {
     }
     if (savedKey) {
         aiKeyInput.value = savedKey;
-        aiHint.textContent = '已恢复上次的 API Key';
-        aiHint.style.color = 'var(--success)';
-        startBtn.disabled = false;
-        startBtn.style.opacity = '1';
-        isAuthed = true;
+        aiHint.textContent = '已恢复 API Key，请点击「测试连接」验证';
+        aiHint.style.color = 'var(--warning)';
+        enableTestBtn();
     }
 
     aiKeyInput.addEventListener('input', () => {
         useBuiltinKey = false;
         devModeBtn.classList.remove('active');
         if (aiKeyInput.value.trim()) {
-            aiHint.textContent = '将使用你的 API Key';
-            aiHint.style.color = 'var(--success)';
-            startBtn.disabled = false;
-            startBtn.style.opacity = '1';
-            isAuthed = true;
+            aiHint.textContent = '请点击「测试连接」验证配置';
+            aiHint.style.color = '';
+            enableTestBtn();
         } else {
             aiHint.textContent = '选择 AI 提供商，填入你的 API Key';
             aiHint.style.color = '';
-            startBtn.disabled = true;
-            startBtn.style.opacity = '0.4';
-            isAuthed = false;
+            disableTestBtn();
         }
+        setAuthed(false);
     });
 
     // 开发者模式
@@ -215,18 +232,16 @@ function initStartScreen() {
                 });
                 if (res.ok) {
                     useBuiltinKey = true;
-                    isAuthed = true;
                     aiKeyInput.value = '';
                     aiKeyInput.placeholder = '开发者模式已激活';
                     aiKeyInput.disabled = true;
                     providerSelect.value = 'deepseek';
                     updateModelOptions();
-                    aiHint.textContent = '✅ 使用内置 API Key';
-                    aiHint.style.color = 'var(--success)';
                     devModeBtn.classList.add('active');
-                    startBtn.disabled = false;
-                    startBtn.style.opacity = '1';
                     overlay.remove();
+                    // 自动触发连通性测试
+                    enableTestBtn();
+                    testConnBtn.click();
                 } else {
                     codeInput.style.borderColor = 'var(--danger)';
                     codeInput.value = '';
@@ -241,6 +256,93 @@ function initStartScreen() {
         codeInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') document.getElementById('dev-confirm').click();
         });
+    });
+
+    // 连通性测试按钮
+    testConnBtn.addEventListener('click', async () => {
+        const provider = providerSelect.value;
+        const model = modelSelect.value;
+        const userKey = aiKeyInput.value.trim();
+        const payload = useBuiltinKey
+            ? { provider, model, apiKey: '__BUILTIN__' }
+            : { provider, model, apiKey: userKey };
+
+        testConnBtn.disabled = true;
+        testConnBtn.textContent = '⏳ 后端连接中...';
+        aiHint.textContent = '正在检测后端服务...';
+        aiHint.style.color = 'var(--warning)';
+
+        // Step 1: 检查后端是否在线
+        try {
+            const healthRes = await fetch(`${API_BASE}/api/health`, { method: 'GET' });
+            if (!healthRes.ok) throw new Error('后端返回异常');
+        } catch (err) {
+            testConnBtn.textContent = '🔗 测试连接';
+            testConnBtn.disabled = false;
+            aiHint.textContent = '❌ 后端连接失败，请检查服务器是否运行';
+            aiHint.style.color = 'var(--danger)';
+            setAuthed(false);
+            return;
+        }
+
+        // Step 2: 先设置 AI 配置
+        testConnBtn.textContent = '⏳ 配置 AI...';
+        aiHint.textContent = '正在设置 AI 配置...';
+        try {
+            const keyRes = await fetch(`${API_BASE}/api/set-key`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!keyRes.ok) {
+                const errData = await keyRes.json().catch(() => ({}));
+                throw new Error(errData.error || 'AI 配置失败');
+            }
+        } catch (err) {
+            testConnBtn.textContent = '🔗 测试连接';
+            testConnBtn.disabled = false;
+            aiHint.textContent = `❌ ${err.message}`;
+            aiHint.style.color = 'var(--danger)';
+            setAuthed(false);
+            return;
+        }
+
+        // Step 3: 测试 AI 连通性
+        testConnBtn.textContent = '⏳ AI 测试中...';
+        aiHint.textContent = '正在测试 AI 接口...';
+        try {
+            const testRes = await fetch(`${API_BASE}/api/test-connection`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const testData = await testRes.json();
+            if (testData.ok) {
+                testConnBtn.textContent = '✅ 连接成功';
+                aiHint.textContent = '✅ 连接成功，可以开始游戏';
+                aiHint.style.color = 'var(--success)';
+                setAuthed(true);
+                // 保存到 localStorage
+                if (!useBuiltinKey && userKey) {
+                    localStorage.setItem('life-sim-ai-key', userKey);
+                    localStorage.setItem('life-sim-provider', provider);
+                    localStorage.setItem('life-sim-model', model);
+                }
+                setTimeout(() => { testConnBtn.textContent = '🔗 测试连接'; testConnBtn.disabled = false; }, 3000);
+            } else {
+                testConnBtn.textContent = '🔗 测试连接';
+                testConnBtn.disabled = false;
+                aiHint.textContent = `❌ AI 测试失败: ${testData.error || '未知错误'}`;
+                aiHint.style.color = 'var(--danger)';
+                setAuthed(false);
+            }
+        } catch (err) {
+            testConnBtn.textContent = '🔗 测试连接';
+            testConnBtn.disabled = false;
+            aiHint.textContent = `❌ 测试请求失败: ${err.message}`;
+            aiHint.style.color = 'var(--danger)';
+            setAuthed(false);
+        }
     });
 
     // 难度选择
@@ -373,7 +475,7 @@ function initStartScreen() {
         if (!isAuthed) { alert('请先配置 AI 设置'); return; }
         if (!unlimitedMode && calcUsed() > 30) { alert('属性点超出30点！'); return; }
 
-        // 发送 AI 配置到后端
+        // 发送 AI 配置到后端（已在测试时设置，这里再确认一次）
         try {
             const provider = providerSelect.value;
             const model = modelSelect.value;
@@ -387,14 +489,8 @@ function initStartScreen() {
                 body: JSON.stringify(payload)
             });
             if (!keyRes.ok) throw new Error('设置失败');
-            // 保存到 localStorage
-            if (!useBuiltinKey && userKey) {
-                localStorage.setItem('life-sim-ai-key', userKey);
-                localStorage.setItem('life-sim-provider', provider);
-                localStorage.setItem('life-sim-model', model);
-            }
         } catch (err) {
-            alert('AI 配置失败，请检查服务器是否运行');
+            alert('AI 配置失败，请重新测试连接');
             return;
         }
 
