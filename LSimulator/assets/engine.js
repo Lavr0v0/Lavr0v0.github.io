@@ -40,6 +40,7 @@ export class GameEngine {
         this.focusPhase = null; // { start, end } — 重点阶段
         this.contentMode = 'sfw'; // 'sfw' or 'nsfw'
         this.creativeMode = 'original'; // 'original' or 'fanfic'
+        this.narrativeStyle = 'humorous'; // 'humorous', 'literary', 'realistic', 'dramatic'
         this.lifeFocus = 'balanced'; // 'balanced', 'career', 'relationship', 'family', 'adventure'
         this.scheduledEvents = []; // [{ age, text }] — 定时事件
         this.playerDirective = ''; // 金手指：玩家的下一轮指令
@@ -123,7 +124,7 @@ export class GameEngine {
         }
     }
 
-    initializeGame(name, gender, personality, attributes, weirdness, difficulty, contentMode, creativeMode, lifeFocus, kinks) {
+    initializeGame(name, gender, personality, attributes, weirdness, difficulty, contentMode, creativeMode, lifeFocus, kinks, narrativeStyle, backgroundSetting, customBackground) {
             this.playerName = name;
             this.playerGender = gender;
             this.playerPersonality = personality;
@@ -133,7 +134,10 @@ export class GameEngine {
             this.state.difficulty = difficulty || 2;
             this.contentMode = contentMode || 'sfw';
             this.creativeMode = creativeMode || 'original';
+            this.narrativeStyle = narrativeStyle || 'humorous';
             this.lifeFocus = lifeFocus || 'balanced';
+            this.backgroundSetting = backgroundSetting || 'modern';
+            this.customBackground = customBackground || '';
             this.initializeHiddenAttributes();
             this.initializeDerivedFromAttributes();
         }
@@ -175,6 +179,9 @@ export class GameEngine {
                     focusPhase: this.focusPhase,
                     contentMode: this.contentMode,
                     creativeMode: this.creativeMode,
+                    narrativeStyle: this.narrativeStyle,
+                    backgroundSetting: this.backgroundSetting,
+                    customBackground: this.customBackground,
                     lifeFocus: this.lifeFocus,
                     focusRound,
                     scheduledEvents: this.scheduledEvents,
@@ -233,7 +240,10 @@ export class GameEngine {
                     playerGender: this.playerGender,
                     playerPersonality: this.playerPersonality,
                     contentMode: this.contentMode,
-                    creativeMode: this.creativeMode
+                    creativeMode: this.creativeMode,
+                    narrativeStyle: this.narrativeStyle,
+                    backgroundSetting: this.backgroundSetting,
+                    customBackground: this.customBackground
                 })
             });
             clearTimeout(timeoutId);
@@ -274,7 +284,10 @@ export class GameEngine {
                     playerGender: this.playerGender,
                     playerPersonality: this.playerPersonality,
                     contentMode: this.contentMode,
-                    creativeMode: this.creativeMode
+                    creativeMode: this.creativeMode,
+                    narrativeStyle: this.narrativeStyle,
+                    backgroundSetting: this.backgroundSetting,
+                    customBackground: this.customBackground
                 })
             });
             clearTimeout(timeoutId);
@@ -294,7 +307,10 @@ export class GameEngine {
                     playerGender: this.playerGender,
                     playerPersonality: this.playerPersonality,
                     contentMode: this.contentMode,
-                    creativeMode: this.creativeMode
+                    creativeMode: this.creativeMode,
+                    narrativeStyle: this.narrativeStyle,
+                    backgroundSetting: this.backgroundSetting,
+                    customBackground: this.customBackground
                 })
             });
             if (!res.ok) throw new Error();
@@ -313,7 +329,10 @@ export class GameEngine {
                     playerGender: this.playerGender,
                     playerPersonality: this.playerPersonality,
                     contentMode: this.contentMode,
-                    creativeMode: this.creativeMode
+                    creativeMode: this.creativeMode,
+                    narrativeStyle: this.narrativeStyle,
+                    backgroundSetting: this.backgroundSetting,
+                    customBackground: this.customBackground
                 })
             });
             if (!res.ok) throw new Error();
@@ -606,10 +625,13 @@ export class GameEngine {
             focusPhase: this.focusPhase,
             contentMode: this.contentMode,
             creativeMode: this.creativeMode,
+            narrativeStyle: this.narrativeStyle,
             lifeFocus: this.lifeFocus,
             scheduledEvents: this.scheduledEvents,
             playerDirective: this.playerDirective,
-            backstory: this.backstory
+            backstory: this.backstory,
+            backgroundSetting: this.backgroundSetting,
+            customBackground: this.customBackground
         };
         localStorage.setItem('life-sim-save', JSON.stringify(saveData));
         return true;
@@ -627,10 +649,13 @@ export class GameEngine {
             this.focusPhase = saveData.focusPhase || null;
             this.contentMode = saveData.contentMode || 'sfw';
             this.creativeMode = saveData.creativeMode || 'original';
+            this.narrativeStyle = saveData.narrativeStyle || 'humorous';
             this.lifeFocus = saveData.lifeFocus || 'balanced';
             this.scheduledEvents = saveData.scheduledEvents || [];
             this.playerDirective = saveData.playerDirective || '';
             this.backstory = saveData.backstory || '';
+            this.backgroundSetting = saveData.backgroundSetting || 'modern';
+            this.customBackground = saveData.customBackground || '';
             return true;
         } catch { return false; }
     }

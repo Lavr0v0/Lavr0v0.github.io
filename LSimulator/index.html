@@ -62,9 +62,9 @@
             </div>
 
             <div id="attribute-allocation">
-                <h2>分配属性点（剩余 <span id="points-left">30</span> 点）</h2>
+                <h2>分配属性点（剩余 <span id="points-left">0</span> 点）</h2>
                 <div class="attr-warning" id="attr-warning" style="display:none">
-                    ⚠️ 警告：属性低于 2 点可能导致早死！
+                    ⚠️ 警告：属性低于 2 点可能导致夭折！
                 </div>
                 <div class="attributes"></div>
             </div>
@@ -97,6 +97,17 @@
                 <div class="creative-mode-hint" id="creative-mode-hint">原创模式：所有角色都是独立创作，不参考现实人物</div>
             </div>
 
+            <div class="narrative-style-section">
+                <label>解说风格</label>
+                <div class="narrative-style-options">
+                    <button class="style-btn active" data-style="humorous">吐槽风</button>
+                    <button class="style-btn" data-style="literary">文艺风</button>
+                    <button class="style-btn" data-style="realistic">写实风</button>
+                    <button class="style-btn" data-style="dramatic">戏剧风</button>
+                </div>
+                <div class="narrative-style-hint" id="narrative-style-hint">吐槽风：毒舌损友式的幽默解说（默认）</div>
+            </div>
+
             <div class="life-focus-section">
                 <label>人生侧重</label>
                 <div class="life-focus-options">
@@ -120,6 +131,21 @@
                     <button class="phase-btn" data-age="22">工作</button>
                 </div>
                 <div class="phase-hint" id="phase-hint">从出生开始完整体验</div>
+            </div>
+
+            <div class="background-setting-section">
+                <label>背景设定</label>
+                <div class="background-options">
+                    <button class="bg-btn active" data-bg="modern">现代（优化）</button>
+                    <button class="bg-btn" data-bg="custom">自定义</button>
+                </div>
+                <div class="background-hint" id="background-hint">现代背景：经过优化的现代都市生活，包含学业、职场、感情等常规人生阶段</div>
+                <div id="custom-background-input" style="display:none; margin-top: 12px;">
+                    <textarea id="custom-background-text" placeholder="描述你的背景设定（例如：修仙世界、赛博朋克未来、中世纪欧洲、末日废土等）&#10;&#10;可以包含：世界观、时代背景、社会结构、特殊规则、魔法/科技体系等。字数不限，越详细越好。" maxlength="2000" rows="6" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; font-family: inherit; background: rgba(15,23,42,0.5); color: var(--text); resize: vertical;"></textarea>
+                    <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px; text-align: right;">
+                        <span id="custom-bg-count">0</span>/2000 字
+                    </div>
+                </div>
             </div>
 
             <div class="scheduled-events-section">

@@ -146,11 +146,11 @@ function initStartScreen() {
         const hasZeroAttr = Object.values(allocated).some(v => v === 0);
         
         if (hasZeroAttr) {
-            warningEl.textContent = '⚠️ 警告：属性为 0 极易早死！';
+            warningEl.textContent = '⚠️ 警告：属性为 0 极易夭折！';
             warningEl.style.display = 'block';
             warningEl.style.color = 'var(--danger)';
         } else if (hasLowAttr) {
-            warningEl.textContent = '⚠️ 警告：属性低于 2 点可能导致早死！';
+            warningEl.textContent = '⚠️ 警告：属性低于 2 点可能导致夭折！';
             warningEl.style.display = 'block';
             warningEl.style.color = 'var(--warning)';
         } else {
@@ -159,6 +159,9 @@ function initStartScreen() {
     };
 
     container.addEventListener('click', handleAttrClick);
+    
+    // 初始化时更新点数显示
+    updatePoints();
 
     // ===== AI 提供商配置 =====
     const PROVIDERS = {
@@ -581,6 +584,23 @@ function initStartScreen() {
         });
     });
 
+    // 解说风格选择
+    let selectedNarrativeStyle = 'humorous';
+    const narrativeStyleHints = {
+        humorous: '吐槽风：毒舌损友式的幽默解说（默认）',
+        literary: '文艺风：优美细腻的文学化叙述',
+        realistic: '写实风：客观冷静的纪实性描写',
+        dramatic: '戏剧风：夸张生动的戏剧化表现'
+    };
+    document.querySelectorAll('.style-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedNarrativeStyle = btn.dataset.style;
+            document.getElementById('narrative-style-hint').textContent = narrativeStyleHints[selectedNarrativeStyle];
+        });
+    });
+
     // 人生侧重选择
     let selectedLifeFocus = 'balanced';
     const lifeFocusHints = {
@@ -597,6 +617,46 @@ function initStartScreen() {
             selectedLifeFocus = btn.dataset.focus;
             document.getElementById('life-focus-hint').textContent = lifeFocusHints[selectedLifeFocus];
         });
+    });
+
+    // 背景设定选择
+    let selectedBackground = 'modern';
+    let customBackgroundText = '';
+    const backgroundHints = {
+        modern: '现代背景：经过优化的现代都市生活，包含学业、职场、感情等常规人生阶段',
+        custom: '自定义背景：完全自由的世界观设定，不受现代社会框架限制'
+    };
+    
+    document.querySelectorAll('.bg-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.bg-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedBackground = btn.dataset.bg;
+            document.getElementById('background-hint').textContent = backgroundHints[selectedBackground] || '';
+            
+            const customInput = document.getElementById('custom-background-input');
+            const phaseSection = document.querySelector('.phase-section');
+            
+            if (selectedBackground === 'custom') {
+                customInput.style.display = 'block';
+                // 自定义背景下隐藏起始阶段选择
+                if (phaseSection) phaseSection.style.display = 'none';
+            } else {
+                customInput.style.display = 'none';
+                if (phaseSection) phaseSection.style.display = 'block';
+            }
+        });
+    });
+
+    // 自定义背景文本输入
+    const customBgTextarea = document.getElementById('custom-background-text');
+    const customBgCount = document.getElementById('custom-bg-count');
+    
+    customBgTextarea?.addEventListener('input', () => {
+        customBackgroundText = customBgTextarea.value;
+        if (customBgCount) {
+            customBgCount.textContent = customBackgroundText.length;
+        }
     });
 
     // 起始阶段选择
@@ -688,7 +748,7 @@ function initStartScreen() {
         }
 
         const weirdness = 3; // 固定值，已移除奇异度滑块
-        game.initializeGame(name, gender, personality || '普通', allocated, weirdness, selectedDifficulty, selectedContentMode, selectedCreativeMode, selectedLifeFocus, kinks);
+        game.initializeGame(name, gender, personality || '普通', allocated, weirdness, selectedDifficulty, selectedContentMode, selectedCreativeMode, selectedLifeFocus, kinks, selectedNarrativeStyle, selectedBackground, customBackgroundText);
         game.scheduledEvents = [...scheduledEvents];
         await game.loadFallbackEvents();
 
@@ -818,6 +878,7 @@ function initStartScreen() {
                 playerKinks: game.playerKinks,
                 contentMode: game.contentMode,
                 creativeMode: game.creativeMode,
+                narrativeStyle: game.narrativeStyle,
                 lifeFocus: game.lifeFocus,
                 state: game.state,
                 scheduledEvents: game.scheduledEvents,
@@ -865,6 +926,7 @@ function initStartScreen() {
             game.playerKinks = saveData.playerKinks || '';
             game.contentMode = saveData.contentMode || 'sfw';
             game.creativeMode = saveData.creativeMode || 'original';
+            game.narrativeStyle = saveData.narrativeStyle || 'humorous';
             game.lifeFocus = saveData.lifeFocus || 'balanced';
             game.state = saveData.state;
             game.scheduledEvents = saveData.scheduledEvents || [];

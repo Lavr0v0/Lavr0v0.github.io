@@ -548,6 +548,7 @@ h3 { font-size: 13px; font-weight: 600; color: var(--text); margin: 14px 0 8px; 
 .difficulty-section,
 .content-mode-section,
 .phase-section,
+.background-setting-section,
 .scheduled-events-section {
     margin: 12px 0;
     padding: 14px 16px;
@@ -559,6 +560,7 @@ h3 { font-size: 13px; font-weight: 600; color: var(--text); margin: 14px 0 8px; 
 .difficulty-section > label,
 .content-mode-section > label,
 .phase-section > label,
+.background-setting-section > label,
 .scheduled-events-section > label {
     display: block;
     font-size: 12px;
@@ -592,7 +594,13 @@ h3 { font-size: 13px; font-weight: 600; color: var(--text); margin: 14px 0 8px; 
     gap: 6px;
 }
 
-.diff-btn, .content-btn, .phase-btn {
+.background-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+}
+
+.diff-btn, .content-btn, .phase-btn, .bg-btn {
     padding: 8px 4px;
     font-size: 12px;
     background: rgba(15,23,42,0.5);
@@ -605,14 +613,14 @@ h3 { font-size: 13px; font-weight: 600; color: var(--text); margin: 14px 0 8px; 
     font-family: inherit;
 }
 
-.diff-btn:hover, .content-btn:hover, .phase-btn:hover {
+.diff-btn:hover, .content-btn:hover, .phase-btn:hover, .bg-btn:hover {
     border-color: var(--border-hover);
     color: var(--text);
     transform: none;
     box-shadow: none;
 }
 
-.diff-btn::after, .content-btn::after, .phase-btn::after { display: none; }
+.diff-btn::after, .content-btn::after, .phase-btn::after, .bg-btn::after { display: none; }
 
 .diff-btn.active {
     background: linear-gradient(135deg, var(--danger), #dc2626);
@@ -632,7 +640,13 @@ h3 { font-size: 13px; font-weight: 600; color: var(--text); margin: 14px 0 8px; 
     border-color: transparent;
 }
 
-.difficulty-hint, .content-mode-hint, .phase-hint {
+.bg-btn.active {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border-color: transparent;
+}
+
+.difficulty-hint, .content-mode-hint, .phase-hint, .background-hint {
     font-size: 11px;
     color: var(--text-muted);
     margin-top: 6px;
@@ -695,6 +709,70 @@ h3 { font-size: 13px; font-weight: 600; color: var(--text); margin: 14px 0 8px; 
     color: var(--text-muted);
     margin-top: 6px;
     text-align: center;
+}
+
+/* ===== Narrative Style Section ===== */
+.narrative-style-section {
+    margin: 12px 0;
+    padding: 14px 16px;
+    background: var(--surface-card);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+}
+
+.narrative-style-section > label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+}
+
+.narrative-style-options {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+}
+
+.style-btn {
+    padding: 8px 4px;
+    font-size: 12px;
+    background: rgba(15,23,42,0.5);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.2s;
+    margin: 0;
+    font-family: inherit;
+}
+
+.style-btn:hover {
+    border-color: var(--border-hover);
+    color: var(--text);
+    transform: none;
+    box-shadow: none;
+}
+
+.style-btn::after { display: none; }
+
+.style-btn.active {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border-color: transparent;
+}
+
+.narrative-style-hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 6px;
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+    .narrative-style-options {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 /* ===== Life Focus Section ===== */
