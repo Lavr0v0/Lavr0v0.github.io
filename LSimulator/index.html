@@ -13,14 +13,30 @@
             <h1>人生轨迹模拟器</h1>
             <p class="subtitle">每一个选择，都在书写你的人生</p>
 
-            <!-- API Key 设置 -->
-            <div class="api-key-section">
-                <label>API 设置</label>
-                <div class="api-key-row">
-                    <input type="password" id="api-key-input" placeholder="输入你的 DeepSeek API Key" autocomplete="off">
+            <!-- AI 设置 -->
+            <div class="ai-config-section" id="ai-config-section">
+                <label>AI 设置</label>
+                <div class="ai-provider-row">
+                    <select id="ai-provider">
+                        <option value="deepseek">DeepSeek</option>
+                        <option value="openai">ChatGPT (OpenAI)</option>
+                        <option value="gemini">Gemini (Google)</option>
+                        <option value="qwen">通义千问 (Qwen)</option>
+                    </select>
                     <button id="dev-mode-btn" class="dev-mode-btn" type="button">开发者</button>
                 </div>
-                <div class="api-key-hint" id="api-key-hint">需要 DeepSeek API Key 才能游玩</div>
+                <div class="ai-model-row">
+                    <span class="ai-model-label">模型</span>
+                    <select id="ai-model">
+                        <option value="deepseek-chat">deepseek-chat</option>
+                        <option value="deepseek-reasoner">deepseek-reasoner</option>
+                        <option value="__custom__">自定义模型...</option>
+                    </select>
+                </div>
+                <div class="ai-key-row">
+                    <input type="password" id="ai-key-input" placeholder="输入你的 API Key" autocomplete="off">
+                </div>
+                <div class="ai-config-hint" id="ai-config-hint">选择 AI 提供商，填入你的 API Key</div>
             </div>
 
             <div class="identity-section">
@@ -161,25 +177,5 @@
     <script src="assets/stars.js"></script>
     <script type="module" src="assets/engine.js"></script>
     <script type="module" src="assets/ui.js"></script>
-	<script>
-  const API_BASE =
-  location.hostname === "localhost" || location.hostname === "127.0.0.1"
-    ? "http://localhost:3000"
-    : "https://life-simulator-api.onrender.com/";
-
-  document.getElementById("testApiBtn").addEventListener("click", async () => {
-    const output = document.getElementById("apiResult");
-    output.textContent = "请求中...";
-
-    try {
-      const res = await fetch(`${API_BASE}/health`);
-      const data = await res.json();
-      output.textContent = JSON.stringify(data, null, 2);
-    } catch (err) {
-      output.textContent = "请求失败: " + err.message;
-      console.error(err);
-    }
-  });
-</script>
 </body>
 </html>

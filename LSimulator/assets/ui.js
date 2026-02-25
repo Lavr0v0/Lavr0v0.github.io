@@ -1,9 +1,10 @@
-import { GameEngine } from './engine.js';
+import { GameEngine, API_BASE } from './engine.js';
 
 const game = new GameEngine();
 let currentEvent = null;
 let currentExtraChoices = [];
 let pendingAfterSequence = null; // 定时事件/金手指轮结束后的回调
+let isAuthed = false; // 是否已通过密码验证
 
 const ATTR_NAMES = {
     intelligence: '智力', health: '健康', charisma: '魅力',
@@ -69,42 +70,133 @@ function initStartScreen() {
 
     container.addEventListener('click', handleAttrClick);
 
-    // API Key 设置
-    const apiKeyInput = document.getElementById('api-key-input');
-    const apiKeyHint = document.getElementById('api-key-hint');
+    // ===== AI 提供商配置 =====
+    const PROVIDERS = {
+        deepseek: {
+            name: 'DeepSeek',
+            models: ['deepseek-chat', 'deepseek-reasoner'],
+            endpoint: 'https://api.deepseek.com/chat/completions'
+        },
+        openai: {
+            name: 'ChatGPT (OpenAI)',
+            models: ['gpt-4o-mini', 'gpt-4o', 'gpt-4.1', 'gpt-4.1-mini', 'gpt-4.1-nano', 'gpt-5', 'gpt-5-mini', 'gpt-5.1', 'gpt-5.2', 'o3', 'o4-mini'],
+            endpoint: 'https://api.openai.com/v1/chat/completions'
+        },
+        gemini: {
+            name: 'Gemini (Google)',
+            models: ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.5-pro', 'gemini-2.0-flash'],
+            endpoint: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions'
+        },
+        qwen: {
+            name: '通义千问 (Qwen)',
+            models: ['qwen-plus', 'qwen-turbo', 'qwen-max', 'qwq-32b', 'qwen3-235b-a22b', 'qwen3-30b-a3b'],
+            endpoint: 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions'
+        }
+    };
+
+    const providerSelect = document.getElementById('ai-provider');
+    const modelSelect = document.getElementById('ai-model');
+    const aiKeyInput = document.getElementById('ai-key-input');
+    const aiHint = document.getElementById('ai-config-hint');
     const devModeBtn = document.getElementById('dev-mode-btn');
+    const startBtn = document.getElementById('start-game');
     let useBuiltinKey = false;
 
-    // 从 localStorage 恢复 API Key
-    const savedApiKey = localStorage.getItem('life-sim-api-key');
-    if (savedApiKey) {
-        apiKeyInput.value = savedApiKey;
-        apiKeyHint.textContent = '已从本地恢复 API Key';
-        apiKeyHint.className = 'api-key-hint success';
+    function updateModelOptions() {
+        const provider = PROVIDERS[providerSelect.value];
+        const customVal = modelSelect.dataset.custom || '';
+        modelSelect.innerHTML = provider.models.map(m => `<option value="${m}">${m}</option>`).join('')
+            + '<option value="__custom__">自定义模型...</option>';
+        // 如果之前有自定义值且属于当前提供商，恢复
+        if (customVal && !provider.models.includes(customVal)) {
+            const opt = document.createElement('option');
+            opt.value = customVal;
+            opt.textContent = customVal;
+            modelSelect.insertBefore(opt, modelSelect.lastElementChild);
+            modelSelect.value = customVal;
+        }
     }
 
-    apiKeyInput.addEventListener('input', () => {
+    modelSelect.addEventListener('change', () => {
+        if (modelSelect.value === '__custom__') {
+            const custom = prompt('输入自定义模型名称：');
+            if (custom && custom.trim()) {
+                const val = custom.trim();
+                modelSelect.dataset.custom = val;
+                const opt = document.createElement('option');
+                opt.value = val;
+                opt.textContent = val;
+                modelSelect.insertBefore(opt, modelSelect.lastElementChild);
+                modelSelect.value = val;
+            } else {
+                // 取消，回到第一个
+                modelSelect.selectedIndex = 0;
+            }
+        }
+    });
+
+    providerSelect.addEventListener('change', () => {
+        updateModelOptions();
+        if (useBuiltinKey) {
+            // 切换提供商时退出开发者模式
+            useBuiltinKey = false;
+            aiKeyInput.disabled = false;
+            aiKeyInput.value = '';
+            aiKeyInput.placeholder = '输入你的 API Key';
+            devModeBtn.classList.remove('active');
+            aiHint.textContent = '选择 AI 提供商，填入你的 API Key';
+            aiHint.style.color = '';
+            startBtn.disabled = true;
+            startBtn.style.opacity = '0.4';
+        }
+    });
+
+    // 从 localStorage 恢复
+    const savedProvider = localStorage.getItem('life-sim-provider');
+    const savedModel = localStorage.getItem('life-sim-model');
+    const savedKey = localStorage.getItem('life-sim-ai-key');
+    if (savedProvider && PROVIDERS[savedProvider]) {
+        providerSelect.value = savedProvider;
+        updateModelOptions();
+        if (savedModel) modelSelect.value = savedModel;
+    }
+    if (savedKey) {
+        aiKeyInput.value = savedKey;
+        aiHint.textContent = '已恢复上次的 API Key';
+        aiHint.style.color = 'var(--success)';
+        startBtn.disabled = false;
+        startBtn.style.opacity = '1';
+        isAuthed = true;
+    }
+
+    aiKeyInput.addEventListener('input', () => {
         useBuiltinKey = false;
         devModeBtn.classList.remove('active');
-        if (apiKeyInput.value.trim()) {
-            apiKeyHint.textContent = '将使用你的 API Key';
-            apiKeyHint.className = 'api-key-hint success';
+        if (aiKeyInput.value.trim()) {
+            aiHint.textContent = '将使用你的 API Key';
+            aiHint.style.color = 'var(--success)';
+            startBtn.disabled = false;
+            startBtn.style.opacity = '1';
+            isAuthed = true;
         } else {
-            apiKeyHint.textContent = '需要 DeepSeek API Key 才能游玩';
-            apiKeyHint.className = 'api-key-hint';
+            aiHint.textContent = '选择 AI 提供商，填入你的 API Key';
+            aiHint.style.color = '';
+            startBtn.disabled = true;
+            startBtn.style.opacity = '0.4';
+            isAuthed = false;
         }
     });
 
     // 开发者模式
     devModeBtn.addEventListener('click', () => {
         const overlay = document.createElement('div');
-        overlay.className = 'dev-mode-prompt';
+        overlay.className = 'dev-overlay';
         overlay.innerHTML = `
-            <div class="dev-mode-dialog">
+            <div class="dev-dialog">
                 <h3>开发者验证</h3>
                 <input type="password" id="dev-code-input" placeholder="输入验证码" maxlength="6" autocomplete="off">
-                <div class="dev-mode-actions">
-                    <button class="dev-cancel-btn" id="dev-cancel">取消</button>
+                <div class="dev-actions">
+                    <button id="dev-cancel" class="dev-cancel-btn">取消</button>
                     <button id="dev-confirm">确认</button>
                 </div>
             </div>`;
@@ -113,20 +205,37 @@ function initStartScreen() {
         codeInput.focus();
         document.getElementById('dev-cancel').addEventListener('click', () => overlay.remove());
         overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
-        document.getElementById('dev-confirm').addEventListener('click', () => {
-            if (codeInput.value === '131313') {
-                useBuiltinKey = true;
-                apiKeyInput.value = '';
-                apiKeyInput.placeholder = '开发者模式已激活';
-                apiKeyInput.disabled = true;
-                apiKeyHint.textContent = '使用内置 API Key';
-                apiKeyHint.className = 'api-key-hint success';
-                devModeBtn.classList.add('active');
-                overlay.remove();
-            } else {
+        document.getElementById('dev-confirm').addEventListener('click', async () => {
+            const code = codeInput.value;
+            try {
+                const res = await fetch(`${API_BASE}/api/auth`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: code })
+                });
+                if (res.ok) {
+                    useBuiltinKey = true;
+                    isAuthed = true;
+                    aiKeyInput.value = '';
+                    aiKeyInput.placeholder = '开发者模式已激活';
+                    aiKeyInput.disabled = true;
+                    providerSelect.value = 'deepseek';
+                    updateModelOptions();
+                    aiHint.textContent = '✅ 使用内置 API Key';
+                    aiHint.style.color = 'var(--success)';
+                    devModeBtn.classList.add('active');
+                    startBtn.disabled = false;
+                    startBtn.style.opacity = '1';
+                    overlay.remove();
+                } else {
+                    codeInput.style.borderColor = 'var(--danger)';
+                    codeInput.value = '';
+                    codeInput.placeholder = '验证码错误';
+                }
+            } catch {
                 codeInput.style.borderColor = 'var(--danger)';
                 codeInput.value = '';
-                codeInput.placeholder = '验证码错误';
+                codeInput.placeholder = '服务器连接失败';
             }
         });
         codeInput.addEventListener('keydown', (e) => {
@@ -261,29 +370,31 @@ function initStartScreen() {
         const personality = document.getElementById('player-personality').value.trim();
 
         if (!name) { alert('请输入你的名字'); return; }
+        if (!isAuthed) { alert('请先配置 AI 设置'); return; }
         if (!unlimitedMode && calcUsed() > 30) { alert('属性点超出30点！'); return; }
 
-        // API Key 验证
-        const userApiKey = apiKeyInput.value.trim();
-        if (!useBuiltinKey && !userApiKey) {
-            alert('请输入 DeepSeek API Key 或使用开发者模式');
-            apiKeyInput.focus();
-            return;
-        }
-        // 发送 API Key 到服务端
+        // 发送 AI 配置到后端
         try {
-            const keyRes = await fetch('/api/set-key', {
+            const provider = providerSelect.value;
+            const model = modelSelect.value;
+            const userKey = aiKeyInput.value.trim();
+            const payload = useBuiltinKey
+                ? { provider, model, apiKey: '__BUILTIN__' }
+                : { provider, model, apiKey: userKey };
+            const keyRes = await fetch(`${API_BASE}/api/set-key`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ apiKey: useBuiltinKey ? '__BUILTIN__' : userApiKey })
+                body: JSON.stringify(payload)
             });
-            if (!keyRes.ok) throw new Error('设置 API Key 失败');
+            if (!keyRes.ok) throw new Error('设置失败');
             // 保存到 localStorage
-            if (!useBuiltinKey && userApiKey) {
-                localStorage.setItem('life-sim-api-key', userApiKey);
+            if (!useBuiltinKey && userKey) {
+                localStorage.setItem('life-sim-ai-key', userKey);
+                localStorage.setItem('life-sim-provider', provider);
+                localStorage.setItem('life-sim-model', model);
             }
         } catch (err) {
-            alert('API Key 设置失败，请检查服务器是否运行');
+            alert('AI 配置失败，请检查服务器是否运行');
             return;
         }
 

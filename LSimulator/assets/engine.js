@@ -1,3 +1,8 @@
+export const API_BASE =
+    location.hostname === 'localhost' || location.hostname === '127.0.0.1'
+        ? ''
+        : 'https://life-simulator-api.onrender.com';
+
 export class GameEngine {
     constructor() {
         this.playerName = '';
@@ -50,7 +55,7 @@ export class GameEngine {
     // 快速跳过到指定年龄
     async skipToAge(targetAge) {
         try {
-            const res = await fetch('/api/skip-years', {
+            const res = await fetch(`${API_BASE}/api/skip-years`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -143,7 +148,7 @@ export class GameEngine {
 
     async generateEvent(focusRound = 0) {
         try {
-            const res = await fetch('/api/generate-event', {
+            const res = await fetch(`${API_BASE}/api/generate-event`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -194,7 +199,7 @@ export class GameEngine {
     // 展开生成：对当前事件进行详细展开
     async expandEvent(event) {
         try {
-            const res = await fetch('/api/expand-event', {
+            const res = await fetch(`${API_BASE}/api/expand-event`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -231,7 +236,7 @@ export class GameEngine {
 
     async generateNarrative(event, choice, success) {
         try {
-            const res = await fetch('/api/narrate', {
+            const res = await fetch(`${API_BASE}/api/narrate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -249,7 +254,7 @@ export class GameEngine {
 
     async generateEndingSummary(endingTitle) {
         try {
-            const res = await fetch('/api/generate-ending', {
+            const res = await fetch(`${API_BASE}/api/generate-ending`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -267,7 +272,7 @@ export class GameEngine {
 
     async generateObserverMode() {
         try {
-            const res = await fetch('/api/observer', {
+            const res = await fetch(`${API_BASE}/api/observer`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

@@ -93,8 +93,8 @@ h2 { color: var(--text); font-size: 14px; font-weight: 500; margin: 16px 0 10px;
 h2 span { color: var(--primary); font-weight: 700; }
 h3 { font-size: 13px; font-weight: 600; color: var(--text); margin: 14px 0 8px; }
 
-/* ===== API Key Section ===== */
-.api-key-section {
+/* ===== AI Config Section ===== */
+.ai-config-section {
     margin-bottom: 16px;
     padding: 14px 16px;
     background: var(--surface-card);
@@ -102,7 +102,7 @@ h3 { font-size: 13px; font-weight: 600; color: var(--text); margin: 14px 0 8px; 
     border: 1px solid var(--border);
 }
 
-.api-key-section > label {
+.ai-config-section > label {
     display: block;
     font-size: 12px;
     font-weight: 500;
@@ -110,12 +110,69 @@ h3 { font-size: 13px; font-weight: 600; color: var(--text); margin: 14px 0 8px; 
     margin-bottom: 8px;
 }
 
-.api-key-row {
+.ai-provider-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.ai-provider-row select {
+    flex: 1;
+    padding: 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 13px;
+    background: rgba(15,23,42,0.6);
+    color: var(--text);
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+}
+
+.ai-model-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.ai-model-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    min-width: 28px;
+}
+
+.ai-model-row select {
+    flex: 1;
+    padding: 7px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(15,23,42,0.6);
+    color: var(--text);
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    padding-right: 28px;
+}
+
+.ai-key-row {
     display: flex;
     gap: 6px;
 }
 
-.api-key-row input {
+.ai-key-row input {
     flex: 1;
     padding: 9px 12px;
     border: 1px solid var(--border);
@@ -128,9 +185,14 @@ h3 { font-size: 13px; font-weight: 600; color: var(--text); margin: 14px 0 8px; 
     transition: border-color 0.2s;
 }
 
-.api-key-row input:focus {
+.ai-key-row input:focus {
     border-color: var(--primary);
     box-shadow: 0 0 0 2px rgba(91,141,239,0.15);
+}
+
+.ai-key-row input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .dev-mode-btn {
@@ -162,14 +224,63 @@ h3 { font-size: 13px; font-weight: 600; color: var(--text); margin: 14px 0 8px; 
     border-color: transparent !important;
 }
 
-.api-key-hint {
+.ai-config-hint {
     font-size: 11px;
     color: var(--text-muted);
     margin-top: 6px;
 }
 
-.api-key-hint.success { color: var(--success); }
-.api-key-hint.error { color: var(--danger); }
+/* Dev Mode Dialog */
+.dev-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(10,10,26,0.85); backdrop-filter: blur(6px);
+}
+
+.dev-dialog {
+    background: var(--surface-light);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    width: 320px;
+    text-align: center;
+}
+
+.dev-dialog h3 {
+    color: var(--primary);
+    margin-bottom: 12px;
+    font-size: 15px;
+}
+
+.dev-dialog input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(15,23,42,0.6);
+    color: var(--text);
+    outline: none;
+    text-align: center;
+    letter-spacing: 4px;
+}
+
+.dev-dialog input:focus { border-color: var(--primary); }
+
+.dev-actions {
+    display: flex; gap: 8px; margin-top: 12px;
+}
+
+.dev-actions button {
+    flex: 1; margin: 0; font-size: 13px; padding: 10px;
+}
+
+.dev-cancel-btn {
+    background: var(--surface-card); border: 1px solid var(--border); color: var(--text-muted);
+}
+.dev-cancel-btn:hover { background: rgba(255,255,255,0.05); }
+.dev-cancel-btn::after { display: none; }
 
 /* ===== Identity ===== */
 .identity-section { margin-bottom: 6px; }
@@ -1043,60 +1154,6 @@ button:active { transform: translateY(0); }
 }
 .skip-loading-overlay .loading-spinner { width: 48px; height: 48px; border-width: 3px; }
 .skip-loading-overlay p { color: var(--text-dim); font-size: 14px; margin-top: 16px; text-align: center; }
-
-/* ===== Dev Mode Prompt ===== */
-.dev-mode-prompt {
-    position: fixed; inset: 0; z-index: 200;
-    display: flex; align-items: center; justify-content: center;
-    background: rgba(10,10,26,0.85); backdrop-filter: blur(6px);
-}
-
-.dev-mode-dialog {
-    background: var(--surface-light);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 24px;
-    width: 320px;
-    text-align: center;
-}
-
-.dev-mode-dialog h3 {
-    color: var(--primary);
-    margin-bottom: 12px;
-    font-size: 15px;
-}
-
-.dev-mode-dialog input {
-    width: 100%;
-    padding: 10px 14px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 16px;
-    font-family: 'JetBrains Mono', monospace;
-    background: rgba(15,23,42,0.6);
-    color: var(--text);
-    outline: none;
-    text-align: center;
-    letter-spacing: 4px;
-}
-
-.dev-mode-dialog input:focus {
-    border-color: var(--primary);
-}
-
-.dev-mode-dialog .dev-mode-actions {
-    display: flex; gap: 8px; margin-top: 12px;
-}
-
-.dev-mode-dialog .dev-mode-actions button {
-    flex: 1; margin: 0; font-size: 13px; padding: 10px;
-}
-
-.dev-mode-dialog .dev-cancel-btn {
-    background: var(--surface-card); border: 1px solid var(--border); color: var(--text-muted);
-}
-.dev-mode-dialog .dev-cancel-btn:hover { background: rgba(255,255,255,0.05); }
-.dev-mode-dialog .dev-cancel-btn::after { display: none; }
 
 /* ===== Responsive ===== */
 @media (max-width: 600px) {
