@@ -4,10 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>人生轨迹模拟器</title>
+    <!-- 【性能】preconnect 字体域名，减少 DNS+TLS 延迟 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="assets/app.css">
 </head>
 <body>
     <canvas id="stars-canvas"></canvas>
+    <button id="perf-toggle" class="perf-toggle-btn" title="切换背景动画">
+        <span class="perf-icon">✨</span>
+    </button>
     <div id="app">
         <div id="start-screen" class="screen active">
             <h1>人生轨迹模拟器</h1>
@@ -43,17 +49,23 @@
             <div class="identity-section">
                 <h2>你是谁？</h2>
                 <div class="identity-row">
-                    <input type="text" id="player-name" placeholder="你的名字" maxlength="10">
+                    <input type="text" id="player-name" placeholder="你的名字" maxlength="20">
                     <select id="player-gender">
                         <option value="男">男</option>
                         <option value="女">女</option>
                     </select>
                 </div>
-                <input type="text" id="player-personality" placeholder="角色设定（如：内向学霸、叛逆富二代、热血体育生、社恐天才…）" maxlength="50">
+                <textarea id="player-personality" placeholder="角色设定（性格、背景、特点等）" maxlength="300" rows="4"></textarea>
+                <div id="kink-input-section" style="display:none; margin-top: 8px;">
+                    <input type="text" id="player-kinks" placeholder="性癖偏好（可选，多个用逗号分隔）" maxlength="100" style="width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; font-family: inherit; background: rgba(15,23,42,0.5); color: var(--text);">
+                </div>
             </div>
 
             <div id="attribute-allocation">
                 <h2>分配属性点（剩余 <span id="points-left">30</span> 点）</h2>
+                <div class="attr-warning" id="attr-warning" style="display:none">
+                    ⚠️ 警告：属性低于 2 点可能导致早死！
+                </div>
                 <div class="attributes"></div>
             </div>
 
@@ -76,6 +88,27 @@
                 <div class="content-mode-hint" id="content-mode-hint">适合所有人的内容，情感描写含蓄隐晦</div>
             </div>
 
+            <div class="creative-mode-section">
+                <label>角色模式</label>
+                <div class="creative-mode-options">
+                    <button class="creative-btn active" data-mode="original">原创</button>
+                    <button class="creative-btn" data-mode="fanfic">同人</button>
+                </div>
+                <div class="creative-mode-hint" id="creative-mode-hint">原创模式：所有角色都是独立创作，不参考现实人物</div>
+            </div>
+
+            <div class="life-focus-section">
+                <label>人生侧重</label>
+                <div class="life-focus-options">
+                    <button class="focus-opt-btn active" data-focus="balanced">均衡</button>
+                    <button class="focus-opt-btn" data-focus="career">事业</button>
+                    <button class="focus-opt-btn" data-focus="relationship">感情</button>
+                    <button class="focus-opt-btn" data-focus="family">家庭</button>
+                    <button class="focus-opt-btn" data-focus="adventure">冒险</button>
+                </div>
+                <div class="life-focus-hint" id="life-focus-hint">均衡发展：事业、感情、家庭各方面都会出现</div>
+            </div>
+
             <div class="phase-section">
                 <label>起始阶段</label>
                 <div class="phase-options">
@@ -90,12 +123,12 @@
             </div>
 
             <div class="scheduled-events-section">
-                <label>定时事件（可选）</label>
-                <div class="scheduled-hint">在指定年龄触发你想要的剧情</div>
+                <label>定时事件</label>
+                <div class="scheduled-hint">在指定年龄触发特定剧情</div>
                 <div id="scheduled-list" class="scheduled-list"></div>
                 <div class="scheduled-add-row">
                     <input type="number" id="sched-age" placeholder="年龄" min="0" max="75" class="sched-age-input">
-                    <input type="text" id="sched-text" placeholder="事件描述（如：被初恋甩了、中了彩票…）" class="sched-text-input" maxlength="60">
+                    <input type="text" id="sched-text" placeholder="事件描述" class="sched-text-input" maxlength="60">
                     <button id="sched-add-btn" class="sched-add-btn" type="button">+</button>
                 </div>
             </div>
@@ -105,63 +138,81 @@
         </div>
 
         <div id="game-screen" class="screen">
-            <div id="status-bar">
-                <div class="age"><span id="current-age">0</span>岁</div>
-                <div class="stats">
-                    <span class="stat-pill stress-pill">压力 <span id="stress">0</span></span>
-                    <span class="stat-pill money-pill">金钱 <span id="money">0</span></span>
-                    <span class="stat-pill social-pill">社交 <span id="social">50</span></span>
+            <div class="game-left-panel">
+                <div id="event-display">
+                    <h2 id="event-title"></h2>
+                    <p id="event-description"></p>
+                    <div id="options"></div>
                 </div>
+
+                <div id="narrative-display"></div>
             </div>
 
-            <div id="focus-phase-bar" class="focus-phase-bar" style="display:none">
-                <span id="focus-phase-label">当前聚焦：</span>
-                <button id="focus-phase-btn" class="focus-btn">聚焦当前阶段</button>
-                <button id="focus-phase-cancel" class="focus-cancel-btn" style="display:none">取消聚焦</button>
-            </div>
-
-            <div id="attributes-display"></div>
-            <div id="traits-display" class="traits-container"></div>
-
-            <div id="profile-panel">
-                <div class="profile-header" id="profile-toggle">
-                    <span>小档案</span>
-                    <span class="profile-toggle-arrow">▼</span>
-                </div>
-                <div id="profile-content" class="profile-body">
-                    <div class="profile-row">
-                        <span class="profile-label">学历</span>
-                        <span id="profile-education">未入学</span>
-                    </div>
-                    <div class="profile-row">
-                        <span class="profile-label">职业</span>
-                        <span id="profile-job">无</span>
-                    </div>
-                    <div class="profile-section-title">人际关系</div>
-                    <div id="profile-relationships" class="profile-rel-list">
-                        <div class="profile-empty">还没有认识的人</div>
-                    </div>
-                    <div class="profile-section-title">重要角色</div>
-                    <div id="profile-characters" class="profile-char-list">
-                        <div class="profile-empty">还没有重要角色</div>
+            <div class="game-right-panel">
+                <div id="status-bar">
+                    <div class="age"><span id="current-age">0</span>岁</div>
+                    <div class="stats">
+                        <span class="stat-pill stress-pill">压力 <span id="stress">0</span></span>
+                        <span class="stat-pill money-pill">金钱 <span id="money">0</span></span>
+                        <span class="stat-pill social-pill">社交 <span id="social">50</span></span>
+                        <span class="stat-pill libido-pill" id="libido-pill" style="display:none">性欲 <span id="libido">50</span></span>
+                        <span class="stat-pill experience-pill" id="experience-pill" style="display:none">经验 <span id="experience">0</span></span>
+                        <span class="stat-pill satisfaction-pill" id="satisfaction-pill" style="display:none">满足 <span id="satisfaction">50</span></span>
                     </div>
                 </div>
-            </div>
 
-            <div id="event-display">
-                <h2 id="event-title"></h2>
-                <p id="event-description"></p>
-                <div id="options"></div>
-            </div>
-
-            <div id="narrative-display"></div>
-
-            <div id="biography-log">
-                <div class="bio-log-header">
-                    <span>人生传记</span>
-                    <button id="bio-log-toggle" class="bio-log-toggle-btn">收起</button>
+                <div id="focus-phase-bar" class="focus-phase-bar" style="display:none">
+                    <span id="focus-phase-label">当前聚焦：</span>
+                    <button id="focus-phase-btn" class="focus-btn">聚焦当前阶段</button>
+                    <button id="focus-phase-cancel" class="focus-cancel-btn" style="display:none">取消聚焦</button>
                 </div>
-                <div id="bio-log-content" class="bio-log-entries"></div>
+
+                <div id="attributes-display"></div>
+                <div id="traits-display" class="traits-container"></div>
+
+                <div id="profile-panel">
+                    <div class="profile-header" id="profile-toggle">
+                        <span>小档案</span>
+                        <span class="profile-toggle-arrow">▼</span>
+                    </div>
+                    <div id="profile-content" class="profile-body">
+                        <div class="profile-row">
+                            <span class="profile-label">学历</span>
+                            <span id="profile-education">未入学</span>
+                        </div>
+                        <div class="profile-row">
+                            <span class="profile-label">职业</span>
+                            <span id="profile-job">无</span>
+                        </div>
+                        <div class="profile-section-title">人际关系</div>
+                        <div id="profile-relationships" class="profile-rel-list">
+                            <div class="profile-empty">还没有认识的人</div>
+                        </div>
+                        <div class="profile-section-title">重要角色</div>
+                        <div id="profile-characters" class="profile-char-list">
+                            <div class="profile-empty">还没有重要角色</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="open-biography-btn" class="biography-btn">📖 查看人生传记</button>
+                <button id="goldfinger-trigger-btn" class="goldfinger-trigger-btn">🎮 金手指</button>
+                <button id="save-game-btn" class="save-game-btn">💾 保存存档</button>
+                <input type="file" id="load-game-input" accept=".json" style="display:none">
+                <button id="load-game-file-btn" class="load-game-btn">📂 读取存档</button>
+            </div>
+        </div>
+
+        <!-- 传记弹窗 -->
+        <div id="biography-modal" class="biography-modal" style="display:none">
+            <div class="biography-modal-content">
+                <div class="biography-modal-header">
+                    <h3>📖 人生传记</h3>
+                    <button id="close-biography-btn" class="close-modal-btn">✕</button>
+                </div>
+                <div id="biography-log">
+                    <div id="bio-log-content" class="bio-log-entries"></div>
+                </div>
             </div>
         </div>
 
@@ -175,7 +226,8 @@
         </div>
     </div>
 
-    <script src="assets/stars.js"></script>
+    <!-- 【性能】stars.js 非模块脚本加 defer，不阻塞 HTML 解析 -->
+    <script defer src="assets/stars.js"></script>
     <script type="module" src="assets/engine.js"></script>
     <script type="module" src="assets/ui.js"></script>
 </body>

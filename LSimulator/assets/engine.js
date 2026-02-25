@@ -14,8 +14,8 @@ export class GameEngine {
             alive: true,
             deathReason: '',
             attributes: {
-                intelligence: 0, health: 0, charisma: 0,
-                willpower: 0, luck: 0, familyWealth: 0
+                intelligence: 5, health: 5, charisma: 5,
+                willpower: 5, luck: 5, familyWealth: 5
             },
             hiddenAttributes: {
                 mentalStability: 50, riskPreference: 50,
@@ -39,6 +39,8 @@ export class GameEngine {
         };
         this.focusPhase = null; // { start, end } — 重点阶段
         this.contentMode = 'sfw'; // 'sfw' or 'nsfw'
+        this.creativeMode = 'original'; // 'original' or 'fanfic'
+        this.lifeFocus = 'balanced'; // 'balanced', 'career', 'relationship', 'family', 'adventure'
         this.scheduledEvents = []; // [{ age, text }] — 定时事件
         this.playerDirective = ''; // 金手指：玩家的下一轮指令
         this.backstory = ''; // 跳过阶段时生成的前史摘要
@@ -90,11 +92,12 @@ export class GameEngine {
                 }
             }
             if (data.characters) this.applyCharacterChanges(data.characters);
-            if (data.traits) {
-                for (const t of data.traits) {
-                    if (!this.state.traits.includes(t)) this.state.traits.push(t);
-                }
-            }
+            // 特质系统已禁用
+            // if (data.traits) {
+            //     for (const t of data.traits) {
+            //         if (!this.state.traits.includes(t)) this.state.traits.push(t);
+            //     }
+            // }
             if (data.milestones) {
                 for (const m of data.milestones) {
                     if (!this.state.milestones.includes(m)) this.state.milestones.push(m);
@@ -120,17 +123,21 @@ export class GameEngine {
         }
     }
 
-    initializeGame(name, gender, personality, attributes, weirdness, difficulty, contentMode) {
-        this.playerName = name;
-        this.playerGender = gender;
-        this.playerPersonality = personality;
-        this.state.attributes = { ...attributes };
-        this.state.weirdness = weirdness;
-        this.state.difficulty = difficulty || 2;
-        this.contentMode = contentMode || 'sfw';
-        this.initializeHiddenAttributes();
-        this.initializeDerivedFromAttributes();
-    }
+    initializeGame(name, gender, personality, attributes, weirdness, difficulty, contentMode, creativeMode, lifeFocus, kinks) {
+            this.playerName = name;
+            this.playerGender = gender;
+            this.playerPersonality = personality;
+            this.playerKinks = kinks || '';
+            this.state.attributes = { ...attributes };
+            this.state.weirdness = weirdness;
+            this.state.difficulty = difficulty || 2;
+            this.contentMode = contentMode || 'sfw';
+            this.creativeMode = creativeMode || 'original';
+            this.lifeFocus = lifeFocus || 'balanced';
+            this.initializeHiddenAttributes();
+            this.initializeDerivedFromAttributes();
+        }
+
 
     initializeHiddenAttributes() {
         const a = this.state.attributes;
@@ -142,15 +149,24 @@ export class GameEngine {
     }
 
     initializeDerivedFromAttributes() {
-        this.state.derivedStats.money = this.state.attributes.familyWealth * 8;
-        this.state.derivedStats.socialSupport = 50 + this.state.attributes.charisma * 2;
-    }
+            this.state.derivedStats.money = this.state.attributes.familyWealth * 8;
+            this.state.derivedStats.socialSupport = 50 + this.state.attributes.charisma * 2;
+            // 情色相关数值（仅NSFW+模式使用）
+            this.state.derivedStats.libido = 50; // 性欲
+            this.state.derivedStats.experience = 0; // 经验值
+            this.state.derivedStats.satisfaction = 50; // 满足度
+        }
+
 
     async generateEvent(focusRound = 0) {
+        // 【性能】AbortController 防止请求挂起（90s 超时）
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 90000);
         try {
             const res = await fetch(`${API_BASE}/api/generate-event`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                signal: controller.signal,
                 body: JSON.stringify({
                     state: this.state,
                     playerName: this.playerName,
@@ -158,12 +174,15 @@ export class GameEngine {
                     playerPersonality: this.playerPersonality,
                     focusPhase: this.focusPhase,
                     contentMode: this.contentMode,
+                    creativeMode: this.creativeMode,
+                    lifeFocus: this.lifeFocus,
                     focusRound,
                     scheduledEvents: this.scheduledEvents,
                     playerDirective: this.playerDirective,
                     backstory: this.backstory
                 })
             });
+            clearTimeout(timeoutId);
             if (!res.ok) throw new Error('API error');
             // 用完就清
             this.playerDirective = '';
@@ -190,6 +209,7 @@ export class GameEngine {
 
             return events;
         } catch (err) {
+            clearTimeout(timeoutId);
             console.warn('AI失败，用备用:', err);
             const fb = this.getFallbackEvent();
             return fb ? [fb] : null;
@@ -198,19 +218,25 @@ export class GameEngine {
 
     // 展开生成：对当前事件进行详细展开
     async expandEvent(event) {
+        // 【性能】AbortController 防止续写请求挂起（60s 超时）
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 60000);
         try {
             const res = await fetch(`${API_BASE}/api/expand-event`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                signal: controller.signal,
                 body: JSON.stringify({
                     state: this.state,
                     event: { prompt: event.prompt, type: event.type },
                     playerName: this.playerName,
                     playerGender: this.playerGender,
                     playerPersonality: this.playerPersonality,
-                    contentMode: this.contentMode
+                    contentMode: this.contentMode,
+                    creativeMode: this.creativeMode
                 })
             });
+            clearTimeout(timeoutId);
             if (!res.ok) {
                 console.error('expand API error:', res.status, await res.text());
                 throw new Error('expand API error');
@@ -235,18 +261,23 @@ export class GameEngine {
     }
 
     async generateNarrative(event, choice, success) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 60000);
         try {
             const res = await fetch(`${API_BASE}/api/narrate`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                signal: controller.signal,
                 body: JSON.stringify({
                     state: this.state, event, choice, success,
                     playerName: this.playerName,
                     playerGender: this.playerGender,
                     playerPersonality: this.playerPersonality,
-                    contentMode: this.contentMode
+                    contentMode: this.contentMode,
+                    creativeMode: this.creativeMode
                 })
             });
+            clearTimeout(timeoutId);
             if (!res.ok) throw new Error();
             return (await res.json()).text;
         } catch { return success ? '事情进展顺利。' : '事情没按预期发展。'; }
@@ -262,7 +293,8 @@ export class GameEngine {
                     playerName: this.playerName,
                     playerGender: this.playerGender,
                     playerPersonality: this.playerPersonality,
-                    contentMode: this.contentMode
+                    contentMode: this.contentMode,
+                    creativeMode: this.creativeMode
                 })
             });
             if (!res.ok) throw new Error();
@@ -280,7 +312,8 @@ export class GameEngine {
                     playerName: this.playerName,
                     playerGender: this.playerGender,
                     playerPersonality: this.playerPersonality,
-                    contentMode: this.contentMode
+                    contentMode: this.contentMode,
+                    creativeMode: this.creativeMode
                 })
             });
             if (!res.ok) throw new Error();
@@ -484,11 +517,12 @@ export class GameEngine {
         // 也处理事件级别的档案变更
         if (event.profileChanges) this.applyProfileChanges(event.profileChanges);
 
-        if (option.addTraits) {
-            for (const t of option.addTraits) {
-                if (!this.state.traits.includes(t)) this.state.traits.push(t);
-            }
-        }
+        // 特质系统已禁用
+        // if (option.addTraits) {
+        //     for (const t of option.addTraits) {
+        //         if (!this.state.traits.includes(t)) this.state.traits.push(t);
+        //     }
+        // }
         if (option.addFlags) {
             for (const f of option.addFlags) {
                 if (!this.state.flags.includes(f)) this.state.flags.push(f);
@@ -571,6 +605,8 @@ export class GameEngine {
             state: this.state,
             focusPhase: this.focusPhase,
             contentMode: this.contentMode,
+            creativeMode: this.creativeMode,
+            lifeFocus: this.lifeFocus,
             scheduledEvents: this.scheduledEvents,
             playerDirective: this.playerDirective,
             backstory: this.backstory
@@ -590,6 +626,8 @@ export class GameEngine {
             this.state = saveData.state;
             this.focusPhase = saveData.focusPhase || null;
             this.contentMode = saveData.contentMode || 'sfw';
+            this.creativeMode = saveData.creativeMode || 'original';
+            this.lifeFocus = saveData.lifeFocus || 'balanced';
             this.scheduledEvents = saveData.scheduledEvents || [];
             this.playerDirective = saveData.playerDirective || '';
             this.backstory = saveData.backstory || '';
@@ -696,7 +734,8 @@ export class GameEngine {
         if (successStreak && h.length >= 5) check('lucky', '欧皇', '连续5次成功');
 
         if (d.money <= 0 && d.stress >= 90) check('rockbottom', '人生谷底', '破产且压力爆表');
-        if (this.state.traits.length >= 5) check('complex', '复杂人格', '获得5个以上特质');
+        // 特质系统已禁用
+        // if (this.state.traits.length >= 5) check('complex', '复杂人格', '获得5个以上特质');
 
         return unlocked;
     }

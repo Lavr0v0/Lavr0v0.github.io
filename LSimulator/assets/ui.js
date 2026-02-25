@@ -16,9 +16,78 @@ const STAT_NAMES = {
     stress: '压力', money: '金钱', socialSupport: '社交'
 };
 
+// 【性能】DOM 引用缓存，避免每次 getElementById 查询
+const DOM = {};
+function cacheDOM() {
+    DOM.eventTitle = document.getElementById('event-title');
+    DOM.eventDesc = document.getElementById('event-description');
+    DOM.options = document.getElementById('options');
+    DOM.currentAge = document.getElementById('current-age');
+    DOM.stress = document.getElementById('stress');
+    DOM.money = document.getElementById('money');
+    DOM.social = document.getElementById('social');
+    DOM.libido = document.getElementById('libido');
+    DOM.experience = document.getElementById('experience');
+    DOM.satisfaction = document.getElementById('satisfaction');
+    DOM.libidoPill = document.getElementById('libido-pill');
+    DOM.expPill = document.getElementById('experience-pill');
+    DOM.satPill = document.getElementById('satisfaction-pill');
+    DOM.attrDisplay = document.getElementById('attributes-display');
+    DOM.traitsDisplay = document.getElementById('traits-display');
+    DOM.bioLogContent = document.getElementById('bio-log-content');
+    DOM.profileEducation = document.getElementById('profile-education');
+    DOM.profileJob = document.getElementById('profile-job');
+    DOM.profileRelationships = document.getElementById('profile-relationships');
+    DOM.profileCharacters = document.getElementById('profile-characters');
+}
+// 在 DOMContentLoaded 后初始化缓存
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', cacheDOM);
+} else {
+    cacheDOM();
+}
+
+// 【性能】脏标记：只在数据变化时重建 profile DOM
+let _profileDirty = true;
+let _lastCharHash = '';
+let _lastRelHash = '';
+
+// ===== 性能开关 =====
+(function initPerfToggle() {
+    const perfBtn = document.getElementById('perf-toggle');
+    const canvas = document.getElementById('stars-canvas');
+    if (!perfBtn || !canvas) return;
+
+    // 从 localStorage 恢复状态
+    const savedState = localStorage.getItem('life-sim-perf-mode');
+    let isEnabled = savedState !== 'disabled';
+
+    function updateState() {
+        if (isEnabled) {
+            perfBtn.classList.remove('disabled');
+            canvas.classList.remove('disabled');
+            if (window.starsControl) window.starsControl.start();
+            localStorage.setItem('life-sim-perf-mode', 'enabled');
+        } else {
+            perfBtn.classList.add('disabled');
+            canvas.classList.add('disabled');
+            if (window.starsControl) window.starsControl.stop();
+            localStorage.setItem('life-sim-perf-mode', 'disabled');
+        }
+    }
+
+    perfBtn.addEventListener('click', () => {
+        isEnabled = !isEnabled;
+        updateState();
+    });
+
+    // 初始化状态
+    updateState();
+})();
+
 // ===== 传记日志 =====
 function appendBioLog(age, text, type = 'narrative', milestone = null, choice = null) {
-    const container = document.getElementById('bio-log-content');
+    const container = DOM.bioLogContent || document.getElementById('bio-log-content');
     if (!container) return;
 
     const entry = document.createElement('div');
@@ -59,14 +128,35 @@ function initStartScreen() {
         div.innerHTML = `
             <span>${name}</span>
             <div>
-                <button class="minus" data-attr="${key}">−</button>
+                <button class="minus" data-attr="${key}">-</button>
                 <span class="value">${allocated[key]}</span>
                 <button class="plus" data-attr="${key}">+</button>
             </div>`;
         container.appendChild(div);
     }
 
-    const updatePoints = () => { pointsEl.textContent = 30 - calcUsed(); };
+    const updatePoints = () => { 
+        pointsEl.textContent = 30 - calcUsed(); 
+        checkLowAttributes();
+    };
+
+    const checkLowAttributes = () => {
+        const warningEl = document.getElementById('attr-warning');
+        const hasLowAttr = Object.values(allocated).some(v => v <= 2 && v > 0);
+        const hasZeroAttr = Object.values(allocated).some(v => v === 0);
+        
+        if (hasZeroAttr) {
+            warningEl.textContent = '⚠️ 警告：属性为 0 极易早死！';
+            warningEl.style.display = 'block';
+            warningEl.style.color = 'var(--danger)';
+        } else if (hasLowAttr) {
+            warningEl.textContent = '⚠️ 警告：属性低于 2 点可能导致早死！';
+            warningEl.style.display = 'block';
+            warningEl.style.color = 'var(--warning)';
+        } else {
+            warningEl.style.display = 'none';
+        }
+    };
 
     container.addEventListener('click', handleAttrClick);
 
@@ -173,21 +263,16 @@ function initStartScreen() {
         disableTestBtn();
     });
 
-    // 从 localStorage 恢复
+    // 从 localStorage 恢复（只恢复 provider 和 model，不恢复 API Key）
     const savedProvider = localStorage.getItem('life-sim-provider');
     const savedModel = localStorage.getItem('life-sim-model');
-    const savedKey = localStorage.getItem('life-sim-ai-key');
     if (savedProvider && PROVIDERS[savedProvider]) {
         providerSelect.value = savedProvider;
         updateModelOptions();
         if (savedModel) modelSelect.value = savedModel;
     }
-    if (savedKey) {
-        aiKeyInput.value = savedKey;
-        aiHint.textContent = '已恢复 API Key，请点击「测试连接」验证';
-        aiHint.style.color = 'var(--warning)';
-        enableTestBtn();
-    }
+    // 清理旧版本可能保存的 API Key（安全考虑）
+    localStorage.removeItem('life-sim-ai-key');
 
     aiKeyInput.addEventListener('input', () => {
         useBuiltinKey = false;
@@ -241,7 +326,8 @@ function initStartScreen() {
                     overlay.remove();
                     // 自动触发连通性测试
                     enableTestBtn();
-                    testConnBtn.click();
+                    // 延迟一下确保 DOM 更新完成
+                    setTimeout(() => testConnBtn.click(), 100);
                 } else {
                     codeInput.style.borderColor = 'var(--danger)';
                     codeInput.value = '';
@@ -338,16 +424,21 @@ function initStartScreen() {
             const testData = await testRes.json();
             if (testData.ok) {
                 testConnBtn.textContent = '✅ 连接成功';
+                testConnBtn.disabled = false; // 立即解除 disabled
                 aiHint.textContent = '✅ 连接成功，可以开始游戏';
                 aiHint.style.color = 'var(--success)';
                 setAuthed(true);
-                // 保存到 localStorage
+                // 保存到 localStorage（只保存 provider 和 model，不保存 API Key）
                 if (!useBuiltinKey && userKey) {
-                    localStorage.setItem('life-sim-ai-key', userKey);
                     localStorage.setItem('life-sim-provider', provider);
                     localStorage.setItem('life-sim-model', model);
                 }
-                setTimeout(() => { testConnBtn.textContent = '🔗 测试连接'; testConnBtn.disabled = false; }, 3000);
+                // 3秒后恢复按钮文字
+                setTimeout(() => { 
+                    if (testConnBtn.textContent === '✅ 连接成功') {
+                        testConnBtn.textContent = '🔗 测试连接'; 
+                    }
+                }, 3000);
             } else {
                 testConnBtn.textContent = '🔗 重新测试';
                 testConnBtn.disabled = false;
@@ -377,54 +468,135 @@ function initStartScreen() {
         });
     });
 
-    // 内容尺度选择 — NSFW 隐藏，三击全年龄按钮解锁
+    // 内容尺度选择 — 三级模式：全年龄 → NSFW → NSFW+
     let selectedContentMode = 'sfw';
     let nsfwUnlocked = false;
+    let nsfwPlusUnlocked = false;
     let sfwClickCount = 0;
+    let nsfwClickCount = 0;
     let sfwClickTimer = null;
+    let nsfwClickTimer = null;
     const contentHints = {
         sfw: '适合所有人的内容，情感描写含蓄隐晦',
-        nsfw: '包含露骨的成人内容，未成年人请勿选择'
+        nsfw: '对情色内容不加限制，但不会刻意强调',
+        nsfwPlus: '🔞 专注于情色内容的极致体验'
     };
 
     const sfwBtn = document.getElementById('sfw-btn');
+    let nsfwBtn = null;
+    let nsfwPlusBtn = null;
+
+    // 全年龄按钮点击
     sfwBtn.addEventListener('click', () => {
         if (!nsfwUnlocked) {
+            // 解锁NSFW
             sfwClickCount++;
             clearTimeout(sfwClickTimer);
             sfwClickTimer = setTimeout(() => { sfwClickCount = 0; }, 800);
             if (sfwClickCount >= 3) {
                 nsfwUnlocked = true;
                 sfwClickCount = 0;
-                // 展开 NSFW 选项
                 const optionsDiv = document.querySelector('.content-mode-options');
                 optionsDiv.classList.add('expanded');
-                const nsfwBtn = document.createElement('button');
+                nsfwBtn = document.createElement('button');
                 nsfwBtn.className = 'content-btn';
                 nsfwBtn.dataset.mode = 'nsfw';
                 nsfwBtn.textContent = 'NSFW';
                 optionsDiv.appendChild(nsfwBtn);
-                nsfwBtn.addEventListener('click', () => {
-                    document.querySelectorAll('.content-btn').forEach(b => b.classList.remove('active'));
-                    nsfwBtn.classList.add('active');
-                    selectedContentMode = 'nsfw';
-                    document.getElementById('content-mode-hint').textContent = contentHints.nsfw;
-                });
-                // 让全年龄按钮也能切回
-                sfwBtn.addEventListener('click', () => {
-                    document.querySelectorAll('.content-btn').forEach(b => b.classList.remove('active'));
-                    sfwBtn.classList.add('active');
-                    selectedContentMode = 'sfw';
-                    document.getElementById('content-mode-hint').textContent = contentHints.sfw;
-                });
+                
+                nsfwBtn.addEventListener('click', handleNsfwClick);
                 document.getElementById('content-mode-hint').textContent = '已解锁 NSFW 模式';
             }
         } else {
+            // 切换到全年龄
             document.querySelectorAll('.content-btn').forEach(b => b.classList.remove('active'));
             sfwBtn.classList.add('active');
             selectedContentMode = 'sfw';
             document.getElementById('content-mode-hint').textContent = contentHints.sfw;
+            document.getElementById('kink-input-section').style.display = 'none';
+            document.body.classList.remove('nsfw-plus-mode');
         }
+    });
+
+    function handleNsfwClick() {
+        if (!nsfwPlusUnlocked) {
+            // 解锁NSFW+
+            nsfwClickCount++;
+            clearTimeout(nsfwClickTimer);
+            nsfwClickTimer = setTimeout(() => { nsfwClickCount = 0; }, 800);
+            if (nsfwClickCount >= 3) {
+                nsfwPlusUnlocked = true;
+                nsfwClickCount = 0;
+                const optionsDiv = document.querySelector('.content-mode-options');
+                // 改为三列布局
+                optionsDiv.classList.add('three-columns');
+                nsfwPlusBtn = document.createElement('button');
+                nsfwPlusBtn.className = 'content-btn nsfw-plus-btn';
+                nsfwPlusBtn.dataset.mode = 'nsfwPlus';
+                nsfwPlusBtn.textContent = 'NSFW+';
+                optionsDiv.appendChild(nsfwPlusBtn);
+                
+                nsfwPlusBtn.addEventListener('click', () => {
+                    document.querySelectorAll('.content-btn').forEach(b => b.classList.remove('active'));
+                    nsfwPlusBtn.classList.add('active');
+                    selectedContentMode = 'nsfwPlus';
+                    document.getElementById('content-mode-hint').textContent = contentHints.nsfwPlus;
+                    document.getElementById('kink-input-section').style.display = 'block';
+                    document.body.classList.add('nsfw-plus-mode');
+                });
+                
+                document.getElementById('content-mode-hint').textContent = '已解锁 NSFW+ 模式';
+            } else {
+                // 正常切换到NSFW
+                document.querySelectorAll('.content-btn').forEach(b => b.classList.remove('active'));
+                nsfwBtn.classList.add('active');
+                selectedContentMode = 'nsfw';
+                document.getElementById('content-mode-hint').textContent = contentHints.nsfw;
+                document.getElementById('kink-input-section').style.display = 'none';
+                document.body.classList.remove('nsfw-plus-mode');
+            }
+        } else {
+            // 切换到NSFW
+            document.querySelectorAll('.content-btn').forEach(b => b.classList.remove('active'));
+            nsfwBtn.classList.add('active');
+            selectedContentMode = 'nsfw';
+            document.getElementById('content-mode-hint').textContent = contentHints.nsfw;
+            document.getElementById('kink-input-section').style.display = 'none';
+            document.body.classList.remove('nsfw-plus-mode');
+        }
+    }
+
+    // 角色模式选择
+    let selectedCreativeMode = 'original';
+    const creativeModeHints = {
+        original: '原创模式：所有角色都是独立创作，不参考现实人物',
+        fanfic: '同人模式：角色会参考现实/作品中的人设（如明星、动漫角色等）'
+    };
+    document.querySelectorAll('.creative-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.creative-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedCreativeMode = btn.dataset.mode;
+            document.getElementById('creative-mode-hint').textContent = creativeModeHints[selectedCreativeMode];
+        });
+    });
+
+    // 人生侧重选择
+    let selectedLifeFocus = 'balanced';
+    const lifeFocusHints = {
+        balanced: '均衡发展：事业、感情、家庭各方面都会出现',
+        career: '事业为重：更多工作、升职、创业相关事件',
+        relationship: '感情为重：更多恋爱、亲密关系、情感纠葛',
+        family: '家庭为重：更多家人互动、亲情、家庭责任',
+        adventure: '冒险刺激：更多意外、冒险、极端体验'
+    };
+    document.querySelectorAll('.focus-opt-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.focus-opt-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedLifeFocus = btn.dataset.focus;
+            document.getElementById('life-focus-hint').textContent = lifeFocusHints[selectedLifeFocus];
+        });
     });
 
     // 起始阶段选择
@@ -490,6 +662,7 @@ function initStartScreen() {
         const name = document.getElementById('player-name').value.trim();
         const gender = document.getElementById('player-gender').value;
         const personality = document.getElementById('player-personality').value.trim();
+        const kinks = document.getElementById('player-kinks').value.trim();
 
         if (!name) { alert('请输入你的名字'); return; }
         if (!isAuthed) { alert('请先配置 AI 设置'); return; }
@@ -515,7 +688,7 @@ function initStartScreen() {
         }
 
         const weirdness = 3; // 固定值，已移除奇异度滑块
-        game.initializeGame(name, gender, personality || '普通', allocated, weirdness, selectedDifficulty, selectedContentMode);
+        game.initializeGame(name, gender, personality || '普通', allocated, weirdness, selectedDifficulty, selectedContentMode, selectedCreativeMode, selectedLifeFocus, kinks);
         game.scheduledEvents = [...scheduledEvents];
         await game.loadFallbackEvents();
 
@@ -601,6 +774,7 @@ function initStartScreen() {
                 else if (e.target.classList.contains('minus') && allocated[attr] > 0) allocated[attr]--;
                 valSpan.textContent = allocated[attr];
                 pointsEl.textContent = '∞';
+                checkLowAttributes();
             });
             // 小提示动画
             const hint = document.createElement('div');
@@ -622,11 +796,109 @@ function initStartScreen() {
         updatePoints();
     }
 
-    // 传记日志折叠
-    document.getElementById('bio-log-toggle')?.addEventListener('click', (e) => {
-        const content = document.getElementById('bio-log-content');
-        const collapsed = content.classList.toggle('collapsed');
-        e.target.textContent = collapsed ? '展开' : '收起';
+    // 传记弹窗控制
+    document.getElementById('open-biography-btn')?.addEventListener('click', () => {
+        document.getElementById('biography-modal').style.display = 'flex';
+    });
+
+    // 金手指按钮
+    document.getElementById('goldfinger-trigger-btn')?.addEventListener('click', () => {
+        showGoldFingerInput();
+    });
+
+    // 保存存档
+    document.getElementById('save-game-btn')?.addEventListener('click', () => {
+        try {
+            const saveData = {
+                version: '1.0',
+                timestamp: Date.now(),
+                playerName: game.playerName,
+                playerGender: game.playerGender,
+                playerPersonality: game.playerPersonality,
+                playerKinks: game.playerKinks,
+                contentMode: game.contentMode,
+                creativeMode: game.creativeMode,
+                lifeFocus: game.lifeFocus,
+                state: game.state,
+                scheduledEvents: game.scheduledEvents,
+                backstory: game.backstory
+            };
+            
+            const json = JSON.stringify(saveData, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `人生模拟器_${game.playerName}_${game.state.age}岁_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert('存档已保存！');
+        } catch (err) {
+            console.error('保存失败:', err);
+            alert('保存失败：' + err.message);
+        }
+    });
+
+    // 读取存档
+    document.getElementById('load-game-file-btn')?.addEventListener('click', () => {
+        document.getElementById('load-game-input').click();
+    });
+
+    document.getElementById('load-game-input')?.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        try {
+            const text = await file.text();
+            const saveData = JSON.parse(text);
+            
+            // 验证存档格式
+            if (!saveData.version || !saveData.playerName || !saveData.state) {
+                throw new Error('存档格式不正确');
+            }
+            
+            // 恢复游戏状态
+            game.playerName = saveData.playerName;
+            game.playerGender = saveData.playerGender;
+            game.playerPersonality = saveData.playerPersonality;
+            game.playerKinks = saveData.playerKinks || '';
+            game.contentMode = saveData.contentMode || 'sfw';
+            game.creativeMode = saveData.creativeMode || 'original';
+            game.lifeFocus = saveData.lifeFocus || 'balanced';
+            game.state = saveData.state;
+            game.scheduledEvents = saveData.scheduledEvents || [];
+            game.backstory = saveData.backstory || '';
+            
+            await game.loadFallbackEvents();
+            
+            // 切换到游戏界面
+            showScreen('game-screen');
+            updateStatusBar();
+            updateFocusPhaseUI();
+            
+            // 显示当前事件或进入下一年
+            alert(`存档读取成功！\n${game.playerName}，${game.state.age}岁`);
+            nextYear();
+            
+            // 清空文件输入
+            e.target.value = '';
+        } catch (err) {
+            console.error('读取失败:', err);
+            alert('读取存档失败：' + err.message);
+            e.target.value = '';
+        }
+    });
+
+    document.getElementById('close-biography-btn')?.addEventListener('click', () => {
+        document.getElementById('biography-modal').style.display = 'none';
+    });
+
+    // 点击弹窗背景关闭
+    document.getElementById('biography-modal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'biography-modal') {
+            document.getElementById('biography-modal').style.display = 'none';
+        }
     });
 
     // 小档案折叠
@@ -638,17 +910,34 @@ function initStartScreen() {
     });
 }
 
+// 【性能】缓存 screen 元素列表，避免每次切屏都 querySelectorAll
+let _cachedScreens = null;
 function showScreen(id) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    if (!_cachedScreens) _cachedScreens = document.querySelectorAll('.screen');
+    _cachedScreens.forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
+    
+    // 游戏界面添加布局类
+    const app = document.getElementById('app');
+    if (id === 'game-screen') {
+        app.classList.add('game-layout');
+        document.body.classList.add('game-active');
+    } else {
+        app.classList.remove('game-layout');
+        document.body.classList.remove('game-active');
+    }
 }
 
 function updateStatusBar() {
-    const oldStress = parseInt(document.getElementById('stress')?.textContent) || 0;
-    const oldMoney = parseInt(document.getElementById('money')?.textContent) || 0;
-    const oldSocial = parseInt(document.getElementById('social')?.textContent) || 0;
+    const stressEl = DOM.stress || document.getElementById('stress');
+    const moneyEl = DOM.money || document.getElementById('money');
+    const socialEl = DOM.social || document.getElementById('social');
+    
+    const oldStress = parseInt(stressEl?.textContent) || 0;
+    const oldMoney = parseInt(moneyEl?.textContent) || 0;
+    const oldSocial = parseInt(socialEl?.textContent) || 0;
 
-    document.getElementById('current-age').textContent = game.state.age;
+    (DOM.currentAge || document.getElementById('current-age')).textContent = game.state.age;
 
     const newStress = Math.round(game.state.derivedStats.stress);
     const newMoney = Math.round(game.state.derivedStats.money);
@@ -658,6 +947,34 @@ function updateStatusBar() {
     animateStatChange('money', oldMoney, newMoney);
     animateStatChange('social', oldSocial, newSocial);
 
+    // NSFW+ 模式显示情色数值
+    const isNsfwPlus = game.contentMode === 'nsfwPlus';
+    const libidoPill = DOM.libidoPill || document.getElementById('libido-pill');
+    const expPill = DOM.expPill || document.getElementById('experience-pill');
+    const satPill = DOM.satPill || document.getElementById('satisfaction-pill');
+    
+    if (isNsfwPlus) {
+        libidoPill.style.display = '';
+        expPill.style.display = '';
+        satPill.style.display = '';
+        
+        const oldLibido = parseInt((DOM.libido || document.getElementById('libido'))?.textContent) || 50;
+        const oldExp = parseInt((DOM.experience || document.getElementById('experience'))?.textContent) || 0;
+        const oldSat = parseInt((DOM.satisfaction || document.getElementById('satisfaction'))?.textContent) || 50;
+        
+        const newLibido = Math.round(game.state.derivedStats.libido || 50);
+        const newExp = Math.round(game.state.derivedStats.experience || 0);
+        const newSat = Math.round(game.state.derivedStats.satisfaction || 50);
+        
+        animateStatChange('libido', oldLibido, newLibido);
+        animateStatChange('experience', oldExp, newExp);
+        animateStatChange('satisfaction', oldSat, newSat);
+    } else {
+        libidoPill.style.display = 'none';
+        expPill.style.display = 'none';
+        satPill.style.display = 'none';
+    }
+
     // 回溯按钮状态
     const rewindBtn = document.getElementById('rewind-btn');
     if (rewindBtn) {
@@ -666,39 +983,60 @@ function updateStatusBar() {
         rewindBtn.style.display = game.state.rewindsLeft > 0 ? '' : 'none';
     }
 
-    const box = document.getElementById('attributes-display');
-    box.innerHTML = '';
-    for (const [key, name] of Object.entries(ATTR_NAMES)) {
-        const div = document.createElement('div');
-        div.className = 'attr-display';
-        div.innerHTML = `<strong>${name}</strong>${game.state.attributes[key]}`;
-        box.appendChild(div);
+    // 【性能】属性面板：diff 更新而非每次 innerHTML 重建
+    const box = DOM.attrDisplay || document.getElementById('attributes-display');
+    const attrEntries = Object.entries(ATTR_NAMES);
+    if (box.children.length !== attrEntries.length) {
+        // 首次渲染或结构变化时才全量重建
+        box.innerHTML = '';
+        for (const [key, name] of attrEntries) {
+            const div = document.createElement('div');
+            div.className = 'attr-display';
+            div.dataset.attr = key;
+            div.innerHTML = `<strong>${name}</strong><span>${game.state.attributes[key]}</span>`;
+            box.appendChild(div);
+        }
+    } else {
+        // 后续只更新数值文本
+        for (const [key, name] of attrEntries) {
+            const div = box.querySelector(`[data-attr="${key}"]`);
+            if (div) {
+                const span = div.querySelector('span');
+                const newVal = String(game.state.attributes[key]);
+                if (span.textContent !== newVal) {
+                    span.textContent = newVal;
+                }
+            }
+        }
     }
 
-    // 特质显示
-    const traitsEl = document.getElementById('traits-display');
+    // 特质显示 - 已禁用
+    const traitsEl = DOM.traitsDisplay || document.getElementById('traits-display');
     if (traitsEl) {
-        traitsEl.innerHTML = game.state.traits.length
-            ? game.state.traits.map(t => `<span class="trait-tag">${t}</span>`).join('')
-            : '';
+        traitsEl.style.display = 'none';
     }
 
+    // 【性能】标记 profile 需要更新
+    _profileDirty = true;
     updateProfile();
 }
 
 function updateProfile() {
     const p = game.state.profile;
     const chars = game.state.characters;
-    const eduEl = document.getElementById('profile-education');
-    const jobEl = document.getElementById('profile-job');
-    const relEl = document.getElementById('profile-relationships');
-    const charEl = document.getElementById('profile-characters');
+    const eduEl = DOM.profileEducation || document.getElementById('profile-education');
+    const jobEl = DOM.profileJob || document.getElementById('profile-job');
+    const relEl = DOM.profileRelationships || document.getElementById('profile-relationships');
+    const charEl = DOM.profileCharacters || document.getElementById('profile-characters');
     if (eduEl) eduEl.textContent = p.education || '未入学';
     if (jobEl) jobEl.textContent = p.job || '无';
 
-    // 角色卡
-    if (charEl) {
-        const charList = Object.values(chars);
+    // 【性能】用简单 hash 检测数据是否变化，避免无变化时重建 DOM
+    const charList = Object.values(chars);
+    const charHash = charList.map(c => `${c.name}|${c.relation}|${c.importance}`).join(',');
+    
+    if (charEl && charHash !== _lastCharHash) {
+        _lastCharHash = charHash;
         if (!charList.length) {
             charEl.innerHTML = '<div class="profile-empty">还没有重要角色</div>';
         } else {
@@ -727,16 +1065,18 @@ function updateProfile() {
 
     if (!relEl) return;
 
-    // 只显示重要关系（importance >= 3）且最近出现过的（5年内）
     const currentAge = game.state.age;
     const importantRels = p.relationships.filter(r => {
         if ((r.importance || 3) < 3) return false;
-        // 核心关系（家人/配偶 importance 5）始终显示
         if ((r.importance || 3) >= 5) return true;
-        // 其他关系：5年内出现过才显示
         const lastSeen = r.lastSeen ?? 0;
         return (currentAge - lastSeen) <= 5;
     });
+
+    // 【性能】关系列表也用 hash 检测变化
+    const relHash = importantRels.map(r => `${r.name}|${r.relation}|${r.affinity}|${r.status}`).join(',');
+    if (relHash === _lastRelHash) return;
+    _lastRelHash = relHash;
 
     if (!importantRels.length) {
         relEl.innerHTML = '<div class="profile-empty">还没有重要的人</div>';
@@ -788,7 +1128,8 @@ function showAchievementToast(achievement) {
 
 // ===== 数值变化动画 =====
 function animateStatChange(elementId, oldVal, newVal) {
-    const el = document.getElementById(elementId);
+    // 【性能】使用 DOM 缓存，减少 getElementById 调用
+    const el = DOM[elementId] || document.getElementById(elementId);
     if (!el || oldVal === newVal) return;
     el.textContent = newVal;
     const cls = newVal > oldVal ? 'stat-flash-up' : 'stat-flash-down';
@@ -865,10 +1206,13 @@ document.getElementById('focus-phase-cancel')?.addEventListener('click', () => {
 });
 
 function showLoading(msg = 'AI 正在构思...') {
-    document.getElementById('event-title').textContent = '';
-    document.getElementById('event-description').textContent = '';
-    document.getElementById('event-description').className = '';
-    document.getElementById('options').innerHTML =
+    const title = DOM.eventTitle || document.getElementById('event-title');
+    const desc = DOM.eventDesc || document.getElementById('event-description');
+    const opts = DOM.options || document.getElementById('options');
+    title.textContent = '';
+    desc.textContent = '';
+    desc.className = '';
+    opts.innerHTML =
         `<div class="loading-spinner"></div><p class="loading-text">${msg}</p>`;
 }
 
@@ -954,14 +1298,14 @@ async function showScheduledEvents(scheduledList) {
     const remaining = scheduledList.slice(1);
 
     // 先在界面上显示定时事件卡片
-    document.getElementById('event-title').innerHTML = `${game.state.age}岁 <span class="milestone-badge">📅 定时事件</span>`;
-    const desc = document.getElementById('event-description');
+    (DOM.eventTitle || document.getElementById('event-title')).innerHTML = `${game.state.age}岁 <span class="milestone-badge">📅 定时事件</span>`;
+    const desc = DOM.eventDesc || document.getElementById('event-description');
     desc.textContent = sched.text;
     desc.className = 'narrative-only';
 
     appendBioLog(game.state.age, `📅 定时事件：${sched.text}`, 'milestone');
 
-    const box = document.getElementById('options');
+    const box = DOM.options || document.getElementById('options');
     box.innerHTML = `
         <div class="narrative-result neutral">
             <p>📅 玩家预设的剧情即将展开……</p>
@@ -1043,7 +1387,7 @@ async function triggerGoldFinger(directive) {
     }
 
     if (!events || !events.length) {
-        const box = document.getElementById('options');
+        const box = DOM.options || document.getElementById('options');
         box.innerHTML = `<div class="narrative-result neutral">
                 <p>🎮 金手指「${directive}」似乎没有生效……</p>
                 <p class="loading-text" style="color:#f59e0b">⚠️ AI生成失败</p>
@@ -1095,10 +1439,11 @@ async function runNormalGeneration() {
     if (!events || !events.length) {
         appendBioLog(game.state.age, '这一年平平淡淡地过去了。', 'narrative');
         game.recordNarrative({ prompt: '这一年平平淡淡地过去了。', type: 'narrative' }, {});
-        document.getElementById('event-title').textContent = `${game.state.age}岁`;
-        document.getElementById('event-description').textContent = '这一年平平淡淡地过去了。';
-        document.getElementById('event-description').className = 'narrative-only';
-        const box = document.getElementById('options');
+        (DOM.eventTitle || document.getElementById('event-title')).textContent = `${game.state.age}岁`;
+        const descEl = DOM.eventDesc || document.getElementById('event-description');
+        descEl.textContent = '这一年平平淡淡地过去了。';
+        descEl.className = 'narrative-only';
+        const box = DOM.options || document.getElementById('options');
         box.innerHTML = `<button id="continue-btn" class="continue-btn">下一年 →</button>`;
         document.getElementById('continue-btn').addEventListener('click', () => nextYear());
         return;
@@ -1159,7 +1504,7 @@ async function showEventSequence(narratives, choiceEvent, extraChoices = []) {
             return;
         }
         // 所有事件都显示完了，显示按钮让玩家手动进入下一年
-        const box = document.getElementById('options');
+        const box = DOM.options || document.getElementById('options');
         const btnText = focusRoundCounter > 0 ? '继续这一年 →' : '下一年 →';
         box.innerHTML = `<button id="continue-btn" class="continue-btn">${btnText}</button>`;
         document.getElementById('continue-btn').addEventListener('click', () => nextYear());
@@ -1175,8 +1520,8 @@ async function showEventSequence(narratives, choiceEvent, extraChoices = []) {
         ? ` <span class="milestone-badge">🏆 ${narr.milestone}</span>`
         : '';
 
-    document.getElementById('event-title').innerHTML = ageLabel + msTag;
-    const desc = document.getElementById('event-description');
+    (DOM.eventTitle || document.getElementById('event-title')).innerHTML = ageLabel + msTag;
+    const desc = DOM.eventDesc || document.getElementById('event-description');
     desc.textContent = narr.prompt;
     desc.className = 'narrative-only';
 
@@ -1192,7 +1537,7 @@ async function showEventSequence(narratives, choiceEvent, extraChoices = []) {
         appendBioLog(game.state.age, crisis.prompt, 'fail');
         game.recordNarrative(crisis, {});
         updateStatusBar();
-        const box = document.getElementById('options');
+        const box = DOM.options || document.getElementById('options');
         box.innerHTML = `
             <div class="narrative-result fail">
                 <p>💀 ${crisis.prompt}</p>
@@ -1209,43 +1554,105 @@ async function showEventSequence(narratives, choiceEvent, extraChoices = []) {
         ? `<p class="more-events-hint">📌 这一年还有 ${remaining.length + allChoices.length} 件事...</p>`
         : (allChoices.length > 0 ? `<p class="more-events-hint">📌 接下来有${allChoices.length > 1 ? allChoices.length + '个' : '一个'}重要选择...</p>` : '');
 
-    const box = document.getElementById('options');
+    const box = DOM.options || document.getElementById('options');
     box.innerHTML = `
         <div class="narrative-result neutral">
             <p>📖 ${narr.prompt.length > 20 ? '生活继续着。' : '这一年就这样过去了。'}</p>
             ${renderChanges(changes)}
         </div>
         ${hint}
-        <div class="event-tools">
-            <button id="expand-btn" class="tool-btn expand-btn">🔍 展开详情</button>
-            <button id="goldfinger-btn" class="tool-btn goldfinger-btn">🎮 金手指</button>
-        </div>
-        <button id="continue-btn" class="continue-btn">${btnText}</button>`;
+        <div class="expand-controls">
+            <button class="expand-control-btn continue-expand-btn" id="first-expand-btn">📖 继续续写</button>
+            <button class="expand-control-btn next-event-btn" id="first-next-btn">➡️ 下一件事</button>
+        </div>`;
 
-    // 展开详情
-    document.getElementById('expand-btn').addEventListener('click', async () => {
-        const btn = document.getElementById('expand-btn');
-        if (!narr?.prompt) { btn.textContent = '❌ 无内容可展开'; return; }
-        btn.disabled = true;
-        btn.textContent = '🔍 展开中...';
+    // 第一次续写
+    document.getElementById('first-expand-btn').addEventListener('click', async function() {
+        this.disabled = true;
+        this.textContent = '📖 续写中...';
         try {
             const expanded = await game.expandEvent(narr);
             if (expanded) {
                 const expandDiv = document.createElement('div');
                 expandDiv.className = 'expanded-content';
                 expandDiv.innerHTML = `<p>${expanded}</p>`;
-                btn.parentElement.after(expandDiv);
-                btn.textContent = '✅ 已展开';
+                
+                // 创建续写控制按钮
+                const expandControls = document.createElement('div');
+                expandControls.className = 'expand-controls';
+                expandControls.innerHTML = `
+                    <button class="expand-control-btn continue-expand-btn">📖 继续续写</button>
+                    <button class="expand-control-btn next-event-btn">➡️ 下一件事</button>
+                `;
+                expandDiv.appendChild(expandControls);
+                
+                // 插入到结果后面，替换原来的控制按钮
+                const resultDiv = box.querySelector('.narrative-result');
+                const firstControls = box.querySelector('.expand-controls');
+                firstControls.replaceWith(expandDiv);
+                
+                // 绑定新的控制按钮
+                bindExpandControls(expandDiv, narr);
             } else {
-                btn.textContent = '❌ 展开失败';
-                setTimeout(() => { btn.textContent = '🔍 展开详情'; btn.disabled = false; }, 2000);
+                this.textContent = '❌ 续写失败';
+                setTimeout(() => { this.textContent = '📖 继续续写'; this.disabled = false; }, 2000);
             }
         } catch (err) {
-            console.error('展开按钮错误:', err);
-            btn.textContent = '❌ 展开失败';
-            setTimeout(() => { btn.textContent = '🔍 展开详情'; btn.disabled = false; }, 2000);
+            console.error('续写错误:', err);
+            this.textContent = '❌ 续写失败';
+            setTimeout(() => { this.textContent = '📖 继续续写'; this.disabled = false; }, 2000);
         }
     });
+    
+    // 第一次点击下一件事
+    document.getElementById('first-next-btn').addEventListener('click', () => {
+        if (remaining.length > 0 || allChoices.length > 0) {
+            showEventSequence(remaining, allChoices[0] || null, allChoices.slice(1));
+        } else {
+            nextYear();
+        }
+    });
+    
+    // 递归绑定续写控制按钮的辅助函数
+    function bindExpandControls(expandDiv, narr) {
+        expandDiv.querySelector('.continue-expand-btn')?.addEventListener('click', async function() {
+            this.disabled = true;
+            this.textContent = '📖 续写中...';
+            try {
+                const moreExpanded = await game.expandEvent(narr);
+                if (moreExpanded) {
+                    const moreDiv = document.createElement('div');
+                    moreDiv.className = 'expanded-content';
+                    moreDiv.innerHTML = `<p>${moreExpanded}</p>`;
+                    
+                    const moreControls = document.createElement('div');
+                    moreControls.className = 'expand-controls';
+                    moreControls.innerHTML = `
+                        <button class="expand-control-btn continue-expand-btn">📖 继续续写</button>
+                        <button class="expand-control-btn next-event-btn">➡️ 下一件事</button>
+                    `;
+                    moreDiv.appendChild(moreControls);
+                    
+                    expandDiv.after(moreDiv);
+                    expandDiv.querySelector('.expand-controls').remove();
+                    
+                    bindExpandControls(moreDiv, narr);
+                } else {
+                    this.textContent = '❌ 续写失败';
+                    setTimeout(() => { this.textContent = '📖 继续续写'; this.disabled = false; }, 2000);
+                }
+            } catch (err) {
+                console.error('续写错误:', err);
+                this.textContent = '❌ 续写失败';
+                setTimeout(() => { this.textContent = '📖 继续续写'; this.disabled = false; }, 2000);
+            }
+        });
+        
+        expandDiv.querySelector('.next-event-btn')?.addEventListener('click', () => {
+            document.querySelectorAll('.expanded-content').forEach(el => el.remove());
+            document.getElementById('continue-btn')?.click();
+        });
+    }
 
     // 金手指
     document.getElementById('goldfinger-btn').addEventListener('click', () => {
@@ -1277,40 +1684,67 @@ function displayChoiceEvent(event, extraChoices = []) {
     currentEvent = event;
     currentExtraChoices = extraChoices;
     const ageLabel = `${game.state.age}岁`;
-    document.getElementById('event-title').innerHTML = ageLabel + milestoneTag(event);
-    const desc = document.getElementById('event-description');
+    (DOM.eventTitle || document.getElementById('event-title')).innerHTML = ageLabel + milestoneTag(event);
+    const desc = DOM.eventDesc || document.getElementById('event-description');
     desc.textContent = event.prompt;
     desc.className = '';
 
-    const box = document.getElementById('options');
+    const box = DOM.options || document.getElementById('options');
     box.innerHTML = '';
 
-    // 展开和金手指工具栏
-    const toolsDiv = document.createElement('div');
-    toolsDiv.className = 'event-tools';
-    toolsDiv.innerHTML = `<button id="expand-choice-btn" class="tool-btn expand-btn">🔍 展开详情</button><button id="goldfinger-choice-btn" class="tool-btn goldfinger-btn">🎮 金手指</button>`;
-    box.appendChild(toolsDiv);
-
-    document.getElementById('expand-choice-btn')?.addEventListener('click', async () => {
-        const btn = document.getElementById('expand-choice-btn');
-        btn.disabled = true;
-        btn.textContent = '🔍 展开中...';
-        const expanded = await game.expandEvent(event);
-        if (expanded) {
-            const expandDiv = document.createElement('div');
-            expandDiv.className = 'expanded-content';
-            expandDiv.innerHTML = `<p>${expanded}</p>`;
-            toolsDiv.after(expandDiv);
-            btn.textContent = '✅ 已展开';
-        } else {
-            btn.textContent = '❌ 展开失败';
-            setTimeout(() => { btn.textContent = '🔍 展开详情'; btn.disabled = false; }, 2000);
-        }
-    });
-
-    document.getElementById('goldfinger-choice-btn')?.addEventListener('click', () => {
-        showGoldFingerInput();
-    });
+    // 直接显示续写控制按钮
+    const expandControls = document.createElement('div');
+    expandControls.className = 'expand-controls';
+    expandControls.innerHTML = `
+        <button class="expand-control-btn continue-expand-btn">📖 继续续写</button>
+        <button class="expand-control-btn next-event-btn">➡️ 下一件事</button>
+    `;
+    box.appendChild(expandControls);
+    
+    // 绑定续写控制按钮
+    bindChoiceExpandControls(expandControls, event, box);
+    
+    // 选择事件的续写控制绑定函数
+    function bindChoiceExpandControls(controlsDiv, event, parentBox) {
+        controlsDiv.querySelector('.continue-expand-btn')?.addEventListener('click', async function() {
+            this.disabled = true;
+            this.textContent = '📖 续写中...';
+            try {
+                const moreExpanded = await game.expandEvent(event);
+                if (moreExpanded) {
+                    const moreDiv = document.createElement('div');
+                    moreDiv.className = 'expanded-content';
+                    moreDiv.innerHTML = `<p>${moreExpanded}</p>`;
+                    
+                    const moreControls = document.createElement('div');
+                    moreControls.className = 'expand-controls';
+                    moreControls.innerHTML = `
+                        <button class="expand-control-btn continue-expand-btn">📖 继续续写</button>
+                        <button class="expand-control-btn next-event-btn">➡️ 下一件事</button>
+                    `;
+                    moreDiv.appendChild(moreControls);
+                    
+                    controlsDiv.after(moreDiv);
+                    controlsDiv.remove();
+                    
+                    bindChoiceExpandControls(moreControls, event, parentBox);
+                } else {
+                    this.textContent = '❌ 续写失败';
+                    setTimeout(() => { this.textContent = '📖 继续续写'; this.disabled = false; }, 2000);
+                }
+            } catch (err) {
+                console.error('续写错误:', err);
+                this.textContent = '❌ 续写失败';
+                setTimeout(() => { this.textContent = '📖 继续续写'; this.disabled = false; }, 2000);
+            }
+        });
+        
+        controlsDiv.querySelector('.next-event-btn')?.addEventListener('click', () => {
+            document.querySelectorAll('.expanded-content').forEach(el => el.remove());
+            document.querySelectorAll('.expand-controls').forEach(el => el.remove());
+            // 清除所有展开内容和控制按钮
+        });
+    }
 
     event.options.forEach((opt, i) => {
         const btn = document.createElement('button');
@@ -1337,7 +1771,7 @@ function showGoldFingerInput() {
             <button id="goldfinger-confirm" class="goldfinger-confirm-btn">🎮 立即执行</button>
         </div>`;
 
-    document.getElementById('options').appendChild(panel);
+    (DOM.options || document.getElementById('options')).appendChild(panel);
 
     document.getElementById('goldfinger-cancel').addEventListener('click', () => panel.remove());
     document.getElementById('goldfinger-confirm').addEventListener('click', async () => {

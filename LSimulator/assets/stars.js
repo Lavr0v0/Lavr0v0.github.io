@@ -1,14 +1,21 @@
-// 高性能星空背景 - 批量渲染 + 流星 + GPU优化
+// 优化版星空背景 - 可控性能
 (function () {
     const canvas = document.getElementById('stars-canvas');
     if (!canvas) return;
-    const ctx = canvas.getContext('2d', { alpha: true });
+    const ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
 
     let w, h, stars, shootingStars = [];
-    const STAR_COUNT = 180;
+    let animationId = null;
+    let isRunning = true;
+    const STAR_COUNT = 100;
+
+    // 【性能】缓存静态颜色字符串，避免每帧拼接
+    const BG_COLOR = '#0a0e1a';
+    const STAR_COLOR = 'rgba(255,255,255,0.6)';
+    const TAU = 6.283185307; // 2 * Math.PI 预计算
 
     function resize() {
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const dpr = window.devicePixelRatio > 1 ? 1.5 : 1;
         w = window.innerWidth;
         h = window.innerHeight;
         canvas.width = w * dpr;
@@ -24,70 +31,121 @@
             const off = i * 4;
             stars[off] = Math.random() * w;
             stars[off + 1] = Math.random() * h;
-            stars[off + 2] = Math.random() * 1.4 + 0.3;
-            stars[off + 3] = Math.random() * 6.28;
+            stars[off + 2] = Math.random() * 1.2 + 0.4;
+            stars[off + 3] = Math.random() * TAU;
         }
     }
 
     function maybeSpawnShootingStar() {
-        if (Math.random() < 0.003 && shootingStars.length < 2) {
+        if (Math.random() < 0.002 && shootingStars.length < 1) {
             shootingStars.push({
                 x: Math.random() * w * 0.8,
                 y: Math.random() * h * 0.3,
-                len: 60 + Math.random() * 80,
-                speed: 4 + Math.random() * 4,
-                angle: 0.6 + Math.random() * 0.4,
+                len: 50 + Math.random() * 60,
+                speed: 5 + Math.random() * 3,
+                angle: 0.7 + Math.random() * 0.3,
+                // 【性能】预计算 cos/sin，避免每帧重复计算
+                cos: 0, sin: 0,
                 life: 1
             });
+            const s = shootingStars[shootingStars.length - 1];
+            s.cos = Math.cos(s.angle);
+            s.sin = Math.sin(s.angle);
         }
     }
 
-    function draw(time) {
-        ctx.clearRect(0, 0, w, h);
-        const t = time * 0.0008;
+    // 【性能】帧计数器，星星闪烁隔帧更新
+    let frameCount = 0;
+    let cachedAlphas = new Uint8Array(STAR_COUNT); // 0 = skip, 1 = draw
 
-        // 批量绘制星星 - 按亮度分组减少fillStyle切换
-        for (let batch = 0; batch < 4; batch++) {
-            const alphaBase = 0.3 + batch * 0.18;
-            ctx.fillStyle = `rgba(255,255,255,${alphaBase})`;
-            ctx.beginPath();
-            for (let i = batch; i < STAR_COUNT; i += 4) {
-                const off = i * 4;
-                const alpha = 0.35 + 0.65 * Math.sin(t + stars[off + 3]);
-                if (Math.abs(alpha - alphaBase) < 0.15) {
-                    ctx.moveTo(stars[off] + stars[off + 2], stars[off + 1]);
-                    ctx.arc(stars[off], stars[off + 1], stars[off + 2], 0, 6.28);
-                }
+    function draw(time) {
+        if (!isRunning) return;
+        
+        ctx.fillStyle = BG_COLOR;
+        ctx.fillRect(0, 0, w, h);
+        
+        // 【性能】每 2 帧才重新计算星星可见性，减少 Math.sin 调用 50%
+        if (frameCount % 2 === 0) {
+            const t = time * 0.0006;
+            for (let i = 0; i < STAR_COUNT; i++) {
+                const alpha = 0.4 + 0.6 * Math.sin(t + stars[i * 4 + 3]);
+                cachedAlphas[i] = alpha > 0.5 ? 1 : 0;
             }
-            ctx.fill();
         }
+        frameCount++;
+
+        ctx.fillStyle = STAR_COLOR;
+        ctx.beginPath();
+        for (let i = 0; i < STAR_COUNT; i++) {
+            if (cachedAlphas[i]) {
+                const off = i * 4;
+                ctx.moveTo(stars[off] + stars[off + 2], stars[off + 1]);
+                ctx.arc(stars[off], stars[off + 1], stars[off + 2], 0, TAU);
+            }
+        }
+        ctx.fill();
 
         // 流星
-        maybeSpawnShootingStar();
-        for (let i = shootingStars.length - 1; i >= 0; i--) {
+        if (Math.random() < 0.5) maybeSpawnShootingStar();
+        
+        // 【性能】用 writeIdx 替代 splice，避免数组重排
+        let writeIdx = 0;
+        for (let i = 0; i < shootingStars.length; i++) {
             const s = shootingStars[i];
-            const dx = Math.cos(s.angle) * s.len;
-            const dy = Math.sin(s.angle) * s.len;
+            const dx = s.cos * s.len;
+            const dy = s.sin * s.len;
             const grad = ctx.createLinearGradient(s.x, s.y, s.x + dx, s.y + dy);
-            grad.addColorStop(0, `rgba(255,255,255,${s.life * 0.8})`);
+            grad.addColorStop(0, `rgba(255,255,255,${s.life * 0.7})`);
             grad.addColorStop(1, 'rgba(255,255,255,0)');
             ctx.strokeStyle = grad;
-            ctx.lineWidth = 1.5;
+            ctx.lineWidth = 1.2;
             ctx.beginPath();
             ctx.moveTo(s.x, s.y);
             ctx.lineTo(s.x + dx, s.y + dy);
             ctx.stroke();
-            s.x += Math.cos(s.angle) * s.speed;
-            s.y += Math.sin(s.angle) * s.speed;
-            s.life -= 0.015;
-            if (s.life <= 0 || s.x > w || s.y > h) shootingStars.splice(i, 1);
+            s.x += s.cos * s.speed;
+            s.y += s.sin * s.speed;
+            s.life -= 0.02;
+            if (s.life > 0 && s.x <= w && s.y <= h) {
+                shootingStars[writeIdx++] = s;
+            }
         }
+        shootingStars.length = writeIdx;
 
+        animationId = requestAnimationFrame(draw);
+    }
+
+    function stop() {
+        isRunning = false;
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+        }
+        ctx.fillStyle = BG_COLOR;
+        ctx.fillRect(0, 0, w, h);
+    }
+
+    function start() {
+        if (isRunning) return;
+        isRunning = true;
         requestAnimationFrame(draw);
     }
+
+    window.starsControl = { stop, start, isRunning: () => isRunning };
 
     resize();
     createStars();
     requestAnimationFrame(draw);
-    window.addEventListener('resize', () => { resize(); createStars(); });
+    
+    let resizeTimer;
+    // 【性能】passive: true 让浏览器知道不会 preventDefault，优化滚动/resize 性能
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            resize();
+            createStars();
+            // 【性能】resize 后重新分配 cachedAlphas
+            cachedAlphas = new Uint8Array(STAR_COUNT);
+        }, 200);
+    }, { passive: true });
 })();
