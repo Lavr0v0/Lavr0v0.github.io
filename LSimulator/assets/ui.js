@@ -263,23 +263,41 @@ function initStartScreen() {
         const provider = providerSelect.value;
         const model = modelSelect.value;
         const userKey = aiKeyInput.value.trim();
+
+        if (!useBuiltinKey && !userKey) {
+            aiHint.textContent = '❌ 请先输入 API Key';
+            aiHint.style.color = 'var(--danger)';
+            return;
+        }
+
         const payload = useBuiltinKey
             ? { provider, model, apiKey: '__BUILTIN__' }
             : { provider, model, apiKey: userKey };
 
         testConnBtn.disabled = true;
         testConnBtn.textContent = '⏳ 后端连接中...';
-        aiHint.textContent = '正在检测后端服务...';
+        aiHint.textContent = '正在连接后端（首次可能需要30秒唤醒）...';
         aiHint.style.color = 'var(--warning)';
+
+        // 带超时的 fetch
+        function fetchWithTimeout(url, options, timeoutMs = 60000) {
+            return Promise.race([
+                fetch(url, options),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('请求超时，服务器可能在休眠')), timeoutMs))
+            ]);
+        }
 
         // Step 1: 检查后端是否在线
         try {
-            const healthRes = await fetch(`${API_BASE}/api/health`, { method: 'GET' });
-            if (!healthRes.ok) throw new Error('后端返回异常');
+            const healthRes = await fetchWithTimeout(`${API_BASE}/api/health`, { method: 'GET' }, 60000);
+            if (!healthRes.ok) throw new Error(`后端返回 ${healthRes.status}`);
+            const healthData = await healthRes.json();
+            console.log('✅ 后端健康检查:', healthData);
         } catch (err) {
-            testConnBtn.textContent = '🔗 测试连接';
+            console.error('❌ 后端连接失败:', err);
+            testConnBtn.textContent = '🔗 重新测试';
             testConnBtn.disabled = false;
-            aiHint.textContent = '❌ 后端连接失败，请检查服务器是否运行';
+            aiHint.textContent = `❌ 后端连接失败: ${err.message}`;
             aiHint.style.color = 'var(--danger)';
             setAuthed(false);
             return;
@@ -287,21 +305,22 @@ function initStartScreen() {
 
         // Step 2: 先设置 AI 配置
         testConnBtn.textContent = '⏳ 配置 AI...';
-        aiHint.textContent = '正在设置 AI 配置...';
+        aiHint.textContent = '后端已连接，正在设置 AI 配置...';
         try {
-            const keyRes = await fetch(`${API_BASE}/api/set-key`, {
+            const keyRes = await fetchWithTimeout(`${API_BASE}/api/set-key`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
-            });
+            }, 15000);
             if (!keyRes.ok) {
                 const errData = await keyRes.json().catch(() => ({}));
-                throw new Error(errData.error || 'AI 配置失败');
+                throw new Error(errData.error || `设置失败 (${keyRes.status})`);
             }
         } catch (err) {
-            testConnBtn.textContent = '🔗 测试连接';
+            console.error('❌ AI 配置失败:', err);
+            testConnBtn.textContent = '🔗 重新测试';
             testConnBtn.disabled = false;
-            aiHint.textContent = `❌ ${err.message}`;
+            aiHint.textContent = `❌ AI 配置失败: ${err.message}`;
             aiHint.style.color = 'var(--danger)';
             setAuthed(false);
             return;
@@ -309,13 +328,13 @@ function initStartScreen() {
 
         // Step 3: 测试 AI 连通性
         testConnBtn.textContent = '⏳ AI 测试中...';
-        aiHint.textContent = '正在测试 AI 接口...';
+        aiHint.textContent = '正在测试 AI 接口（可能需要几秒）...';
         try {
-            const testRes = await fetch(`${API_BASE}/api/test-connection`, {
+            const testRes = await fetchWithTimeout(`${API_BASE}/api/test-connection`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
-            });
+            }, 30000);
             const testData = await testRes.json();
             if (testData.ok) {
                 testConnBtn.textContent = '✅ 连接成功';
@@ -330,16 +349,17 @@ function initStartScreen() {
                 }
                 setTimeout(() => { testConnBtn.textContent = '🔗 测试连接'; testConnBtn.disabled = false; }, 3000);
             } else {
-                testConnBtn.textContent = '🔗 测试连接';
+                testConnBtn.textContent = '🔗 重新测试';
                 testConnBtn.disabled = false;
                 aiHint.textContent = `❌ AI 测试失败: ${testData.error || '未知错误'}`;
                 aiHint.style.color = 'var(--danger)';
                 setAuthed(false);
             }
         } catch (err) {
-            testConnBtn.textContent = '🔗 测试连接';
+            console.error('❌ AI 测试失败:', err);
+            testConnBtn.textContent = '🔗 重新测试';
             testConnBtn.disabled = false;
-            aiHint.textContent = `❌ 测试请求失败: ${err.message}`;
+            aiHint.textContent = `❌ 测试失败: ${err.message}`;
             aiHint.style.color = 'var(--danger)';
             setAuthed(false);
         }
