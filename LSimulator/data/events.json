@@ -1,0 +1,332 @@
+[
+  {
+    "id": "childhood_toy",
+    "ageMin": 3,
+    "ageMax": 5,
+    "baseWeight": 10,
+    "prompt": "你想要一个新玩具，但家里经济紧张。",
+    "options": [
+      {
+        "text": "哭闹着要",
+        "successRate": 0.3,
+        "effectsSuccess": { "stress": -5 },
+        "effectsFail": { "stress": 10, "socialSupport": -5 }
+      },
+      {
+        "text": "懂事地放弃",
+        "successRate": 1.0,
+        "effectsSuccess": { "willpower": 1, "socialSupport": 5 },
+        "effectsFail": {}
+      },
+      {
+        "text": "提出用家务换取",
+        "successRate": 0.6,
+        "effectsSuccess": { "intelligence": 1, "money": 5 },
+        "effectsFail": { "stress": 5 }
+      },
+      {
+        "text": "自己动手做一个",
+        "successRate": 0.4,
+        "effectsSuccess": { "intelligence": 1, "charisma": 1 },
+        "effectsFail": { "stress": 5 }
+      }
+    ]
+  },
+  {
+    "id": "first_day_school",
+    "ageMin": 6,
+    "ageMax": 6,
+    "baseWeight": 15,
+    "prompt": "第一天上学，你感到紧张和不安。",
+    "options": [
+      {
+        "text": "主动和同学打招呼",
+        "successRate": 0.5,
+        "effectsSuccess": { "charisma": 1, "socialSupport": 10 },
+        "effectsFail": { "stress": 10 }
+      },
+      {
+        "text": "安静地坐在角落",
+        "successRate": 1.0,
+        "effectsSuccess": { "stress": -5 },
+        "effectsFail": {}
+      },
+      {
+        "text": "紧紧抓住父母不放",
+        "successRate": 0.2,
+        "effectsSuccess": { "stress": -10 },
+        "effectsFail": { "stress": 15, "socialSupport": -10 }
+      },
+      {
+        "text": "观察环境后再行动",
+        "successRate": 0.7,
+        "effectsSuccess": { "intelligence": 1, "socialSupport": 5 },
+        "effectsFail": { "stress": 5 }
+      }
+    ]
+  },
+  {
+    "id": "homework_pressure",
+    "ageMin": 7,
+    "ageMax": 12,
+    "baseWeight": 12,
+    "prompt": "作业很多，你感到压力很大。",
+    "options": [
+      {
+        "text": "熬夜完成所有作业",
+        "successRate": 0.6,
+        "effectsSuccess": { "intelligence": 1, "stress": 15 },
+        "effectsFail": { "health": -1, "stress": 20 }
+      },
+      {
+        "text": "只做重要的部分",
+        "successRate": 0.7,
+        "effectsSuccess": { "intelligence": 1, "stress": 5 },
+        "effectsFail": { "stress": 10 }
+      },
+      {
+        "text": "抄同学的作业",
+        "successRate": 0.8,
+        "effectsSuccess": { "stress": -10 },
+        "effectsFail": { "socialSupport": -10, "stress": 20 }
+      },
+      {
+        "text": "向老师说明情况",
+        "successRate": 0.5,
+        "effectsSuccess": { "charisma": 1, "stress": -5 },
+        "effectsFail": { "stress": 10 }
+      }
+    ]
+  },
+  {
+    "id": "bullying_incident",
+    "ageMin": 8,
+    "ageMax": 14,
+    "baseWeight": 8,
+    "prompt": "你看到有同学被欺负。",
+    "options": [
+      {
+        "text": "挺身而出制止",
+        "successRate": 0.4,
+        "effectsSuccess": { "charisma": 2, "socialSupport": 15 },
+        "effectsFail": { "health": -1, "stress": 15 }
+      },
+      {
+        "text": "告诉老师",
+        "successRate": 0.7,
+        "effectsSuccess": { "socialSupport": 10 },
+        "effectsFail": { "socialSupport": -5 }
+      },
+      {
+        "text": "假装没看见",
+        "successRate": 1.0,
+        "effectsSuccess": { "stress": 10 },
+        "effectsFail": {}
+      },
+      {
+        "text": "安慰被欺负的同学",
+        "successRate": 0.8,
+        "effectsSuccess": { "charisma": 1, "socialSupport": 10 },
+        "effectsFail": { "stress": 5 }
+      }
+    ]
+  },
+  {
+    "id": "exam_preparation",
+    "ageMin": 10,
+    "ageMax": 18,
+    "baseWeight": 15,
+    "prompt": "期末考试临近，你需要决定如何准备。",
+    "options": [
+      {
+        "text": "制定详细计划认真复习",
+        "successRate": 0.7,
+        "effectsSuccess": { "intelligence": 2, "stress": 10 },
+        "effectsFail": { "stress": 15 }
+      },
+      {
+        "text": "临时抱佛脚",
+        "successRate": 0.4,
+        "effectsSuccess": { "intelligence": 1, "stress": 20 },
+        "effectsFail": { "stress": 25, "socialSupport": -5 }
+      },
+      {
+        "text": "和同学组队学习",
+        "successRate": 0.6,
+        "effectsSuccess": { "intelligence": 1, "socialSupport": 10 },
+        "effectsFail": { "stress": 10 }
+      },
+      {
+        "text": "放松心态正常发挥",
+        "successRate": 0.5,
+        "effectsSuccess": { "stress": -5 },
+        "effectsFail": { "stress": 15 }
+      }
+    ]
+  },
+  {
+    "id": "first_crush",
+    "ageMin": 13,
+    "ageMax": 16,
+    "baseWeight": 10,
+    "prompt": "你对班上的某个同学产生了好感。",
+    "options": [
+      {
+        "text": "鼓起勇气表白",
+        "successRate": 0.3,
+        "effectsSuccess": { "charisma": 2, "socialSupport": 15 },
+        "effectsFail": { "stress": 20, "socialSupport": -10 }
+      },
+      {
+        "text": "默默关注对方",
+        "successRate": 1.0,
+        "effectsSuccess": { "stress": 5 },
+        "effectsFail": {}
+      },
+      {
+        "text": "通过朋友传话",
+        "successRate": 0.5,
+        "effectsSuccess": { "socialSupport": 10 },
+        "effectsFail": { "stress": 15 }
+      },
+      {
+        "text": "专注学业暂不考虑",
+        "successRate": 1.0,
+        "effectsSuccess": { "intelligence": 1, "willpower": 1 },
+        "effectsFail": {}
+      }
+    ]
+  },
+  {
+    "id": "parent_conflict",
+    "ageMin": 14,
+    "ageMax": 17,
+    "baseWeight": 12,
+    "prompt": "你和父母在未来规划上产生了严重分歧。",
+    "options": [
+      {
+        "text": "激烈争吵坚持己见",
+        "successRate": 0.3,
+        "effectsSuccess": { "willpower": 2 },
+        "effectsFail": { "stress": 25, "socialSupport": -15 }
+      },
+      {
+        "text": "完全听从父母安排",
+        "successRate": 1.0,
+        "effectsSuccess": { "socialSupport": 10, "stress": 10 },
+        "effectsFail": {}
+      },
+      {
+        "text": "冷静沟通寻求理解",
+        "successRate": 0.6,
+        "effectsSuccess": { "charisma": 1, "socialSupport": 10 },
+        "effectsFail": { "stress": 15 }
+      },
+      {
+        "text": "寻求第三方帮助调解",
+        "successRate": 0.7,
+        "effectsSuccess": { "intelligence": 1, "socialSupport": 5 },
+        "effectsFail": { "stress": 10 }
+      }
+    ]
+  },
+  {
+    "id": "college_entrance",
+    "ageMin": 18,
+    "ageMax": 18,
+    "baseWeight": 20,
+    "prompt": "高考结束，你需要选择未来的道路。",
+    "options": [
+      {
+        "text": "报考名牌大学",
+        "successRate": 0.4,
+        "effectsSuccess": { "intelligence": 2, "socialSupport": 15 },
+        "effectsFail": { "stress": 30, "money": -20 }
+      },
+      {
+        "text": "选择稳妥的学校",
+        "successRate": 0.8,
+        "effectsSuccess": { "intelligence": 1, "stress": -10 },
+        "effectsFail": { "stress": 10 }
+      },
+      {
+        "text": "直接就业工作",
+        "successRate": 0.6,
+        "effectsSuccess": { "money": 30, "willpower": 1 },
+        "effectsFail": { "stress": 20 }
+      },
+      {
+        "text": "出国留学",
+        "successRate": 0.3,
+        "effectsSuccess": { "intelligence": 2, "charisma": 1, "money": -40 },
+        "effectsFail": { "stress": 35, "money": -50 }
+      }
+    ]
+  },
+  {
+    "id": "part_time_job",
+    "ageMin": 19,
+    "ageMax": 25,
+    "baseWeight": 10,
+    "prompt": "你想找一份兼职来赚取生活费。",
+    "options": [
+      {
+        "text": "做家教",
+        "successRate": 0.6,
+        "effectsSuccess": { "money": 20, "intelligence": 1 },
+        "effectsFail": { "stress": 10 }
+      },
+      {
+        "text": "餐厅服务员",
+        "successRate": 0.8,
+        "effectsSuccess": { "money": 15, "health": -1 },
+        "effectsFail": { "stress": 15 }
+      },
+      {
+        "text": "网络兼职",
+        "successRate": 0.5,
+        "effectsSuccess": { "money": 25, "intelligence": 1 },
+        "effectsFail": { "stress": 10, "money": -10 }
+      },
+      {
+        "text": "专注学业不打工",
+        "successRate": 1.0,
+        "effectsSuccess": { "intelligence": 1, "stress": -5 },
+        "effectsFail": {}
+      }
+    ]
+  },
+  {
+    "id": "career_choice",
+    "ageMin": 22,
+    "ageMax": 24,
+    "baseWeight": 18,
+    "prompt": "毕业在即，你收到了几份工作offer。",
+    "options": [
+      {
+        "text": "大公司稳定工作",
+        "successRate": 0.7,
+        "effectsSuccess": { "money": 40, "socialSupport": 10 },
+        "effectsFail": { "stress": 15 }
+      },
+      {
+        "text": "创业公司高风险高回报",
+        "successRate": 0.4,
+        "effectsSuccess": { "money": 60, "willpower": 2 },
+        "effectsFail": { "stress": 30, "money": -20 }
+      },
+      {
+        "text": "考研继续深造",
+        "successRate": 0.5,
+        "effectsSuccess": { "intelligence": 2, "money": -20 },
+        "effectsFail": { "stress": 25 }
+      },
+      {
+        "text": "自由职业",
+        "successRate": 0.5,
+        "effectsSuccess": { "money": 30, "stress": -10 },
+        "effectsFail": { "stress": 20, "money": -10 }
+      }
+    ]
+  }
+]

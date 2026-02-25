@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人生轨迹模拟器</title>
+    <link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+    <canvas id="stars-canvas"></canvas>
+    <div id="app">
+        <div id="start-screen" class="screen active">
+            <h1>人生轨迹模拟器</h1>
+            <p class="subtitle">每一个选择，都在书写你的人生</p>
+
+            <!-- API Key 设置 -->
+            <div class="api-key-section">
+                <label>API 设置</label>
+                <div class="api-key-row">
+                    <input type="password" id="api-key-input" placeholder="输入你的 DeepSeek API Key" autocomplete="off">
+                    <button id="dev-mode-btn" class="dev-mode-btn" type="button">开发者</button>
+                </div>
+                <div class="api-key-hint" id="api-key-hint">需要 DeepSeek API Key 才能游玩</div>
+            </div>
+
+            <div class="identity-section">
+                <h2>你是谁？</h2>
+                <div class="identity-row">
+                    <input type="text" id="player-name" placeholder="你的名字" maxlength="10">
+                    <select id="player-gender">
+                        <option value="男">男</option>
+                        <option value="女">女</option>
+                    </select>
+                </div>
+                <input type="text" id="player-personality" placeholder="角色设定（如：内向学霸、叛逆富二代、热血体育生、社恐天才…）" maxlength="50">
+            </div>
+
+            <div id="attribute-allocation">
+                <h2>分配属性点（剩余 <span id="points-left">30</span> 点）</h2>
+                <div class="attributes"></div>
+            </div>
+
+            <div class="difficulty-section">
+                <label>难度</label>
+                <div class="difficulty-options">
+                    <button class="diff-btn" data-diff="1">简单</button>
+                    <button class="diff-btn active" data-diff="2">普通</button>
+                    <button class="diff-btn" data-diff="3">困难</button>
+                    <button class="diff-btn" data-diff="4">地狱</button>
+                </div>
+                <div class="difficulty-hint" id="difficulty-hint">正常的人生体验</div>
+            </div>
+
+            <div class="content-mode-section">
+                <label>内容尺度</label>
+                <div class="content-mode-options">
+                    <button class="content-btn active" data-mode="sfw" id="sfw-btn">全年龄</button>
+                </div>
+                <div class="content-mode-hint" id="content-mode-hint">适合所有人的内容，情感描写含蓄隐晦</div>
+            </div>
+
+            <div class="phase-section">
+                <label>起始阶段</label>
+                <div class="phase-options">
+                    <button class="phase-btn active" data-age="0">出生</button>
+                    <button class="phase-btn" data-age="6">小学</button>
+                    <button class="phase-btn" data-age="12">初中</button>
+                    <button class="phase-btn" data-age="15">高中</button>
+                    <button class="phase-btn" data-age="18">大学</button>
+                    <button class="phase-btn" data-age="22">工作</button>
+                </div>
+                <div class="phase-hint" id="phase-hint">从出生开始完整体验</div>
+            </div>
+
+            <div class="scheduled-events-section">
+                <label>定时事件（可选）</label>
+                <div class="scheduled-hint">在指定年龄触发你想要的剧情</div>
+                <div id="scheduled-list" class="scheduled-list"></div>
+                <div class="scheduled-add-row">
+                    <input type="number" id="sched-age" placeholder="年龄" min="0" max="75" class="sched-age-input">
+                    <input type="text" id="sched-text" placeholder="事件描述（如：被初恋甩了、中了彩票…）" class="sched-text-input" maxlength="60">
+                    <button id="sched-add-btn" class="sched-add-btn" type="button">+</button>
+                </div>
+            </div>
+
+            <button id="start-game">开始人生</button>
+            <button id="load-game" class="load-btn" style="display:none">继续上次的人生</button>
+        </div>
+
+        <div id="game-screen" class="screen">
+            <div id="status-bar">
+                <div class="age"><span id="current-age">0</span>岁</div>
+                <div class="stats">
+                    <span class="stat-pill stress-pill">压力 <span id="stress">0</span></span>
+                    <span class="stat-pill money-pill">金钱 <span id="money">0</span></span>
+                    <span class="stat-pill social-pill">社交 <span id="social">50</span></span>
+                </div>
+            </div>
+
+            <div id="focus-phase-bar" class="focus-phase-bar" style="display:none">
+                <span id="focus-phase-label">当前聚焦：</span>
+                <button id="focus-phase-btn" class="focus-btn">聚焦当前阶段</button>
+                <button id="focus-phase-cancel" class="focus-cancel-btn" style="display:none">取消聚焦</button>
+            </div>
+
+            <div id="attributes-display"></div>
+            <div id="traits-display" class="traits-container"></div>
+
+            <div id="profile-panel">
+                <div class="profile-header" id="profile-toggle">
+                    <span>小档案</span>
+                    <span class="profile-toggle-arrow">▼</span>
+                </div>
+                <div id="profile-content" class="profile-body">
+                    <div class="profile-row">
+                        <span class="profile-label">学历</span>
+                        <span id="profile-education">未入学</span>
+                    </div>
+                    <div class="profile-row">
+                        <span class="profile-label">职业</span>
+                        <span id="profile-job">无</span>
+                    </div>
+                    <div class="profile-section-title">人际关系</div>
+                    <div id="profile-relationships" class="profile-rel-list">
+                        <div class="profile-empty">还没有认识的人</div>
+                    </div>
+                    <div class="profile-section-title">重要角色</div>
+                    <div id="profile-characters" class="profile-char-list">
+                        <div class="profile-empty">还没有重要角色</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="event-display">
+                <h2 id="event-title"></h2>
+                <p id="event-description"></p>
+                <div id="options"></div>
+            </div>
+
+            <div id="narrative-display"></div>
+
+            <div id="biography-log">
+                <div class="bio-log-header">
+                    <span>人生传记</span>
+                    <button id="bio-log-toggle" class="bio-log-toggle-btn">收起</button>
+                </div>
+                <div id="bio-log-content" class="bio-log-entries"></div>
+            </div>
+        </div>
+
+        <div id="end-screen" class="screen">
+            <h1>人生回顾</h1>
+            <div id="ending-result"></div>
+            <button id="observer-btn" class="observer-btn" style="display:none">观察者模式 — 看看你走后的世界</button>
+            <div id="observer-result" style="display:none"></div>
+            <button id="restart">重新开始</button>
+            <button id="export">导出人生</button>
+        </div>
+    </div>
+
+    <script src="assets/stars.js"></script>
+    <script type="module" src="assets/engine.js"></script>
+    <script type="module" src="assets/ui.js"></script>
+	<script>
+  const API_BASE =
+  location.hostname === "localhost" || location.hostname === "127.0.0.1"
+    ? "http://localhost:3000"
+    : "https://life-simulator-api.onrender.com/";
+
+  document.getElementById("testApiBtn").addEventListener("click", async () => {
+    const output = document.getElementById("apiResult");
+    output.textContent = "请求中...";
+
+    try {
+      const res = await fetch(`${API_BASE}/health`);
+      const data = await res.json();
+      output.textContent = JSON.stringify(data, null, 2);
+    } catch (err) {
+      output.textContent = "请求失败: " + err.message;
+      console.error(err);
+    }
+  });
+</script>
+</body>
+</html>
