@@ -29,9 +29,6 @@ function cacheDOM() {
     DOM.libido = document.getElementById('libido');
     DOM.experience = document.getElementById('experience');
     DOM.satisfaction = document.getElementById('satisfaction');
-    DOM.libidoPill = document.getElementById('libido-pill');
-    DOM.expPill = document.getElementById('experience-pill');
-    DOM.satPill = document.getElementById('satisfaction-pill');
     DOM.attrDisplay = document.getElementById('attributes-display');
     DOM.traitsDisplay = document.getElementById('traits-display');
     DOM.bioLogContent = document.getElementById('bio-log-content');
@@ -1011,14 +1008,14 @@ function updateStatusBar() {
 
     // NSFW+ 模式显示情色数值
     const isNsfwPlus = game.contentMode === 'nsfwPlus';
-    const libidoPill = DOM.libidoPill || document.getElementById('libido-pill');
-    const expPill = DOM.expPill || document.getElementById('experience-pill');
-    const satPill = DOM.satPill || document.getElementById('satisfaction-pill');
+    const libidoRow = document.getElementById('libido-row');
+    const expRow = document.getElementById('experience-row');
+    const satRow = document.getElementById('satisfaction-row');
     
     if (isNsfwPlus) {
-        libidoPill.style.display = '';
-        expPill.style.display = '';
-        satPill.style.display = '';
+        if (libidoRow) libidoRow.style.display = '';
+        if (expRow) expRow.style.display = '';
+        if (satRow) satRow.style.display = '';
         
         const oldLibido = parseInt((DOM.libido || document.getElementById('libido'))?.textContent) || 50;
         const oldExp = parseInt((DOM.experience || document.getElementById('experience'))?.textContent) || 0;
@@ -1032,9 +1029,9 @@ function updateStatusBar() {
         animateStatChange('experience', oldExp, newExp);
         animateStatChange('satisfaction', oldSat, newSat);
     } else {
-        libidoPill.style.display = 'none';
-        expPill.style.display = 'none';
-        satPill.style.display = 'none';
+        if (libidoRow) libidoRow.style.display = 'none';
+        if (expRow) expRow.style.display = 'none';
+        if (satRow) satRow.style.display = 'none';
     }
 
     // 回溯按钮状态
@@ -1088,87 +1085,167 @@ function updateProfile() {
     const chars = game.state.characters;
     const eduEl = DOM.profileEducation || document.getElementById('profile-education');
     const jobEl = DOM.profileJob || document.getElementById('profile-job');
-    const relEl = DOM.profileRelationships || document.getElementById('profile-relationships');
-    const charEl = DOM.profileCharacters || document.getElementById('profile-characters');
+    const relListEl = document.getElementById('relationships-list');
+    
     if (eduEl) eduEl.textContent = p.education || '未入学';
     if (jobEl) jobEl.textContent = p.job || '无';
 
-    // 【性能】用简单 hash 检测数据是否变化，避免无变化时重建 DOM
-    const charList = Object.values(chars);
-    const charHash = charList.map(c => `${c.name}|${c.relation}|${c.importance}`).join(',');
-    
-    if (charEl && charHash !== _lastCharHash) {
-        _lastCharHash = charHash;
-        if (!charList.length) {
-            charEl.innerHTML = '<div class="profile-empty">还没有重要角色</div>';
-        } else {
-            charEl.innerHTML = charList
-                .sort((a, b) => (b.importance || 3) - (a.importance || 3))
-                .map(c => {
-                    const impStars = '★'.repeat(Math.min(c.importance || 3, 5));
-                    return `<div class="char-card" onclick="this.classList.toggle('expanded')">
-                        <div class="char-card-header">
-                            <span class="char-card-name">${c.name}</span>
-                            <span class="char-card-relation">${c.relation || '认识'}</span>
-                            <span class="char-card-imp">${impStars}</span>
-                        </div>
-                        <div class="char-card-body">
-                            <div class="char-card-row"><span>性别</span><span>${c.gender || '未知'}</span></div>
-                            <div class="char-card-row"><span>年龄</span><span>${c.age || '未知'}</span></div>
-                            <div class="char-card-row"><span>性格</span><span>${c.personality || '未知'}</span></div>
-                            <div class="char-card-row"><span>职业</span><span>${c.job || '未知'}</span></div>
-                            <div class="char-card-row"><span>外貌</span><span>${c.appearance || '未知'}</span></div>
-                            <div class="char-card-row"><span>初识</span><span>${c.firstMet || '未知'}</span></div>
-                        </div>
-                    </div>`;
-                }).join('');
-        }
-    }
+    if (!relListEl) return;
 
-    if (!relEl) return;
-
+    // 筛选有交情的人物（好感度 >= 30 或重要度 >= 3）
     const currentAge = game.state.age;
     const importantRels = p.relationships.filter(r => {
-        if ((r.importance || 3) < 3) return false;
-        if ((r.importance || 3) >= 5) return true;
-        const lastSeen = r.lastSeen ?? 0;
-        return (currentAge - lastSeen) <= 5;
+        const affinity = r.affinity || 0;
+        const importance = r.importance || 3;
+        // 显示好感度 >= 30 或重要度 >= 3 的人物
+        if (affinity >= 30 || importance >= 3) return true;
+        return false;
     });
 
-    // 【性能】关系列表也用 hash 检测变化
-    const relHash = importantRels.map(r => `${r.name}|${r.relation}|${r.affinity}|${r.status}`).join(',');
+    // 【性能】关系列表用 hash 检测变化
+    const relHash = importantRels.map(r => `${r.name}|${r.relation}|${r.affinity}`).join(',');
     if (relHash === _lastRelHash) return;
     _lastRelHash = relHash;
 
     if (!importantRels.length) {
-        relEl.innerHTML = '<div class="profile-empty">还没有重要的人</div>';
+        relListEl.innerHTML = '<div class="empty-hint">还没有认识的人</div>';
         return;
     }
 
-    relEl.innerHTML = importantRels
+    relListEl.innerHTML = importantRels
         .sort((a, b) => (b.affinity || 0) - (a.affinity || 0))
         .map(r => {
-            const tagClass = getRelTagClass(r.relation);
-            const barColor = r.affinity >= 70 ? '#ec4899' : r.affinity >= 40 ? '#6366f1' : '#9ca3af';
-            return `<div class="profile-rel-item">
-                <div class="profile-rel-top">
-                    <span class="profile-rel-name">${r.name}</span>
-                    <span class="profile-rel-tag ${tagClass}">${r.relation}</span>
-                </div>
-                <div class="profile-rel-bottom">
-                    <div class="profile-rel-bar">
-                        <div class="profile-rel-bar-fill" style="width:${r.affinity}%;background:${barColor}"></div>
-                    </div>
-                    <span class="profile-rel-status">${r.status}</span>
-                </div>
+            const affinity = r.affinity || 0;
+            const relation = r.relation || '认识';
+            const affinityColor = getAffinityColor(relation, affinity);
+            
+            return `<div class="relationship-item" data-rel-name="${r.name}">
+                <div class="rel-name">${r.name}</div>
+                <div class="rel-affinity" style="color: ${affinityColor}">${affinity}</div>
+                <div class="rel-relation">${relation}</div>
             </div>`;
         }).join('');
+    
+    // 绑定点击事件显示详情
+    relListEl.querySelectorAll('.relationship-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const relName = item.dataset.relName;
+            const rel = p.relationships.find(r => r.name === relName);
+            const char = chars[relName];
+            showNPCModal(char, rel);
+        });
+    });
+}
+
+// 根据关系类型和好感度返回颜色
+function getAffinityColor(relation, affinity) {
+    // 亲情关系 - 蓝色
+    if (['父亲', '母亲', '爸爸', '妈妈', '儿子', '女儿', '兄弟', '姐妹', '哥哥', '弟弟', '姐姐', '妹妹', '爷爷', '奶奶', '外公', '外婆'].some(k => relation.includes(k))) {
+        return '#60a5fa'; // 蓝色
+    }
+    // 恋爱关系 - 红色
+    if (['恋人', '热恋', '男友', '女友', '配偶', '老公', '老婆', '丈夫', '妻子'].some(k => relation.includes(k))) {
+        return '#f87171'; // 红色
+    }
+    // 暧昧关系 - 粉色
+    if (['暗恋', '心动', '单相思', '暧昧', '喜欢'].some(k => relation.includes(k))) {
+        return '#f472b6'; // 粉色
+    }
+    // 普通朋友 - 绿色（好感度 >= 50）
+    if (affinity >= 50) {
+        return '#4ade80'; // 绿色
+    }
+    // 默认 - 灰色
+    return '#94a3b8';
+}
+
+// 显示NPC详情弹窗
+function showNPCModal(char, rel) {
+    const modal = document.createElement('div');
+    modal.className = 'npc-detail-modal';
+    
+    const name = char?.name || rel?.name || '未知';
+    const relation = rel?.relation || char?.relation || '认识';
+    const affinity = rel?.affinity || 0;
+    const status = rel?.status || '未知';
+    
+    modal.innerHTML = `
+        <div class="npc-detail-content">
+            <div class="npc-detail-header">
+                <div>
+                    <div class="npc-detail-name">${name}</div>
+                    <div style="font-size: 13px; color: var(--text-dim); margin-top: 4px;">${relation}</div>
+                </div>
+                <button class="npc-detail-close">×</button>
+            </div>
+            <div class="npc-detail-info">
+                ${rel ? `
+                    <div class="npc-detail-row">
+                        <span class="npc-detail-label">好感度</span>
+                        <span class="npc-detail-value">${affinity}</span>
+                    </div>
+                    <div class="npc-detail-row">
+                        <span class="npc-detail-label">状态</span>
+                        <span class="npc-detail-value">${status}</span>
+                    </div>
+                ` : ''}
+                ${char ? `
+                    <div class="npc-detail-row">
+                        <span class="npc-detail-label">性别</span>
+                        <span class="npc-detail-value">${char.gender || '未知'}</span>
+                    </div>
+                    <div class="npc-detail-row">
+                        <span class="npc-detail-label">年龄</span>
+                        <span class="npc-detail-value">${char.age || '未知'}</span>
+                    </div>
+                    ${char.personality ? `
+                        <div class="npc-detail-row">
+                            <span class="npc-detail-label">性格</span>
+                            <span class="npc-detail-value">${char.personality}</span>
+                        </div>
+                    ` : ''}
+                    ${char.job ? `
+                        <div class="npc-detail-row">
+                            <span class="npc-detail-label">职业</span>
+                            <span class="npc-detail-value">${char.job}</span>
+                        </div>
+                    ` : ''}
+                    ${char.appearance ? `
+                        <div class="npc-detail-row">
+                            <span class="npc-detail-label">外貌</span>
+                            <span class="npc-detail-value">${char.appearance}</span>
+                        </div>
+                    ` : ''}
+                    ${char.backstory ? `
+                        <div class="npc-detail-row full-width">
+                            <span class="npc-detail-label">背景</span>
+                            <span class="npc-detail-value">${char.backstory}</span>
+                        </div>
+                    ` : ''}
+                    ${char.description ? `
+                        <div class="npc-detail-row full-width">
+                            <span class="npc-detail-label">介绍</span>
+                            <span class="npc-detail-value">${char.description}</span>
+                        </div>
+                    ` : ''}
+                ` : ''}
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // 点击关闭按钮或背景关闭
+    modal.querySelector('.npc-detail-close').addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
 }
 
 function getRelTagClass(relation) {
     if (['恋人', '热恋', '男友', '女友'].some(k => relation.includes(k))) return 'lover';
     if (['配偶', '老公', '老婆', '丈夫', '妻子'].some(k => relation.includes(k))) return 'spouse';
-    if (['前任', '前男友', '前女友'].some(k => relation.includes(k))) return 'ex';
+    if (['前任', '前男友', '前女女友'].some(k => relation.includes(k))) return 'ex';
     if (['暗恋', '心动', '单相思'].some(k => relation.includes(k))) return 'crush';
     if (['仇人', '敌人', '对手'].some(k => relation.includes(k))) return 'enemy';
     if (['朋友', '死党', '闺蜜', '兄弟', '好友'].some(k => relation.includes(k))) return 'friend';
@@ -1859,8 +1936,8 @@ function renderChanges(changes) {
 }
 
 async function handleChoice(idx) {
-    // 保存快照用于回溯
-    game.saveSnapshot();
+    // 不再保存快照，删除回溯功能
+    // game.saveSnapshot();
 
     const result = game.makeChoice(currentEvent, idx);
     document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
@@ -1887,19 +1964,90 @@ async function handleChoice(idx) {
             <p>${narrative}</p>
             ${renderChanges(result.changes)}
         </div>
-        ${game.canRewind() ? `<button id="rewind-choice-btn" class="rewind-btn">⏪ 回溯重选 (剩${game.state.rewindsLeft}次)</button>` : ''}
-        <button id="continue-btn" class="continue-btn">继续 →</button>`;
+        <div class="expand-controls">
+            <button class="expand-control-btn continue-expand-btn" id="choice-expand-btn">📖 继续续写</button>
+            <button class="expand-control-btn next-event-btn" id="choice-next-btn">➡️ 下一件事</button>
+        </div>`;
 
-    // 回溯按钮
-    document.getElementById('rewind-choice-btn')?.addEventListener('click', () => {
-        if (game.rewind()) {
-            narDiv.classList.remove('active');
-            narDiv.innerHTML = '';
-            updateStatusBar();
-            displayChoiceEvent(currentEvent, currentExtraChoices);
+    // 绑定续写按钮
+    document.getElementById('choice-expand-btn')?.addEventListener('click', async function() {
+        this.disabled = true;
+        this.textContent = '📖 续写中...';
+        try {
+            const expanded = await game.expandEvent(currentEvent);
+            if (expanded) {
+                const expandDiv = document.createElement('div');
+                expandDiv.className = 'expanded-content';
+                expandDiv.innerHTML = `<p>${expanded}</p>`;
+                
+                const expandControls = document.createElement('div');
+                expandControls.className = 'expand-controls';
+                expandControls.innerHTML = `
+                    <button class="expand-control-btn continue-expand-btn">📖 继续续写</button>
+                    <button class="expand-control-btn next-event-btn">➡️ 下一件事</button>
+                `;
+                expandDiv.appendChild(expandControls);
+                
+                const firstControls = narDiv.querySelector('.expand-controls');
+                firstControls.replaceWith(expandDiv);
+                
+                bindChoiceResultExpandControls(expandDiv, currentEvent, narDiv);
+            } else {
+                this.textContent = '❌ 续写失败';
+                setTimeout(() => { this.textContent = '📖 继续续写'; this.disabled = false; }, 2000);
+            }
+        } catch (err) {
+            console.error('续写错误:', err);
+            this.textContent = '❌ 续写失败';
+            setTimeout(() => { this.textContent = '📖 继续续写'; this.disabled = false; }, 2000);
         }
     });
-
+    
+    // 递归绑定续写控制按钮的辅助函数
+    function bindChoiceResultExpandControls(expandDiv, event, parentDiv) {
+        expandDiv.querySelector('.continue-expand-btn')?.addEventListener('click', async function() {
+            this.disabled = true;
+            this.textContent = '📖 续写中...';
+            try {
+                const moreExpanded = await game.expandEvent(event);
+                if (moreExpanded) {
+                    const moreDiv = document.createElement('div');
+                    moreDiv.className = 'expanded-content';
+                    moreDiv.innerHTML = `<p>${moreExpanded}</p>`;
+                    
+                    const moreControls = document.createElement('div');
+                    moreControls.className = 'expand-controls';
+                    moreControls.innerHTML = `
+                        <button class="expand-control-btn continue-expand-btn">📖 继续续写</button>
+                        <button class="expand-control-btn next-event-btn">➡️ 下一件事</button>
+                    `;
+                    moreDiv.appendChild(moreControls);
+                    
+                    expandDiv.after(moreDiv);
+                    expandDiv.querySelector('.expand-controls').remove();
+                    
+                    bindChoiceResultExpandControls(moreDiv, event, parentDiv);
+                } else {
+                    this.textContent = '❌ 续写失败';
+                    setTimeout(() => { this.textContent = '📖 继续续写'; this.disabled = false; }, 2000);
+                }
+            } catch (err) {
+                console.error('续写错误:', err);
+                this.textContent = '❌ 续写失败';
+                setTimeout(() => { this.textContent = '📖 继续续写'; this.disabled = false; }, 2000);
+            }
+        });
+        
+        expandDiv.querySelector('.next-event-btn')?.addEventListener('click', () => {
+            proceedToNext();
+        });
+    }
+    
+    // 下一件事按钮
+    document.getElementById('choice-next-btn')?.addEventListener('click', () => {
+        proceedToNext();
+    });
+    
     // 极端状态检测
     const crisis = game.checkExtremeStates();
     if (crisis) {
@@ -1909,18 +2057,22 @@ async function handleChoice(idx) {
             <div class="narrative-result fail" style="margin-top:8px">
                 <p>💀 ${crisis.prompt}</p>
             </div>`;
-        const btn = narDiv.querySelector('#continue-btn');
-        btn.textContent = '查看结局';
-        btn.addEventListener('click', () => {
+        const allControls = narDiv.querySelectorAll('.expand-controls');
+        allControls.forEach(ctrl => ctrl.remove());
+        const endBtn = document.createElement('button');
+        endBtn.className = 'continue-btn';
+        endBtn.textContent = '查看结局';
+        endBtn.addEventListener('click', () => {
             narDiv.classList.remove('active');
             narDiv.innerHTML = '';
             showEnding();
         });
+        narDiv.appendChild(endBtn);
         updateStatusBar();
         return;
     }
-
-    document.getElementById('continue-btn').addEventListener('click', () => {
+    
+    function proceedToNext() {
         narDiv.classList.remove('active');
         narDiv.innerHTML = '';
         if (currentExtraChoices.length > 0) {
@@ -1934,8 +2086,8 @@ async function handleChoice(idx) {
         } else {
             nextYear();
         }
-    });
-
+    }
+    
     updateStatusBar();
 }
 

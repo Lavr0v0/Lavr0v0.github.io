@@ -178,57 +178,88 @@
             </div>
 
             <div class="game-right-panel">
-                <div id="status-bar">
-                    <div class="age"><span id="current-age">0</span>岁</div>
-                    <div class="stats">
-                        <span class="stat-pill stress-pill">压力 <span id="stress">0</span></span>
-                        <span class="stat-pill money-pill">金钱 <span id="money">0</span></span>
-                        <span class="stat-pill social-pill">社交 <span id="social">50</span></span>
-                        <span class="stat-pill libido-pill" id="libido-pill" style="display:none">性欲 <span id="libido">50</span></span>
-                        <span class="stat-pill experience-pill" id="experience-pill" style="display:none">经验 <span id="experience">0</span></span>
-                        <span class="stat-pill satisfaction-pill" id="satisfaction-pill" style="display:none">满足 <span id="satisfaction">50</span></span>
+                <!-- 左列：数值面板 -->
+                <div class="stats-column">
+                    <!-- 聚焦功能 -->
+                    <div id="focus-phase-bar" class="focus-phase-bar" style="display:none">
+                        <span id="focus-phase-label" class="focus-phase-label">🔍 <span id="focus-phase-name"></span></span>
+                        <button id="focus-phase-btn" class="focus-btn">聚焦</button>
+                        <button id="focus-phase-cancel" class="focus-cancel-btn" style="display:none">取消</button>
                     </div>
-                </div>
 
-                <div id="focus-phase-bar" class="focus-phase-bar" style="display:none">
-                    <span id="focus-phase-label">当前聚焦：</span>
-                    <button id="focus-phase-btn" class="focus-btn">聚焦当前阶段</button>
-                    <button id="focus-phase-cancel" class="focus-cancel-btn" style="display:none">取消聚焦</button>
-                </div>
-
-                <div id="attributes-display"></div>
-                <div id="traits-display" class="traits-container"></div>
-
-                <div id="profile-panel">
-                    <div class="profile-header" id="profile-toggle">
-                        <span>小档案</span>
-                        <span class="profile-toggle-arrow">▼</span>
-                    </div>
-                    <div id="profile-content" class="profile-body">
-                        <div class="profile-row">
-                            <span class="profile-label">学历</span>
-                            <span id="profile-education">未入学</span>
+                    <!-- 年龄和基础档案 -->
+                    <div class="status-card">
+                        <div class="age-display">
+                            <span id="current-age">0</span>岁
                         </div>
-                        <div class="profile-row">
-                            <span class="profile-label">职业</span>
-                            <span id="profile-job">无</span>
-                        </div>
-                        <div class="profile-section-title">人际关系</div>
-                        <div id="profile-relationships" class="profile-rel-list">
-                            <div class="profile-empty">还没有认识的人</div>
-                        </div>
-                        <div class="profile-section-title">重要角色</div>
-                        <div id="profile-characters" class="profile-char-list">
-                            <div class="profile-empty">还没有重要角色</div>
+                        <div class="profile-compact">
+                            <div class="profile-item">
+                                <span class="profile-icon">🎓</span>
+                                <span id="profile-education">未入学</span>
+                            </div>
+                            <div class="profile-item">
+                                <span class="profile-icon">💼</span>
+                                <span id="profile-job">无</span>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- 衍生数值 -->
+                    <div class="stats-card">
+                        <div class="stat-row">
+                            <span class="stat-label">压力</span>
+                            <span class="stat-value" id="stress">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">金钱</span>
+                            <span class="stat-value" id="money">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">社交</span>
+                            <span class="stat-value" id="social">50</span>
+                        </div>
+                        <div class="stat-row" id="libido-row" style="display:none">
+                            <span class="stat-label">性欲</span>
+                            <span class="stat-value" id="libido">50</span>
+                        </div>
+                        <div class="stat-row" id="experience-row" style="display:none">
+                            <span class="stat-label">经验</span>
+                            <span class="stat-value" id="experience">0</span>
+                        </div>
+                        <div class="stat-row" id="satisfaction-row" style="display:none">
+                            <span class="stat-label">满足</span>
+                            <span class="stat-value" id="satisfaction">50</span>
+                        </div>
+                    </div>
+
+                    <!-- 基础属性 -->
+                    <div class="attributes-card">
+                        <div id="attributes-display"></div>
+                    </div>
+
+                    <!-- 特质 -->
+                    <div id="traits-display" class="traits-container"></div>
+
+                    <!-- 操作按钮 -->
+                    <div class="action-buttons-grid">
+                        <button id="open-biography-btn" class="action-btn">📖 传记</button>
+                        <button id="goldfinger-trigger-btn" class="action-btn">🎮 金手指</button>
+                        <button id="save-game-btn" class="action-btn">💾 保存</button>
+                        <button id="load-game-btn" class="action-btn">📂 读取</button>
+                    </div>
+                    
+                    <input type="file" id="load-game-input" accept=".json" style="display:none">
                 </div>
 
-                <button id="open-biography-btn" class="biography-btn">📖 查看人生传记</button>
-                <button id="goldfinger-trigger-btn" class="goldfinger-trigger-btn">🎮 金手指</button>
-                <button id="save-game-btn" class="save-game-btn">💾 保存存档</button>
-                <input type="file" id="load-game-input" accept=".json" style="display:none">
-                <button id="load-game-file-btn" class="load-game-btn">📂 读取存档</button>
+                <!-- 右列：关系面板 -->
+                <div class="relationships-column">
+                    <div class="relationships-card">
+                        <div class="card-header">人际关系</div>
+                        <div id="relationships-list" class="relationships-list">
+                            <div class="empty-hint">还没有认识的人</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
