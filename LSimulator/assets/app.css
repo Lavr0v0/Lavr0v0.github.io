@@ -27,7 +27,22 @@
     --shadow-lg: 0 20px 60px rgba(0,0,0,0.4);
     --radius: 16px;
     --radius-sm: 10px;
+    --radius-xs: 6px;
     --transition: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-fast: 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+    
+    /* 渐变色 */
+    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    --gradient-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    --gradient-card: linear-gradient(135deg, rgba(99,102,241,0.05) 0%, rgba(139,92,246,0.05) 100%);
+    
+    /* 关系颜色 */
+    --color-family: #60a5fa;
+    --color-love: #f87171;
+    --color-ambiguous: #f472b6;
+    --color-friend: #4ade80;
     
     /* 字体家族 */
     --font-sans: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -313,7 +328,35 @@ body:not(.game-active) .perf-toggle-btn {
     border-radius: var(--radius-sm);
     border: 1px solid var(--border);
     padding: 14px 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1), 0 0 0 1px rgba(255,255,255,0.03) inset;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1), 
+                0 0 0 1px rgba(255,255,255,0.03) inset,
+                0 1px 0 0 rgba(255,255,255,0.05) inset;
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.attributes-card::before,
+.profile-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255,255,255,0.1) 50%, 
+        transparent 100%);
+    pointer-events: none;
+}
+
+.attributes-card:hover,
+.profile-card:hover {
+    border-color: var(--border-hover);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2), 
+                0 0 0 1px rgba(255,255,255,0.05) inset,
+                0 1px 0 0 rgba(255,255,255,0.08) inset;
 }
 
 /* 年龄和档案卡片 */
@@ -322,16 +365,39 @@ body:not(.game-active) .perf-toggle-btn {
     flex-direction: column;
     gap: 12px;
     padding: 16px;
+    background: var(--surface-card);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1), 
+                0 0 0 1px rgba(255,255,255,0.03) inset;
+    position: relative;
+    overflow: hidden;
+}
+
+.status-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: radial-gradient(ellipse at top, rgba(99,102,241,0.15) 0%, transparent 70%);
+    pointer-events: none;
 }
 
 .age-display {
-    font-size: 32px;
-    font-weight: 800;
-    color: var(--primary);
+    font-size: 36px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #818cf8 0%, #6366f1 50%, #4f46e5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     font-family: var(--font-mono);
     text-align: center;
-    letter-spacing: -0.02em;
-    text-shadow: 0 2px 8px rgba(99,102,241,0.3);
+    letter-spacing: -0.03em;
+    filter: drop-shadow(0 2px 8px rgba(99,102,241,0.4));
+    position: relative;
+    z-index: 1;
 }
 
 .profile-compact {
@@ -361,8 +427,32 @@ body:not(.game-active) .perf-toggle-btn {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 0;
+    padding: 10px 0;
     border-bottom: 1px solid rgba(255,255,255,0.05);
+    position: relative;
+    transition: var(--transition-fast);
+}
+
+.stat-row::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--primary);
+    opacity: 0;
+    transition: var(--transition-fast);
+    border-radius: 0 2px 2px 0;
+}
+
+.stat-row:hover::before {
+    opacity: 1;
+}
+
+.stat-row:hover {
+    padding-left: 8px;
+    background: rgba(99,102,241,0.05);
 }
 
 .stat-row:last-child {
@@ -378,13 +468,25 @@ body:not(.game-active) .perf-toggle-btn {
     color: var(--text-dim);
     font-size: 13px;
     font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .stat-value {
     color: var(--text);
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 700;
     font-family: var(--font-mono);
+    padding: 2px 8px;
+    background: rgba(99,102,241,0.1);
+    border-radius: var(--radius-xs);
+    transition: var(--transition-fast);
+}
+
+.stat-row:hover .stat-value {
+    background: rgba(99,102,241,0.15);
+    transform: scale(1.05);
 }
 
 /* 属性显示 */
@@ -398,24 +500,49 @@ body:not(.game-active) .perf-toggle-btn {
     border-radius: var(--radius-sm);
     border: 1px solid var(--border);
     padding: 14px 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1), 0 0 0 1px rgba(255,255,255,0.03) inset;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1), 
+                0 0 0 1px rgba(255,255,255,0.03) inset,
+                0 1px 0 0 rgba(255,255,255,0.05) inset;
     flex: 1;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     height: 100%;
+    position: relative;
+}
+
+.relationships-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255,255,255,0.1) 50%, 
+        transparent 100%);
+    pointer-events: none;
 }
 
 .card-header {
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 700;
     color: var(--text-dim);
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     margin-bottom: 12px;
-    padding-bottom: 8px;
+    padding-bottom: 10px;
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.card-header::before {
+    content: '👥';
+    font-size: 14px;
 }
 
 .relationships-list {
@@ -425,13 +552,33 @@ body:not(.game-active) .perf-toggle-btn {
     gap: 8px;
     overflow-y: auto;
     overflow-x: hidden;
+    padding-right: 4px;
+}
+
+/* 自定义滚动条 */
+.relationships-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.relationships-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.relationships-list::-webkit-scrollbar-thumb {
+    background: var(--border-hover);
+    border-radius: 2px;
+}
+
+.relationships-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.2);
 }
 
 .empty-hint {
-    padding: 20px;
+    padding: 30px 20px;
     text-align: center;
     color: var(--text-muted);
-    font-size: 13px;
+    font-size: 12px;
+    opacity: 0.6;
 }
 
 /* 关系卡片 */
@@ -441,18 +588,60 @@ body:not(.game-active) .perf-toggle-btn {
     grid-template-rows: auto auto;
     gap: 4px 12px;
     padding: 12px;
-    background: rgba(15,23,42,0.5);
+    background: linear-gradient(135deg, rgba(15,23,42,0.6) 0%, rgba(15,23,42,0.4) 100%);
     border-radius: 8px;
     border: 1px solid var(--border);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.relationship-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: currentColor;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.relationship-item:hover::before {
+    opacity: 1;
+}
+
+.relationship-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+                rgba(255,255,255,0.08) 0%, 
+                transparent 50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+.relationship-item:hover::after {
+    opacity: 1;
 }
 
 .relationship-item:hover {
+    transform: translateX(4px);
     border-color: var(--border-hover);
-    background: rgba(15,23,42,0.7);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    background: linear-gradient(135deg, rgba(15,23,42,0.8) 0%, rgba(15,23,42,0.6) 100%);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3),
+                0 0 0 1px rgba(255,255,255,0.05) inset;
+}
+
+.relationship-item:active {
+    transform: translateX(2px) scale(0.98);
 }
 
 .rel-name {
@@ -461,21 +650,43 @@ body:not(.game-active) .perf-toggle-btn {
     font-weight: 600;
     font-size: 14px;
     color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .rel-affinity {
     grid-column: 2;
     grid-row: 1;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 13px;
     text-align: right;
+    padding: 2px 8px;
+    background: rgba(255,255,255,0.05);
+    border-radius: var(--radius-xs);
+    font-family: var(--font-mono);
+    transition: var(--transition-fast);
+}
+
+.relationship-item:hover .rel-affinity {
+    background: rgba(255,255,255,0.1);
+    transform: scale(1.05);
 }
 
 .rel-relation {
     grid-column: 1 / -1;
     grid-row: 2;
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.rel-relation::before {
+    content: '•';
+    color: currentColor;
+    opacity: 0.5;
 }
 
 /* NPC详情弹窗 */.rel-affinity.family {
@@ -507,25 +718,60 @@ body:not(.game-active) .perf-toggle-btn {
 .npc-detail-modal {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(4px);
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 1000;
     padding: 20px;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 .npc-detail-content {
-    background: var(--surface-light);
+    background: linear-gradient(135deg, rgba(30,36,58,0.98) 0%, rgba(22,27,44,0.98) 100%);
     border-radius: var(--radius);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-hover);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5),
+                0 0 0 1px rgba(255,255,255,0.05) inset;
     max-width: 500px;
     width: 100%;
     max-height: 80vh;
     overflow-y: auto;
     padding: 24px;
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.npc-detail-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: radial-gradient(ellipse at top, rgba(99,102,241,0.2) 0%, transparent 70%);
+    pointer-events: none;
 }
 
 .npc-detail-header {
@@ -535,31 +781,43 @@ body:not(.game-active) .perf-toggle-btn {
     margin-bottom: 20px;
     padding-bottom: 16px;
     border-bottom: 2px solid var(--border);
+    position: relative;
+    z-index: 1;
 }
 
 .npc-detail-name {
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 700;
-    color: var(--primary);
+    background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     margin-bottom: 4px;
 }
 
 .npc-detail-close {
-    background: none;
-    border: none;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
     color: var(--text-dim);
-    font-size: 28px;
+    font-size: 24px;
     cursor: pointer;
     padding: 0;
     width: 36px;
     height: 36px;
     margin: 0;
     line-height: 1;
-    transition: color 0.2s;
+    border-radius: var(--radius-xs);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .npc-detail-close:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: var(--border-hover);
     color: var(--text);
+    transform: rotate(90deg);
 }
 
 .npc-detail-info {
@@ -570,21 +828,30 @@ body:not(.game-active) .perf-toggle-btn {
 
 .npc-detail-row {
     display: grid;
-    grid-template-columns: 80px 1fr;
+    grid-template-columns: 90px 1fr;
     gap: 12px;
     padding: 12px;
-    background: var(--surface-card);
+    background: rgba(15,23,42,0.5);
     border-radius: 8px;
+    border: 1px solid var(--border);
+    transition: var(--transition-fast);
+}
+
+.npc-detail-row:hover {
+    background: rgba(15,23,42,0.7);
+    border-color: var(--border-hover);
 }
 
 .npc-detail-row.full-width {
-    grid-template-columns: 80px 1fr;
+    grid-template-columns: 90px 1fr;
 }
 
 .npc-detail-label {
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .npc-detail-value {
@@ -606,17 +873,43 @@ body:not(.game-active) .perf-toggle-btn {
     margin: 0;
     font-size: 13px;
     font-weight: 600;
-    background: var(--surface-card);
+    background: linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(139,92,246,0.1) 100%);
     border: 1px solid var(--border);
     color: var(--text);
     border-radius: var(--radius-sm);
-    transition: all 0.2s;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.action-buttons-grid .action-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255,255,255,0.1) 50%, 
+        transparent 100%);
+    transition: left 0.5s;
+}
+
+.action-buttons-grid .action-btn:hover::before {
+    left: 100%;
 }
 
 .action-buttons-grid .action-btn:hover {
-    background: var(--surface-light);
+    background: linear-gradient(135deg, rgba(99,102,241,0.2) 0%, rgba(139,92,246,0.2) 100%);
     border-color: var(--border-hover);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+}
+
+.action-buttons-grid .action-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(99,102,241,0.2);
 }
 
 @keyframes screenIn {
@@ -2899,4 +3192,166 @@ body.nsfw-plus-mode .bio-log-header {
 
 .expand-control-btn::after {
     display: none;
+}
+
+/* ===== 视觉增强动画 ===== */
+
+/* 数值变化闪烁动画 */
+@keyframes statPulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+.stat-value.changed {
+    animation: statPulse 0.5s ease;
+}
+
+/* 卡片入场动画 */
+@keyframes cardSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.status-card,
+.stats-card,
+.attributes-card,
+.profile-card,
+.relationships-card {
+    animation: cardSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.status-card {
+    animation-delay: 0.05s;
+}
+
+.stats-card {
+    animation-delay: 0.1s;
+}
+
+.attributes-card {
+    animation-delay: 0.15s;
+}
+
+.profile-card {
+    animation-delay: 0.2s;
+}
+
+.relationships-card {
+    animation-delay: 0.25s;
+}
+
+/* 关系卡片入场动画 */
+@keyframes relationshipSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.relationship-item {
+    animation: relationshipSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.relationship-item:nth-child(1) { animation-delay: 0.05s; }
+.relationship-item:nth-child(2) { animation-delay: 0.1s; }
+.relationship-item:nth-child(3) { animation-delay: 0.15s; }
+.relationship-item:nth-child(4) { animation-delay: 0.2s; }
+.relationship-item:nth-child(5) { animation-delay: 0.25s; }
+
+/* 加载状态 */
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+.loading-skeleton {
+    background: linear-gradient(
+        90deg,
+        rgba(255,255,255,0.05) 0%,
+        rgba(255,255,255,0.1) 50%,
+        rgba(255,255,255,0.05) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: var(--radius-xs);
+}
+
+/* 悬停光效 */
+@keyframes glow {
+    0%, 100% {
+        box-shadow: 0 0 5px rgba(99,102,241,0.3),
+                    0 0 10px rgba(99,102,241,0.2),
+                    0 0 15px rgba(99,102,241,0.1);
+    }
+    50% {
+        box-shadow: 0 0 10px rgba(99,102,241,0.4),
+                    0 0 20px rgba(99,102,241,0.3),
+                    0 0 30px rgba(99,102,241,0.2);
+    }
+}
+
+.glow-effect {
+    animation: glow 2s ease-in-out infinite;
+}
+
+/* 脉冲动画 */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+}
+
+.pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* 旋转加载 */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.spin {
+    animation: spin 1s linear infinite;
+}
+
+/* 弹跳动画 */
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+.bounce {
+    animation: bounce 1s ease-in-out infinite;
 }
