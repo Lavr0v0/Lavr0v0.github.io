@@ -4,7 +4,7 @@
 /* 自定义字体 */
 @font-face {
     font-family: 'Lorchin';
-    src: url('resources/FONT/LorchinSansP0.ttf') format('truetype');
+    src: url('../resources/FONT/LorchinSansP0.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -12,7 +12,7 @@
 
 @font-face {
     font-family: 'Shanghai Modern';
-    src: url('resources/FONT/上海摩登体.otf') format('opentype');
+    src: url('../resources/FONT/上海摩登体.otf') format('opentype');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
@@ -20,7 +20,7 @@
 
 @font-face {
     font-family: 'Luperca';
-    src: url('resources/FONT/Luperca-72-96Banner.ttf') format('truetype');
+    src: url('../resources/FONT/Luperca-72-96Banner.ttf') format('truetype');
     font-weight: 900;
     font-style: normal;
     font-display: swap;
@@ -28,7 +28,7 @@
 
 @font-face {
     font-family: 'Luperca';
-    src: url('resources/FONT/Luperca-48-72Header.ttf') format('truetype');
+    src: url('../resources/FONT/Luperca-48-72Header.ttf') format('truetype');
     font-weight: 700;
     font-style: normal;
     font-display: swap;
@@ -36,7 +36,7 @@
 
 @font-face {
     font-family: 'Luperca';
-    src: url('resources/FONT/Luperca-36-48Title.ttf') format('truetype');
+    src: url('../resources/FONT/Luperca-36-48Title.ttf') format('truetype');
     font-weight: 600;
     font-style: normal;
     font-display: swap;
@@ -44,7 +44,7 @@
 
 @font-face {
     font-family: 'Luperca';
-    src: url('resources/FONT/Luperca-24-36Subtitle.ttf') format('truetype');
+    src: url('../resources/FONT/Luperca-24-36Subtitle.ttf') format('truetype');
     font-weight: 500;
     font-style: normal;
     font-display: swap;
@@ -52,7 +52,7 @@
 
 @font-face {
     font-family: 'Luperca';
-    src: url('resources/FONT/Luperca-12-24Caption.ttf') format('truetype');
+    src: url('../resources/FONT/Luperca-12-24Caption.ttf') format('truetype');
     font-weight: 400;
     font-style: normal;
     font-display: swap;
