@@ -5,6 +5,233 @@ let currentEvent = null;
 let currentExtraChoices = [];
 let pendingAfterSequence = null; // 定时事件/金手指轮结束后的回调
 let isAuthed = false; // 是否已通过密码验证
+let currentLanguage = 'zh'; // 当前语言
+
+// 翻译字典
+const translations = {
+    zh: {
+        // 属性名
+        intelligence: '智力', health: '健康', charisma: '魅力',
+        willpower: '意志', luck: '运气', familyWealth: '家境',
+        stress: '压力', money: '金钱', socialSupport: '社交',
+        libido: '性欲', experience: '经验', satisfaction: '满足',
+        education: '学历', job: '职业',
+        relationships: '人际关系',
+        age: '岁',
+        male: '男', female: '女', other: '其他',
+        
+        // 界面文本
+        title: '人生轨迹模拟器',
+        subtitle: 'Lavro Labs · 多分支事件模拟',
+        aiSettings: 'AI 设置',
+        developer: '开发者',
+        model: '模型',
+        testConnection: '测试连接',
+        aiHint: '选择 AI 提供商，填入你的 API Key',
+        
+        whoAreYou: '你是谁？',
+        yourName: '你的名字',
+        characterSetting: '角色设定（性格、背景、特点等）',
+        kinkPreference: '性癖偏好（可选，多个用逗号分隔）',
+        
+        allocatePoints: '分配属性点（剩余',
+        points: '点）',
+        attrWarningZero: '⚠️ 警告：属性为 0 极易夭折！',
+        attrWarningLow: '⚠️ 警告：属性低于 2 点可能导致夭折！',
+        
+        difficulty: '难度',
+        diffEasy: '简单',
+        diffNormal: '普通',
+        diffHard: '困难',
+        diffHell: '地狱',
+        diffHintEasy: '轻松的人生体验',
+        diffHintNormal: '正常的人生体验',
+        diffHintHard: '充满挑战的人生',
+        diffHintHell: '极度困难，步步惊心',
+        
+        contentMode: '内容尺度',
+        contentSfw: '全年龄',
+        contentNsfw: 'NSFW',
+        contentNsfwPlus: 'NSFW+',
+        contentHintSfw: '适合所有人的内容，情感描写含蓄隐晦',
+        contentHintNsfw: '成人内容，包含露骨的情感和身体描写',
+        contentHintNsfwPlus: '极致成人模式，性和欲望是核心主题',
+        
+        creativeMode: '角色模式',
+        creativeOriginal: '原创',
+        creativeFanfic: '同人',
+        creativeHintOriginal: '原创模式：所有角色都是独立创作，不参考现实人物',
+        creativeHintFanfic: '同人模式：角色会参考现实/作品中的人设（如明星、动漫角色等）',
+        
+        narrativeStyle: '解说风格',
+        styleHumorous: '吐槽风',
+        styleLiterary: '文艺风',
+        styleRealistic: '写实风',
+        styleDramatic: '戏剧风',
+        styleHintHumorous: '吐槽风：毒舌损友式的幽默解说（默认）',
+        styleHintLiterary: '文艺风：优美细腻的文学化叙述',
+        styleHintRealistic: '写实风：客观冷静的纪实性描写',
+        styleHintDramatic: '戏剧风：夸张生动的戏剧化表现',
+        
+        lifeFocus: '人生侧重',
+        focusBalanced: '均衡',
+        focusCareer: '事业',
+        focusRelationship: '感情',
+        focusFamily: '家庭',
+        focusAdventure: '冒险',
+        focusHintBalanced: '均衡发展：事业、感情、家庭各方面都会出现',
+        focusHintCareer: '事业为重：更多工作、升职、创业相关事件',
+        focusHintRelationship: '感情为重：更多恋爱、亲密关系、情感纠葛',
+        focusHintFamily: '家庭为重：更多家人互动、亲情、家庭责任',
+        focusHintAdventure: '冒险刺激：更多意外、冒险、极端体验',
+        
+        startPhase: '起始阶段',
+        phaseBirth: '出生',
+        phaseElementary: '小学',
+        phaseMiddle: '初中',
+        phaseHigh: '高中',
+        phaseCollege: '大学',
+        phaseWork: '工作',
+        phaseHintBirth: '从出生开始完整体验',
+        phaseHintElementary: '跳过婴幼儿期，从小学开始',
+        phaseHintMiddle: '跳过童年，从初中开始',
+        phaseHintHigh: '跳过初中，从高中开始',
+        phaseHintCollege: '跳过高中，从大学开始',
+        phaseHintWork: '跳过学生时代，从工作开始',
+        
+        backgroundSetting: '背景设定',
+        bgModern: '现代（优化）',
+        bgCustom: '自定义',
+        bgHintModern: '现代背景：经过优化的现代都市生活，包含学业、职场、感情等常规人生阶段',
+        bgHintCustom: '自定义背景：完全自由的世界观设定，不受现代社会框架限制',
+        customBgPlaceholder: '描述你的世界观设定...',
+        customBgCount: '字',
+        
+        scheduledEvents: '定时事件',
+        schedAge: '年龄',
+        schedEvent: '事件描述',
+        schedAdd: '添加',
+        schedHint: '在指定年龄触发特定事件（可选）',
+        
+        startGame: '开始人生',
+        continueGame: '继续上次的人生',
+        
+        unlimitedMode: '无限模式已激活'
+    },
+    en: {
+        // Attribute names
+        intelligence: 'Intelligence', health: 'Health', charisma: 'Charisma',
+        willpower: 'Willpower', luck: 'Luck', familyWealth: 'Family Wealth',
+        stress: 'Stress', money: 'Money', socialSupport: 'Social',
+        libido: 'Libido', experience: 'Experience', satisfaction: 'Satisfaction',
+        education: 'Education', job: 'Job',
+        relationships: 'Relationships',
+        age: ' years old',
+        male: 'Male', female: 'Female', other: 'Other',
+        
+        // UI text
+        title: 'Life Trajectory Simulator',
+        subtitle: 'Lavro Labs · Multi-branch Event Simulation',
+        aiSettings: 'AI Settings',
+        developer: 'Developer',
+        model: 'Model',
+        testConnection: 'Test Connection',
+        aiHint: 'Select AI provider and enter your API Key',
+        
+        whoAreYou: 'Who Are You?',
+        yourName: 'Your Name',
+        characterSetting: 'Character Setting (personality, background, traits, etc.)',
+        kinkPreference: 'Kink Preferences (optional, comma-separated)',
+        
+        allocatePoints: 'Allocate Attribute Points (Remaining:',
+        points: 'pts)',
+        attrWarningZero: '⚠️ Warning: 0 attribute may lead to early death!',
+        attrWarningLow: '⚠️ Warning: Attributes below 2 may lead to early death!',
+        
+        difficulty: 'Difficulty',
+        diffEasy: 'Easy',
+        diffNormal: 'Normal',
+        diffHard: 'Hard',
+        diffHell: 'Hell',
+        diffHintEasy: 'Relaxed life experience',
+        diffHintNormal: 'Normal life experience',
+        diffHintHard: 'Challenging life full of obstacles',
+        diffHintHell: 'Extremely difficult, every step is dangerous',
+        
+        contentMode: 'Content Rating',
+        contentSfw: 'All Ages',
+        contentNsfw: 'NSFW',
+        contentNsfwPlus: 'NSFW+',
+        contentHintSfw: 'Content suitable for all ages, subtle emotional descriptions',
+        contentHintNsfw: 'Adult content with explicit emotional and physical descriptions',
+        contentHintNsfwPlus: 'Extreme adult mode, sex and desire are core themes',
+        
+        creativeMode: 'Character Mode',
+        creativeOriginal: 'Original',
+        creativeFanfic: 'Fanfic',
+        creativeHintOriginal: 'Original mode: All characters are independently created',
+        creativeHintFanfic: 'Fanfic mode: Characters reference real people or fictional characters',
+        
+        narrativeStyle: 'Narrative Style',
+        styleHumorous: 'Humorous',
+        styleLiterary: 'Literary',
+        styleRealistic: 'Realistic',
+        styleDramatic: 'Dramatic',
+        styleHintHumorous: 'Humorous: Witty and sarcastic commentary (default)',
+        styleHintLiterary: 'Literary: Beautiful and refined literary narration',
+        styleHintRealistic: 'Realistic: Objective and calm documentary-style description',
+        styleHintDramatic: 'Dramatic: Exaggerated and vivid theatrical expression',
+        
+        lifeFocus: 'Life Focus',
+        focusBalanced: 'Balanced',
+        focusCareer: 'Career',
+        focusRelationship: 'Romance',
+        focusFamily: 'Family',
+        focusAdventure: 'Adventure',
+        focusHintBalanced: 'Balanced: Career, romance, and family all appear',
+        focusHintCareer: 'Career-focused: More work, promotion, and business events',
+        focusHintRelationship: 'Romance-focused: More love, intimacy, and emotional entanglements',
+        focusHintFamily: 'Family-focused: More family interactions, kinship, and responsibilities',
+        focusHintAdventure: 'Adventure: More accidents, adventures, and extreme experiences',
+        
+        startPhase: 'Starting Phase',
+        phaseBirth: 'Birth',
+        phaseElementary: 'Elementary',
+        phaseMiddle: 'Middle School',
+        phaseHigh: 'High School',
+        phaseCollege: 'College',
+        phaseWork: 'Work',
+        phaseHintBirth: 'Start from birth for complete experience',
+        phaseHintElementary: 'Skip infancy, start from elementary school',
+        phaseHintMiddle: 'Skip childhood, start from middle school',
+        phaseHintHigh: 'Skip middle school, start from high school',
+        phaseHintCollege: 'Skip high school, start from college',
+        phaseHintWork: 'Skip student years, start from work',
+        
+        backgroundSetting: 'Background Setting',
+        bgModern: 'Modern (Optimized)',
+        bgCustom: 'Custom',
+        bgHintModern: 'Modern background: Optimized modern urban life with education, career, romance, etc.',
+        bgHintCustom: 'Custom background: Completely free worldview setting, not limited by modern society',
+        customBgPlaceholder: 'Describe your worldview setting...',
+        customBgCount: 'chars',
+        
+        scheduledEvents: 'Scheduled Events',
+        schedAge: 'Age',
+        schedEvent: 'Event Description',
+        schedAdd: 'Add',
+        schedHint: 'Trigger specific events at designated ages (optional)',
+        
+        startGame: 'Start Life',
+        continueGame: 'Continue Last Life',
+        
+        unlimitedMode: 'Unlimited Mode Activated'
+    }
+};
+
+function t(key) {
+    return translations[currentLanguage][key] || key;
+}
 
 const ATTR_NAMES = {
     intelligence: '智力', health: '健康', charisma: '魅力',
@@ -15,6 +242,125 @@ const STAT_NAMES = {
     ...ATTR_NAMES,
     stress: '压力', money: '金钱', socialSupport: '社交'
 };
+
+// 属性分配相关变量（提升到外部作用域以便彩蛋访问）
+let allocated = { ...game.state.attributes };
+let pointsEl = null;
+let container = null;
+let unlimitedMode = false;
+
+const calcUsed = () => Object.values(allocated).reduce((s, v) => s + v, 0);
+
+const updatePoints = () => { 
+    if (pointsEl) {
+        if (unlimitedMode) {
+            pointsEl.textContent = '∞';
+        } else {
+            pointsEl.textContent = 30 - calcUsed();
+        }
+    }
+    checkLowAttributes();
+};
+
+const checkLowAttributes = () => {
+    const warningEl = document.getElementById('attr-warning');
+    if (!warningEl) return;
+    
+    const hasLowAttr = Object.values(allocated).some(v => v <= 2 && v > 0);
+    const hasZeroAttr = Object.values(allocated).some(v => v === 0);
+    
+    if (hasZeroAttr) {
+        warningEl.textContent = '⚠️ 警告：属性为 0 极易夭折！';
+        warningEl.style.display = 'block';
+        warningEl.style.color = 'var(--danger)';
+    } else if (hasLowAttr) {
+        warningEl.textContent = '⚠️ 警告：属性低于 2 点可能导致夭折！';
+        warningEl.style.display = 'block';
+        warningEl.style.color = 'var(--warning)';
+    } else {
+        warningEl.style.display = 'none';
+    }
+};
+
+// 年龄到阶段的映射（用于滑块）
+function getPhaseFromAge(age) {
+    if (age === 0) return currentLanguage === 'zh' ? '出生' : 'Birth';
+    if (age >= 1 && age <= 5) return currentLanguage === 'zh' ? '幼儿' : 'Toddler';
+    if (age >= 6 && age <= 11) return currentLanguage === 'zh' ? '小学' : 'Elementary';
+    if (age >= 12 && age <= 14) return currentLanguage === 'zh' ? '初中' : 'Middle School';
+    if (age >= 15 && age <= 17) return currentLanguage === 'zh' ? '高中' : 'High School';
+    if (age >= 18 && age <= 21) return currentLanguage === 'zh' ? '大学' : 'College';
+    if (age >= 22 && age <= 29) return currentLanguage === 'zh' ? '工作' : 'Work';
+    if (age >= 30 && age <= 39) return currentLanguage === 'zh' ? '而立' : 'Thirties';
+    if (age >= 40 && age <= 49) return currentLanguage === 'zh' ? '不惑' : 'Forties';
+    if (age >= 50 && age <= 59) return currentLanguage === 'zh' ? '知天命' : 'Fifties';
+    if (age >= 60 && age <= 69) return currentLanguage === 'zh' ? '花甲' : 'Sixties';
+    if (age >= 70) return currentLanguage === 'zh' ? '古稀' : 'Seventies+';
+    return '';
+}
+
+// 年龄到提示的映射（用于滑块）
+function getPhaseHint(age) {
+    const hints = {
+        zh: {
+            0: '从出生开始完整体验',
+            1: '跳过婴儿期，从幼儿开始',
+            6: '跳过婴幼儿期，从小学开始',
+            12: '跳过童年，从初中开始',
+            15: '跳过初中，从高中开始',
+            18: '跳过高中，从大学开始',
+            22: '跳过学生时代，从工作开始',
+            30: '从而立之年开始，事业初成',
+            40: '从不惑之年开始，人生过半',
+            50: '从知天命开始，阅历丰富',
+            60: '从花甲之年开始，步入老年',
+            70: '从古稀之年开始，人生晚期'
+        },
+        en: {
+            0: 'Start from birth for complete experience',
+            1: 'Skip infancy, start from toddler years',
+            6: 'Skip infancy, start from elementary school',
+            12: 'Skip childhood, start from middle school',
+            15: 'Skip middle school, start from high school',
+            18: 'Skip high school, start from college',
+            22: 'Skip student years, start from work',
+            30: 'Start from thirties, career established',
+            40: 'Start from forties, midlife',
+            50: 'Start from fifties, experienced',
+            60: 'Start from sixties, senior years',
+            70: 'Start from seventies, late life'
+        }
+    };
+    
+    // 找到最接近的关键年龄
+    const keyAges = [0, 1, 6, 12, 15, 18, 22, 30, 40, 50, 60, 70];
+    let closestAge = 0;
+    for (const keyAge of keyAges) {
+        if (age >= keyAge) closestAge = keyAge;
+    }
+    
+    return hints[currentLanguage][closestAge] || hints[currentLanguage][0];
+}
+
+// 属性点击处理
+function handleAttrClick(e) {
+    if (!e.target.matches('button')) return;
+    const attr = e.target.dataset.attr;
+    const valSpan = e.target.parentElement.querySelector('.value');
+    
+    if (unlimitedMode) {
+        // 无限模式：无上限
+        if (e.target.classList.contains('plus')) allocated[attr]++;
+        else if (e.target.classList.contains('minus') && allocated[attr] > 0) allocated[attr]--;
+    } else {
+        // 普通模式：30点上限
+        if (e.target.classList.contains('plus') && calcUsed() < 30) allocated[attr]++;
+        else if (e.target.classList.contains('minus') && allocated[attr] > 0) allocated[attr]--;
+    }
+    
+    valSpan.textContent = allocated[attr];
+    updatePoints();
+}
 
 // 【性能】DOM 引用缓存，避免每次 getElementById 查询
 const DOM = {};
@@ -49,39 +395,6 @@ let _profileDirty = true;
 let _lastCharHash = '';
 let _lastRelHash = '';
 
-// ===== 性能开关 =====
-(function initPerfToggle() {
-    const perfBtn = document.getElementById('perf-toggle');
-    const canvas = document.getElementById('stars-canvas');
-    if (!perfBtn || !canvas) return;
-
-    // 从 localStorage 恢复状态
-    const savedState = localStorage.getItem('life-sim-perf-mode');
-    let isEnabled = savedState !== 'disabled';
-
-    function updateState() {
-        if (isEnabled) {
-            perfBtn.classList.remove('disabled');
-            canvas.classList.remove('disabled');
-            if (window.starsControl) window.starsControl.start();
-            localStorage.setItem('life-sim-perf-mode', 'enabled');
-        } else {
-            perfBtn.classList.add('disabled');
-            canvas.classList.add('disabled');
-            if (window.starsControl) window.starsControl.stop();
-            localStorage.setItem('life-sim-perf-mode', 'disabled');
-        }
-    }
-
-    perfBtn.addEventListener('click', () => {
-        isEnabled = !isEnabled;
-        updateState();
-    });
-
-    // 初始化状态
-    updateState();
-})();
-
 // ===== 传记日志 =====
 function appendBioLog(age, text, type = 'narrative', milestone = null, choice = null) {
     const container = DOM.bioLogContent || document.getElementById('bio-log-content');
@@ -114,10 +427,9 @@ function appendBioLog(age, text, type = 'narrative', milestone = null, choice = 
 }
 
 function initStartScreen() {
-    const container = document.querySelector('.attributes');
-    const pointsEl = document.getElementById('points-left');
-    const allocated = { ...game.state.attributes };
-    const calcUsed = () => Object.values(allocated).reduce((s, v) => s + v, 0);
+    container = document.querySelector('.attributes');
+    pointsEl = document.getElementById('points-left');
+    allocated = { ...game.state.attributes };
 
     for (const [key, name] of Object.entries(ATTR_NAMES)) {
         const div = document.createElement('div');
@@ -132,33 +444,302 @@ function initStartScreen() {
         container.appendChild(div);
     }
 
-    const updatePoints = () => { 
-        pointsEl.textContent = 30 - calcUsed(); 
-        checkLowAttributes();
-    };
-
-    const checkLowAttributes = () => {
-        const warningEl = document.getElementById('attr-warning');
-        const hasLowAttr = Object.values(allocated).some(v => v <= 2 && v > 0);
-        const hasZeroAttr = Object.values(allocated).some(v => v === 0);
-        
-        if (hasZeroAttr) {
-            warningEl.textContent = '⚠️ 警告：属性为 0 极易夭折！';
-            warningEl.style.display = 'block';
-            warningEl.style.color = 'var(--danger)';
-        } else if (hasLowAttr) {
-            warningEl.textContent = '⚠️ 警告：属性低于 2 点可能导致夭折！';
-            warningEl.style.display = 'block';
-            warningEl.style.color = 'var(--warning)';
-        } else {
-            warningEl.style.display = 'none';
-        }
-    };
-
     container.addEventListener('click', handleAttrClick);
     
     // 初始化时更新点数显示
     updatePoints();
+
+    // ===== 语言切换按钮 =====
+    const langToggleBtn = document.getElementById('lang-toggle');
+    if (langToggleBtn) {
+        langToggleBtn.addEventListener('click', () => {
+            currentLanguage = currentLanguage === 'zh' ? 'en' : 'zh';
+            localStorage.setItem('life-sim-language', currentLanguage);
+            updateLanguage();
+        });
+    }
+
+    // 从localStorage恢复语言设置
+    const savedLang = localStorage.getItem('life-sim-language');
+    if (savedLang && (savedLang === 'zh' || savedLang === 'en')) {
+        currentLanguage = savedLang;
+    }
+    updateLanguage();
+
+    function updateLanguage() {
+        // 更新body的data-lang属性以切换字体
+        document.body.setAttribute('data-lang', currentLanguage);
+        
+        // 更新标题
+        const titleEl = document.querySelector('#start-screen h1');
+        if (titleEl) titleEl.textContent = t('title');
+        
+        const subtitleEl = document.querySelector('#start-screen .subtitle');
+        if (subtitleEl) subtitleEl.textContent = t('subtitle');
+        
+        // 更新AI设置
+        const aiLabel = document.querySelector('.ai-config-section label');
+        if (aiLabel) aiLabel.textContent = t('aiSettings');
+        
+        const devBtn = document.getElementById('dev-mode-btn');
+        if (devBtn) devBtn.textContent = t('developer');
+        
+        const modelLabel = document.querySelector('.ai-model-label');
+        if (modelLabel) modelLabel.textContent = t('model');
+        
+        const testBtn = document.getElementById('test-connection-btn');
+        if (testBtn) testBtn.textContent = t('testConnection');
+        
+        const aiHint = document.getElementById('ai-config-hint');
+        if (aiHint) aiHint.textContent = t('aiHint');
+        
+        // 更新身份部分
+        const identityH2 = document.querySelector('.identity-section h2');
+        if (identityH2) identityH2.textContent = t('whoAreYou');
+        
+        const nameInput = document.getElementById('player-name');
+        if (nameInput) nameInput.placeholder = t('yourName');
+        
+        const personalityInput = document.getElementById('player-personality');
+        if (personalityInput) personalityInput.placeholder = t('characterSetting');
+        
+        const kinksInput = document.getElementById('player-kinks');
+        if (kinksInput) kinksInput.placeholder = t('kinkPreference');
+        
+        // 更新性别选项
+        const genderSelect = document.getElementById('player-gender');
+        if (genderSelect) {
+            const currentValue = genderSelect.value;
+            if (currentLanguage === 'en') {
+                genderSelect.innerHTML = `
+                    <option value="Male">${t('male')}</option>
+                    <option value="Female">${t('female')}</option>
+                    <option value="Other">${t('other')}</option>
+                `;
+                if (currentValue === '男') genderSelect.value = 'Male';
+                else if (currentValue === '女') genderSelect.value = 'Female';
+                else if (currentValue === '其他') genderSelect.value = 'Other';
+            } else {
+                genderSelect.innerHTML = `
+                    <option value="男">${t('male')}</option>
+                    <option value="女">${t('female')}</option>
+                    <option value="其他">${t('other')}</option>
+                `;
+                if (currentValue === 'Male') genderSelect.value = '男';
+                else if (currentValue === 'Female') genderSelect.value = '女';
+                else if (currentValue === 'Other') genderSelect.value = '其他';
+            }
+        }
+        
+        // 更新属性分配标题
+        const attrH2 = document.querySelector('#attribute-allocation h2');
+        if (attrH2) {
+            const pointsLeft = document.getElementById('points-left');
+            const pointsText = pointsLeft ? pointsLeft.textContent : '0';
+            attrH2.innerHTML = `${t('allocatePoints')} <span id="points-left">${pointsText}</span> ${t('points')}`;
+        }
+        
+        // 更新属性名称
+        document.querySelectorAll('.attribute-item span:first-child').forEach((span, index) => {
+            const keys = Object.keys(ATTR_NAMES);
+            if (keys[index]) {
+                span.textContent = t(keys[index]);
+            }
+        });
+        
+        // 更新难度部分
+        const diffSection = document.querySelector('.difficulty-section');
+        if (diffSection) {
+            const label = diffSection.querySelector('label');
+            if (label) label.textContent = t('difficulty');
+            
+            const easyBtn = diffSection.querySelector('.diff-btn[data-diff="1"]');
+            if (easyBtn) easyBtn.textContent = t('diffEasy');
+            
+            const normalBtn = diffSection.querySelector('.diff-btn[data-diff="2"]');
+            if (normalBtn) normalBtn.textContent = t('diffNormal');
+            
+            const hardBtn = diffSection.querySelector('.diff-btn[data-diff="3"]');
+            if (hardBtn) hardBtn.textContent = t('diffHard');
+            
+            const hellBtn = diffSection.querySelector('.diff-btn[data-diff="4"]');
+            if (hellBtn) hellBtn.textContent = t('diffHell');
+            
+            // 更新当前选中的难度提示
+            const activeBtn = diffSection.querySelector('.diff-btn.active');
+            if (activeBtn) {
+                const diff = activeBtn.dataset.diff;
+                const hintKey = diff === '1' ? 'diffHintEasy' : diff === '2' ? 'diffHintNormal' : diff === '3' ? 'diffHintHard' : 'diffHintHell';
+                const hint = document.getElementById('difficulty-hint');
+                if (hint) hint.textContent = t(hintKey);
+            }
+        }
+        
+        // 更新内容尺度
+        const contentSection = document.querySelector('.content-mode-section');
+        if (contentSection) {
+            const label = contentSection.querySelector('label');
+            if (label) label.textContent = t('contentMode');
+            
+            const sfwBtn = document.getElementById('sfw-btn');
+            if (sfwBtn) sfwBtn.textContent = t('contentSfw');
+            
+            const hint = document.getElementById('content-mode-hint');
+            if (hint) hint.textContent = t('contentHintSfw');
+        }
+        
+        // 更新角色模式
+        const creativeSection = document.querySelector('.creative-mode-section');
+        if (creativeSection) {
+            const label = creativeSection.querySelector('label');
+            if (label) label.textContent = t('creativeMode');
+            
+            const originalBtn = creativeSection.querySelector('.creative-btn[data-mode="original"]');
+            if (originalBtn) originalBtn.textContent = t('creativeOriginal');
+            
+            const fanficBtn = creativeSection.querySelector('.creative-btn[data-mode="fanfic"]');
+            if (fanficBtn) fanficBtn.textContent = t('creativeFanfic');
+            
+            const hint = document.getElementById('creative-mode-hint');
+            if (hint) {
+                const activeBtn = creativeSection.querySelector('.creative-btn.active');
+                const mode = activeBtn?.dataset.mode || 'original';
+                hint.textContent = t(mode === 'original' ? 'creativeHintOriginal' : 'creativeHintFanfic');
+            }
+        }
+        
+        // 更新解说风格
+        const narrativeSection = document.querySelector('.narrative-style-section');
+        if (narrativeSection) {
+            const label = narrativeSection.querySelector('label');
+            if (label) label.textContent = t('narrativeStyle');
+            
+            const humorousBtn = narrativeSection.querySelector('.style-btn[data-style="humorous"]');
+            if (humorousBtn) humorousBtn.textContent = t('styleHumorous');
+            
+            const literaryBtn = narrativeSection.querySelector('.style-btn[data-style="literary"]');
+            if (literaryBtn) literaryBtn.textContent = t('styleLiterary');
+            
+            const realisticBtn = narrativeSection.querySelector('.style-btn[data-style="realistic"]');
+            if (realisticBtn) realisticBtn.textContent = t('styleRealistic');
+            
+            const dramaticBtn = narrativeSection.querySelector('.style-btn[data-style="dramatic"]');
+            if (dramaticBtn) dramaticBtn.textContent = t('styleDramatic');
+            
+            const hint = document.getElementById('narrative-style-hint');
+            if (hint) {
+                const activeBtn = narrativeSection.querySelector('.style-btn.active');
+                const style = activeBtn?.dataset.style || 'humorous';
+                const hintKey = `styleHint${style.charAt(0).toUpperCase() + style.slice(1)}`;
+                hint.textContent = t(hintKey);
+            }
+        }
+        
+        // 更新人生侧重
+        const focusSection = document.querySelector('.life-focus-section');
+        if (focusSection) {
+            const label = focusSection.querySelector('label');
+            if (label) label.textContent = t('lifeFocus');
+            
+            const balancedBtn = focusSection.querySelector('.focus-opt-btn[data-focus="balanced"]');
+            if (balancedBtn) balancedBtn.textContent = t('focusBalanced');
+            
+            const careerBtn = focusSection.querySelector('.focus-opt-btn[data-focus="career"]');
+            if (careerBtn) careerBtn.textContent = t('focusCareer');
+            
+            const relationshipBtn = focusSection.querySelector('.focus-opt-btn[data-focus="relationship"]');
+            if (relationshipBtn) relationshipBtn.textContent = t('focusRelationship');
+            
+            const familyBtn = focusSection.querySelector('.focus-opt-btn[data-focus="family"]');
+            if (familyBtn) familyBtn.textContent = t('focusFamily');
+            
+            const adventureBtn = focusSection.querySelector('.focus-opt-btn[data-focus="adventure"]');
+            if (adventureBtn) adventureBtn.textContent = t('focusAdventure');
+            
+            const hint = document.getElementById('life-focus-hint');
+            if (hint) {
+                const activeBtn = focusSection.querySelector('.focus-opt-btn.active');
+                const focus = activeBtn?.dataset.focus || 'balanced';
+                const hintKey = `focusHint${focus.charAt(0).toUpperCase() + focus.slice(1)}`;
+                hint.textContent = t(hintKey);
+            }
+        }
+        
+        // 更新起始阶段
+        const phaseSection = document.querySelector('.phase-section');
+        if (phaseSection) {
+            const label = phaseSection.querySelector('label');
+            if (label) label.textContent = t('startPhase');
+            
+            // 更新滑块显示的阶段标签和提示
+            const phaseAgeDisplay = document.getElementById('phase-age-display');
+            const phaseLabelDisplay = document.getElementById('phase-label-display');
+            const phaseHintEl = document.getElementById('phase-hint');
+            
+            if (phaseLabelDisplay && phaseAgeDisplay) {
+                const currentAge = parseInt(phaseAgeDisplay.textContent) || 0;
+                phaseLabelDisplay.textContent = getPhaseFromAge(currentAge);
+                if (phaseHintEl) {
+                    phaseHintEl.textContent = getPhaseHint(currentAge);
+                }
+            }
+        }
+        
+        // 更新背景设定
+        const bgSection = document.querySelector('.background-setting-section');
+        if (bgSection) {
+            const label = bgSection.querySelector('label');
+            if (label) label.textContent = t('backgroundSetting');
+            
+            const modernBtn = bgSection.querySelector('.bg-btn[data-bg="modern"]');
+            if (modernBtn) modernBtn.textContent = t('bgModern');
+            
+            const customBtn = bgSection.querySelector('.bg-btn[data-bg="custom"]');
+            if (customBtn) customBtn.textContent = t('bgCustom');
+            
+            const bgHint = document.getElementById('background-hint');
+            if (bgHint) bgHint.textContent = t('bgHintModern');
+            
+            const customBgTextarea = document.getElementById('custom-background-text');
+            if (customBgTextarea) customBgTextarea.placeholder = t('customBgPlaceholder');
+        }
+        
+        // 更新定时事件
+        const schedSection = document.querySelector('.scheduled-events-section');
+        if (schedSection) {
+            const label = schedSection.querySelector('label');
+            if (label) label.textContent = t('scheduledEvents');
+            
+            const hint = schedSection.querySelector('.scheduled-hint');
+            if (hint) hint.textContent = t('schedHint');
+            
+            const ageInput = document.getElementById('sched-age');
+            if (ageInput) ageInput.placeholder = t('schedAge');
+            
+            const textInput = document.getElementById('sched-text');
+            if (textInput) textInput.placeholder = t('schedEvent');
+            
+            const addBtn = document.getElementById('sched-add-btn');
+            if (addBtn) addBtn.textContent = '+';
+        }
+        
+        // 更新按钮
+        const startBtn = document.getElementById('start-game');
+        if (startBtn) {
+            const img = startBtn.querySelector('img');
+            startBtn.innerHTML = '';
+            if (img) startBtn.appendChild(img);
+            startBtn.appendChild(document.createTextNode(t('startGame')));
+        }
+        
+        const loadBtn = document.getElementById('load-game');
+        if (loadBtn) {
+            const img = loadBtn.querySelector('img');
+            loadBtn.innerHTML = '';
+            if (img) loadBtn.appendChild(img);
+            loadBtn.appendChild(document.createTextNode(t('continueGame')));
+        }
+    }
 
     // ===== AI 提供商配置 =====
     const PROVIDERS = {
@@ -381,7 +962,7 @@ function initStartScreen() {
             console.log('✅ 后端健康检查:', healthData);
         } catch (err) {
             console.error('❌ 后端连接失败:', err);
-            testConnBtn.textContent = '🔗 重新测试';
+            testConnBtn.textContent = '重新测试';
             testConnBtn.disabled = false;
             aiHint.textContent = `❌ 后端连接失败: ${err.message}`;
             aiHint.style.color = 'var(--danger)';
@@ -404,7 +985,7 @@ function initStartScreen() {
             }
         } catch (err) {
             console.error('❌ AI 配置失败:', err);
-            testConnBtn.textContent = '🔗 重新测试';
+            testConnBtn.textContent = '重新测试';
             testConnBtn.disabled = false;
             aiHint.textContent = `❌ AI 配置失败: ${err.message}`;
             aiHint.style.color = 'var(--danger)';
@@ -436,11 +1017,11 @@ function initStartScreen() {
                 // 3秒后恢复按钮文字
                 setTimeout(() => { 
                     if (testConnBtn.textContent === '✅ 连接成功') {
-                        testConnBtn.textContent = '🔗 测试连接'; 
+                        testConnBtn.textContent = '测试连接'; 
                     }
                 }, 3000);
             } else {
-                testConnBtn.textContent = '🔗 重新测试';
+                testConnBtn.textContent = '重新测试';
                 testConnBtn.disabled = false;
                 aiHint.textContent = `❌ AI 测试失败: ${testData.error || '未知错误'}`;
                 aiHint.style.color = 'var(--danger)';
@@ -448,7 +1029,7 @@ function initStartScreen() {
             }
         } catch (err) {
             console.error('❌ AI 测试失败:', err);
-            testConnBtn.textContent = '🔗 重新测试';
+            testConnBtn.textContent = '重新测试';
             testConnBtn.disabled = false;
             aiHint.textContent = `❌ 测试失败: ${err.message}`;
             aiHint.style.color = 'var(--danger)';
@@ -619,10 +1200,16 @@ function initStartScreen() {
     // 背景设定选择
     let selectedBackground = 'modern';
     let customBackgroundText = '';
+    let customMaxAge = 80;
     const backgroundHints = {
         modern: '现代背景：经过优化的现代都市生活，包含学业、职场、感情等常规人生阶段',
         custom: '自定义背景：完全自由的世界观设定，不受现代社会框架限制'
     };
+    
+    const phaseSlider = document.getElementById('phase-slider');
+    const phaseSliderSection = document.getElementById('phase-section-slider');
+    const phaseInputSection = document.getElementById('phase-section-input');
+    const phaseAgeInput = document.getElementById('phase-age-input');
     
     document.querySelectorAll('.bg-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -632,18 +1219,87 @@ function initStartScreen() {
             document.getElementById('background-hint').textContent = backgroundHints[selectedBackground] || '';
             
             const customInput = document.getElementById('custom-background-input');
-            const phaseSection = document.querySelector('.phase-section');
             
             if (selectedBackground === 'custom') {
                 customInput.style.display = 'block';
-                // 自定义背景下隐藏起始阶段选择
-                if (phaseSection) phaseSection.style.display = 'none';
+                // 自定义模式：显示输入框，隐藏滑块
+                if (phaseSliderSection) phaseSliderSection.style.display = 'none';
+                if (phaseInputSection) phaseInputSection.style.display = 'block';
+                // 同步当前年龄到输入框
+                if (phaseAgeInput) phaseAgeInput.value = selectedStartAge;
             } else {
                 customInput.style.display = 'none';
-                if (phaseSection) phaseSection.style.display = 'block';
+                // 现代模式：显示滑块，隐藏输入框
+                if (phaseSliderSection) phaseSliderSection.style.display = 'block';
+                if (phaseInputSection) phaseInputSection.style.display = 'none';
+                // 现代模式下，固定80岁
+                if (phaseSlider) {
+                    phaseSlider.max = 80;
+                    updateSliderMarkers(80);
+                }
             }
         });
     });
+
+    // 自定义最高年龄输入
+    const customMaxAgeInput = document.getElementById('custom-max-age');
+    customMaxAgeInput?.addEventListener('input', () => {
+        let value = parseInt(customMaxAgeInput.value) || 80;
+        if (value < 22) value = 22;
+        if (value > 200) value = 200;
+        customMaxAge = value;
+        
+        // 更新输入框的最大值
+        if (phaseAgeInput) {
+            phaseAgeInput.max = customMaxAge;
+            // 如果当前值超过最大值，调整
+            if (parseInt(phaseAgeInput.value) > customMaxAge) {
+                phaseAgeInput.value = customMaxAge;
+                selectedStartAge = customMaxAge;
+            }
+        }
+    });
+    
+    // 起始年龄输入框事件
+    if (phaseAgeInput) {
+        phaseAgeInput.addEventListener('input', () => {
+            let value = parseInt(phaseAgeInput.value) || 0;
+            if (value < 0) value = 0;
+            if (value > customMaxAge) value = customMaxAge;
+            selectedStartAge = value;
+            phaseAgeInput.value = value;
+        });
+    }
+    
+    // 更新滑块标记
+    function updateSliderMarkers(maxAge) {
+        const markers = document.querySelector('.phase-markers');
+        if (!markers) return;
+        
+        if (maxAge <= 80) {
+            // 标准标记：0, 18, 30, 50, 70, 80
+            markers.innerHTML = `
+                <span data-age="0">0</span>
+                <span data-age="18">18</span>
+                <span data-age="30">30</span>
+                <span data-age="50">50</span>
+                <span data-age="70">70</span>
+                <span data-age="80">80</span>
+            `;
+        } else {
+            // 自定义标记：0, 1/4, 1/2, 3/4, max
+            const quarter = Math.round(maxAge / 4);
+            const half = Math.round(maxAge / 2);
+            const threeQuarter = Math.round(maxAge * 3 / 4);
+            markers.innerHTML = `
+                <span data-age="0">0</span>
+                <span data-age="${quarter}">${quarter}</span>
+                <span data-age="${half}">${half}</span>
+                <span data-age="${threeQuarter}">${threeQuarter}</span>
+                <span data-age="${maxAge}">${maxAge}</span>
+            `;
+        }
+    }
 
     // 自定义背景文本输入
     const customBgTextarea = document.getElementById('custom-background-text');
@@ -656,24 +1312,26 @@ function initStartScreen() {
         }
     });
 
-    // 起始阶段选择
+    // 起始阶段选择（滑块）
     let selectedStartAge = 0;
-    const phaseHints = {
-        0: '从出生开始完整体验',
-        6: '跳过婴幼儿期，从小学开始',
-        12: '跳过童年，从初中开始',
-        15: '跳过初中，从高中开始',
-        18: '跳过高中，从大学开始',
-        22: '跳过学生时代，从工作开始'
-    };
-    document.querySelectorAll('.phase-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.phase-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            selectedStartAge = parseInt(btn.dataset.age);
-            document.getElementById('phase-hint').textContent = phaseHints[selectedStartAge] || '';
+    
+    const phaseAgeDisplay = document.getElementById('phase-age-display');
+    const phaseLabelDisplay = document.getElementById('phase-label-display');
+    const phaseHintEl = document.getElementById('phase-hint');
+    
+    if (phaseSlider && phaseAgeDisplay && phaseLabelDisplay && phaseHintEl) {
+        phaseSlider.addEventListener('input', (e) => {
+            selectedStartAge = parseInt(e.target.value);
+            phaseAgeDisplay.textContent = selectedStartAge;
+            phaseLabelDisplay.textContent = getPhaseFromAge(selectedStartAge);
+            phaseHintEl.textContent = getPhaseHint(selectedStartAge);
         });
-    });
+        
+        // 初始化显示
+        phaseAgeDisplay.textContent = selectedStartAge;
+        phaseLabelDisplay.textContent = getPhaseFromAge(selectedStartAge);
+        phaseHintEl.textContent = getPhaseHint(selectedStartAge);
+    }
 
     // 定时事件系统
     const scheduledEvents = [];
@@ -745,7 +1403,7 @@ function initStartScreen() {
         }
 
         const weirdness = 3; // 固定值，已移除奇异度滑块
-        game.initializeGame(name, gender, personality || '普通', allocated, weirdness, selectedDifficulty, selectedContentMode, selectedCreativeMode, selectedLifeFocus, kinks, selectedNarrativeStyle, selectedBackground, customBackgroundText);
+        game.initializeGame(name, gender, personality || '普通', allocated, weirdness, selectedDifficulty, selectedContentMode, selectedCreativeMode, selectedLifeFocus, kinks, selectedNarrativeStyle, selectedBackground, customBackgroundText, currentLanguage);
         game.scheduledEvents = [...scheduledEvents];
         await game.loadFallbackEvents();
 
@@ -811,7 +1469,6 @@ function initStartScreen() {
     // 🥚 彩蛋：点三下标题获得无限加点
     let titleClicks = 0;
     let titleClickTimer = null;
-    let unlimitedMode = false;
     document.querySelector('#start-screen h1')?.addEventListener('click', () => {
         titleClicks++;
         clearTimeout(titleClickTimer);
@@ -821,37 +1478,15 @@ function initStartScreen() {
             titleClicks = 0;
             pointsEl.textContent = '∞';
             pointsEl.style.color = '#f59e0b';
-            // 移除30点上限
-            container.removeEventListener('click', handleAttrClick);
-            container.addEventListener('click', (e) => {
-                if (!e.target.matches('button')) return;
-                const attr = e.target.dataset.attr;
-                const valSpan = e.target.parentElement.querySelector('.value');
-                if (e.target.classList.contains('plus')) allocated[attr]++;
-                else if (e.target.classList.contains('minus') && allocated[attr] > 0) allocated[attr]--;
-                valSpan.textContent = allocated[attr];
-                pointsEl.textContent = '∞';
-                checkLowAttributes();
-            });
+            
             // 小提示动画
             const hint = document.createElement('div');
-            hint.textContent = '🌟 无限模式已激活';
+            hint.textContent = t('unlimitedMode');
             hint.style.cssText = 'text-align:center;color:#f59e0b;font-size:12px;font-weight:600;animation:fadeSlideUp 0.5s ease;';
             document.querySelector('#attribute-allocation').appendChild(hint);
             setTimeout(() => hint.remove(), 3000);
         }
     });
-
-    // 属性点击处理（需要命名以便彩蛋移除）
-    function handleAttrClick(e) {
-        if (!e.target.matches('button')) return;
-        const attr = e.target.dataset.attr;
-        const valSpan = e.target.parentElement.querySelector('.value');
-        if (e.target.classList.contains('plus') && calcUsed() < 30) allocated[attr]++;
-        else if (e.target.classList.contains('minus') && allocated[attr] > 0) allocated[attr]--;
-        valSpan.textContent = allocated[attr];
-        updatePoints();
-    }
 
     // 传记弹窗控制
     document.getElementById('open-biography-btn')?.addEventListener('click', () => {

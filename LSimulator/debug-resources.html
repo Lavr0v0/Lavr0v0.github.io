@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>资源加载调试</title>
+    <style>
+        body { padding: 20px; font-family: monospace; background: #1e293b; color: #e2e8f0; }
+        .test { margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px; }
+        .success { color: #22c55e; }
+        .error { color: #ef4444; }
+        img { max-width: 100px; background: rgba(255,255,255,0.1); padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>资源加载调试页面</h1>
+    <p>当前URL: <span id="current-url"></span></p>
+    <p>Base URL: <span id="base-url"></span></p>
+    
+    <div class="test">
+        <h2>图标测试 (../resources/ICON/)</h2>
+        <div id="icon-test"></div>
+    </div>
+    
+    <div class="test">
+        <h2>字体测试</h2>
+        <div id="font-test"></div>
+        <div style="font-family: 'Lorchin'; font-size: 24px; margin-top: 10px;">
+            Lorchin字体测试 - 中文测试文本
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('current-url').textContent = window.location.href;
+        document.getElementById('base-url').textContent = document.baseURI;
+        
+        // 测试图标
+        const icons = ['bookmark', 'diskette', 'female', 'male-gender', 'non-binary', 'translation', 'up-loading'];
+        const iconTest = document.getElementById('icon-test');
+        
+        icons.forEach(name => {
+            const path = `/resources/ICON/${name}.png`;
+            const img = document.createElement('img');
+            img.src = path;
+            img.alt = name;
+            img.title = name;
+            
+            const div = document.createElement('div');
+            div.style.display = 'inline-block';
+            div.style.margin = '10px';
+            div.style.textAlign = 'center';
+            
+            img.onload = () => {
+                div.innerHTML = `<div class="success">✓ ${name}</div>`;
+                div.appendChild(img);
+            };
+            img.onerror = () => {
+                div.innerHTML = `<div class="error">✗ ${name}<br>路径: ${path}</div>`;
+            };
+            
+            iconTest.appendChild(div);
+        });
+        
+        // 测试字体
+        const fontTest = document.getElementById('font-test');
+        document.fonts.ready.then(() => {
+            const fonts = [
+                { name: 'Lorchin', path: '/resources/FONT/LorchinSansP0.ttf' },
+                { name: 'Shanghai Modern', path: '/resources/FONT/上海摩登体.otf' },
+                { name: 'Luperca', path: '/resources/FONT/Luperca-48-72Header.ttf' }
+            ];
+            
+            fonts.forEach(font => {
+                const loaded = document.fonts.check(`16px "${font.name}"`);
+                const div = document.createElement('div');
+                div.className = loaded ? 'success' : 'error';
+                div.textContent = `${loaded ? '✓' : '✗'} ${font.name} - ${font.path}`;
+                fontTest.appendChild(div);
+            });
+        });
+    </script>
+</body>
+</html>

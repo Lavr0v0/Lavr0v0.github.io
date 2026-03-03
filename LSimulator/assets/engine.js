@@ -8,6 +8,7 @@ export class GameEngine {
         this.playerName = '';
         this.playerGender = '男';
         this.playerPersonality = '';
+        this.language = 'zh'; // 'zh' or 'en'
         this.state = {
             age: 0,
             weirdness: 3,
@@ -66,7 +67,8 @@ export class GameEngine {
                     playerGender: this.playerGender,
                     playerPersonality: this.playerPersonality,
                     targetAge,
-                    attributes: this.state.attributes
+                    attributes: this.state.attributes,
+                    language: this.language
                 })
             });
             if (!res.ok) throw new Error('skip API error');
@@ -124,11 +126,12 @@ export class GameEngine {
         }
     }
 
-    initializeGame(name, gender, personality, attributes, weirdness, difficulty, contentMode, creativeMode, lifeFocus, kinks, narrativeStyle, backgroundSetting, customBackground) {
+    initializeGame(name, gender, personality, attributes, weirdness, difficulty, contentMode, creativeMode, lifeFocus, kinks, narrativeStyle, backgroundSetting, customBackground, language) {
             this.playerName = name;
             this.playerGender = gender;
             this.playerPersonality = personality;
             this.playerKinks = kinks || '';
+            this.language = language || 'zh';
             this.state.attributes = { ...attributes };
             this.state.weirdness = weirdness;
             this.state.difficulty = difficulty || 2;
@@ -186,7 +189,8 @@ export class GameEngine {
                     focusRound,
                     scheduledEvents: this.scheduledEvents,
                     playerDirective: this.playerDirective,
-                    backstory: this.backstory
+                    backstory: this.backstory,
+                    language: this.language
                 })
             });
             clearTimeout(timeoutId);
@@ -243,7 +247,8 @@ export class GameEngine {
                     creativeMode: this.creativeMode,
                     narrativeStyle: this.narrativeStyle,
                     backgroundSetting: this.backgroundSetting,
-                    customBackground: this.customBackground
+                    customBackground: this.customBackground,
+                    language: this.language
                 })
             });
             clearTimeout(timeoutId);
@@ -287,7 +292,8 @@ export class GameEngine {
                     creativeMode: this.creativeMode,
                     narrativeStyle: this.narrativeStyle,
                     backgroundSetting: this.backgroundSetting,
-                    customBackground: this.customBackground
+                    customBackground: this.customBackground,
+                    language: this.language
                 })
             });
             clearTimeout(timeoutId);
@@ -310,7 +316,8 @@ export class GameEngine {
                     creativeMode: this.creativeMode,
                     narrativeStyle: this.narrativeStyle,
                     backgroundSetting: this.backgroundSetting,
-                    customBackground: this.customBackground
+                    customBackground: this.customBackground,
+                    language: this.language
                 })
             });
             if (!res.ok) throw new Error();
@@ -332,7 +339,8 @@ export class GameEngine {
                     creativeMode: this.creativeMode,
                     narrativeStyle: this.narrativeStyle,
                     backgroundSetting: this.backgroundSetting,
-                    customBackground: this.customBackground
+                    customBackground: this.customBackground,
+                    language: this.language
                 })
             });
             if (!res.ok) throw new Error();
@@ -621,6 +629,7 @@ export class GameEngine {
             playerName: this.playerName,
             playerGender: this.playerGender,
             playerPersonality: this.playerPersonality,
+            language: this.language,
             state: this.state,
             focusPhase: this.focusPhase,
             contentMode: this.contentMode,
@@ -645,6 +654,7 @@ export class GameEngine {
             this.playerName = saveData.playerName;
             this.playerGender = saveData.playerGender;
             this.playerPersonality = saveData.playerPersonality;
+            this.language = saveData.language || 'zh';
             this.state = saveData.state;
             this.focusPhase = saveData.focusPhase || null;
             this.contentMode = saveData.contentMode || 'sfw';

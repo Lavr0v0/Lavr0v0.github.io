@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#f5f2ed">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>人生轨迹模拟器</title>
@@ -14,10 +14,11 @@
     <link rel="icon" type="image/png" href="/favicon.png">
 </head>
 <body>
-    <canvas id="stars-canvas"></canvas>
-    <button id="perf-toggle" class="perf-toggle-btn" title="切换背景动画">
-        <span class="perf-icon">✨</span>
+    <!-- 语言切换按钮 - 右上角 -->
+    <button id="lang-toggle" class="lang-toggle-btn" title="Switch Language / 切换语言">
+        <img src="/resources/ICON/translation.png" alt="Language">
     </button>
+    
     <div id="app">
         <div id="start-screen" class="screen active">
             <h1>人生轨迹模拟器</h1>
@@ -125,17 +126,33 @@
                 <div class="life-focus-hint" id="life-focus-hint">均衡发展：事业、感情、家庭各方面都会出现</div>
             </div>
 
-            <div class="phase-section">
+            <div class="phase-section" id="phase-section-slider">
                 <label>起始阶段</label>
-                <div class="phase-options">
-                    <button class="phase-btn active" data-age="0">出生</button>
-                    <button class="phase-btn" data-age="6">小学</button>
-                    <button class="phase-btn" data-age="12">初中</button>
-                    <button class="phase-btn" data-age="15">高中</button>
-                    <button class="phase-btn" data-age="18">大学</button>
-                    <button class="phase-btn" data-age="22">工作</button>
+                <div class="phase-slider-container">
+                    <input type="range" id="phase-slider" min="0" max="80" step="1" value="0" class="phase-slider">
+                    <div class="phase-display">
+                        <span class="phase-age" id="phase-age-display">0</span>
+                        <span class="phase-label" id="phase-label-display">出生</span>
+                    </div>
+                    <div class="phase-markers">
+                        <span data-age="0">0</span>
+                        <span data-age="18">18</span>
+                        <span data-age="30">30</span>
+                        <span data-age="50">50</span>
+                        <span data-age="70">70</span>
+                        <span data-age="80">80</span>
+                    </div>
                 </div>
                 <div class="phase-hint" id="phase-hint">从出生开始完整体验</div>
+            </div>
+
+            <div class="phase-section" id="phase-section-input" style="display:none;">
+                <label>起始年龄</label>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <input type="number" id="phase-age-input" min="0" max="200" value="0" placeholder="0" style="flex: 1; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; background: var(--surface-card); color: var(--text);">
+                    <span style="font-size: 14px; color: var(--text-dim);">岁</span>
+                </div>
+                <div class="phase-hint" id="phase-hint-input">从指定年龄开始人生</div>
             </div>
 
             <div class="background-setting-section">
@@ -146,7 +163,12 @@
                 </div>
                 <div class="background-hint" id="background-hint">现代背景：经过优化的现代都市生活，包含学业、职场、感情等常规人生阶段</div>
                 <div id="custom-background-input" style="display:none; margin-top: 12px;">
-                    <textarea id="custom-background-text" placeholder="描述你的背景设定（例如：修仙世界、赛博朋克未来、中世纪欧洲、末日废土等）&#10;&#10;可以包含：世界观、时代背景、社会结构、特殊规则、魔法/科技体系等。字数不限，越详细越好。" maxlength="2000" rows="6" style="width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; font-family: inherit; background: rgba(15,23,42,0.5); color: var(--text); resize: vertical;"></textarea>
+                    <div style="margin-bottom: 12px;">
+                        <label style="display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 6px;">最高年龄</label>
+                        <input type="number" id="custom-max-age" placeholder="80" min="22" max="200" value="80" style="width: 100px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; background: rgba(15,23,42,0.5); color: var(--text);">
+                        <span style="font-size: 11px; color: var(--text-dim); margin-left: 8px;">岁（默认80岁）</span>
+                    </div>
+                    <textarea id="custom-background-text" placeholder="描述你的背景设定（例如：修仙世界、赛博朋克未来、中世纪欧洲、末日废土等）&#10;&#10;可以包含：世界观、时代背景、社会结构、特殊规则、魔法/科技体系等。字数不限，越详细越好。" maxlength="2000" rows="6" style="width: 100%; padding: 12px; border: 2px solid var(--border); border-left: 3px solid var(--primary); border-radius: 0; font-size: 13px; font-family: inherit; background: white; color: var(--text); resize: vertical; box-shadow: inset 0 1px 2px rgba(139, 115, 85, 0.05);"></textarea>
                     <div style="font-size: 11px; color: var(--text-dim); margin-top: 4px; text-align: right;">
                         <span id="custom-bg-count">0</span>/2000 字
                     </div>
@@ -164,8 +186,14 @@
                 </div>
             </div>
 
-            <button id="start-game">开始人生</button>
-            <button id="load-game" class="load-btn" style="display:none">继续上次的人生</button>
+            <button id="start-game">
+                <img src="/resources/ICON/play.png" alt="" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 8px;">
+                开始人生
+            </button>
+            <button id="load-game" class="load-btn" style="display:none">
+                <img src="/resources/ICON/bookmark.png" alt="" style="width: 18px; height: 18px; vertical-align: middle; margin-right: 8px;">
+                继续上次的人生
+            </button>
         </div>
 
         <div id="game-screen" class="screen">
@@ -184,7 +212,7 @@
                 <div class="stats-column">
                     <!-- 聚焦功能 -->
                     <div id="focus-phase-bar" class="focus-phase-bar" style="display:none">
-                        <span id="focus-phase-label" class="focus-phase-label">🔍 <span id="focus-phase-name"></span></span>
+                        <span id="focus-phase-label" class="focus-phase-label"><span id="focus-phase-name"></span></span>
                         <button id="focus-phase-btn" class="focus-btn">聚焦</button>
                         <button id="focus-phase-cancel" class="focus-cancel-btn" style="display:none">取消</button>
                     </div>
@@ -196,11 +224,11 @@
                         </div>
                         <div class="profile-compact">
                             <div class="profile-item">
-                                <span class="profile-icon">🎓</span>
+                                <span class="profile-icon"></span>
                                 <span id="profile-education">未入学</span>
                             </div>
                             <div class="profile-item">
-                                <span class="profile-icon">💼</span>
+                                <span class="profile-icon"></span>
                                 <span id="profile-job">无</span>
                             </div>
                         </div>
@@ -246,8 +274,14 @@
                     <div class="action-buttons-grid">
                         <button id="open-biography-btn" class="action-btn">📖 传记</button>
                         <button id="goldfinger-trigger-btn" class="action-btn">🎮 金手指</button>
-                        <button id="save-game-btn" class="action-btn">💾 保存</button>
-                        <button id="load-game-btn" class="action-btn">📂 读取</button>
+                        <button id="save-game-btn" class="action-btn">
+                            <img src="/resources/ICON/diskette.png" alt="" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 4px;">
+                            保存
+                        </button>
+                        <button id="load-game-btn" class="action-btn">
+                            <img src="/resources/ICON/bookmark.png" alt="" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 4px;">
+                            读取
+                        </button>
                     </div>
                     
                     <input type="file" id="load-game-input" accept=".json" style="display:none">
@@ -288,9 +322,15 @@
         </div>
     </div>
 
-    <!-- 【性能】stars.js 非模块脚本加 defer，不阻塞 HTML 解析 -->
-    <script defer src="assets/stars.js"></script>
     <script type="module" src="assets/engine.js"></script>
     <script type="module" src="assets/ui.js"></script>
+    
+    <!-- 资源来源说明 -->
+    <div style="position: fixed; bottom: 10px; right: 10px; font-size: 11px; opacity: 0.5; z-index: 1000;">
+        <a href="../CREDITS.md" target="_blank" style="color: var(--text-secondary); text-decoration: none;">
+            Icons & Fonts Credits
+        </a>
+    </div>
 </body>
 </html>
+
