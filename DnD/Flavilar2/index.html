@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>芙勒维拉 - 狂战士档案</title>
+    <title>芙勒维拉 Flavilar</title>
     
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -32,11 +32,9 @@
             const currentRef = ref.current;
             if (!currentRef) return;
             const observer = new IntersectionObserver(([entry]) => {
-              // 一旦进入视口，就触发并保持高亮状态
               if (entry.isIntersecting) {
                   setInView(true);
               } else {
-                  // 如果希望滑出视口后变回透明，取消下面这行的注释即可。这里默认移出后恢复暗淡，保持动态感。
                   setInView(false);
               }
             }, { threshold: options.threshold });
@@ -48,11 +46,9 @@
         };
 
         const FlavilarProfile = () => {
-          // 绑定经过 Lenis 平滑处理的滚动值与速度
           const [scrollY, setScrollY] = useState(0);
           const [velocity, setVelocity] = useState(0);
 
-          // 关系网视口检测 (当元素露出 40% 时自动触发高亮)
           const [alberinaRef, alberinaInView] = useInView({ threshold: 0.4 });
           const [shirulRef, shirulInView] = useInView({ threshold: 0.4 });
 
@@ -63,14 +59,16 @@
 
             import('https://esm.sh/@studio-freight/lenis@1.0.29').then(({ default: Lenis }) => {
               lenisInstance = new Lenis({
-                duration: 1.5, // 缓动时间，保证惯性回弹的丝滑
+                duration: 1.5,
                 easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
                 direction: 'vertical',
                 gestureDirection: 'vertical',
                 smooth: true,
+                // 修复移动端无法获取 Velocity 的核心设置
+                smoothTouch: true, // 开启移动端平滑滚动代理
+                touchMultiplier: 2, // 放大手指滑动的速率，增强动态倾斜感
               });
 
-              // 监听 Lenis，捕获滚动距离与瞬时速度
               lenisInstance.on('scroll', (e) => {
                 setScrollY(e.scroll);
                 setVelocity(e.velocity);
@@ -93,92 +91,64 @@
           // 物理动效参数计算 (GPU 加速)
           // ==============================
 
-          const heroTitleScale = 1 + scrollY * 0.0004; // 标题随着下拉微微放大，增加压迫感
+          const heroTitleScale = 1 + scrollY * 0.0004;
           const heroTextTranslateY = scrollY * 0.25; 
           
-          // 动态计算首屏反相切割线的位置：随着向下滚动，切割线向左移动（数值变小），反相区域如幕布般被拉大
-          const clipTop = Math.max(0, 55 - scrollY * 0.03);
-          const clipBottom = Math.max(0, 35 - scrollY * 0.04); 
+          // 减缓首屏切割线的拉开速度，防止在长页面上过度溢出
+          const clipTop = Math.max(0, 55 - scrollY * 0.015);
+          const clipBottom = Math.max(0, 35 - scrollY * 0.02); 
 
-          // 限制瞬时速度上限，防止剧烈滚动时变形过度
-          const clampedVelocity = Math.max(-40, Math.min(40, velocity));
+          // 放宽速度限制上限，并施加倍率，让倾斜（Skew）在手机上也极其明显
+          const clampedVelocity = Math.max(-60, Math.min(60, velocity * 1.5));
 
-          // 巨型背景文字的横向平移 (利用超长重复文本，避免出现断层边缘)
           const erasedTextTranslateX = scrollY * -0.15; 
-          
-          // 正文段落的纵向微视差，产生文字“浮”在背景上的错觉
           const contentParallax1 = scrollY * -0.015;
           const contentParallax2 = scrollY * -0.025;
 
           return (
             <div className="min-h-screen bg-[#050505] text-[#f0f0f0] overflow-x-hidden selection:bg-[#00ff66] selection:text-black font-sans">
               
-              {/* 巨型展示字体 */}
               <style dangerouslySetInnerHTML={{__html: `
                 @import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
                 .font-display { font-family: 'Anton', sans-serif; }
               `}} />
 
-              {/* =========================================
-                  GLOBAL FIXED BACKGROUND: 彻底静止、清晰
-                  ========================================= */}
+              {/* GLOBAL FIXED BACKGROUND */}
               <div 
                 className="fixed inset-0 z-0 bg-cover bg-center grayscale contrast-125 brightness-[0.35] scale-105 pointer-events-none"
-                style={{ 
-                  backgroundImage: 'url("https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=2560&auto=format&fit=crop")'
-                }}
+                style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=2560&auto=format&fit=crop")' }}
               ></div>
-
               <div 
                 className="fixed inset-0 z-[1] pointer-events-none opacity-[0.06] mix-blend-overlay"
                 style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/stardust.png")' }}
               ></div>
 
-              {/* =========================================
-                  HERO SECTION: 动态切割与缩放
-                  ========================================= */}
+              {/* HERO SECTION */}
               <header className="relative w-full h-screen flex items-center justify-center z-10">
-                
-                {/* 左侧内容层：随滚动向下剥落 */}
                 <div 
                   className="absolute inset-0 z-20 w-full max-w-[100rem] mx-auto px-6 flex flex-col items-start justify-center"
-                  style={{ transform: `translate3d(0, ${heroTextTranslateY}px, 0)` }}
+                  style={{ transform: `translate3d(0, ${heroTextTranslateY}px, 0)`, willChange: 'transform' }}
                 >
                   <h2 className="text-[#00ff66] tracking-[0.3em] uppercase text-xs md:text-sm mb-8 font-bold opacity-80">
                     WINDREED TRAVELERS
                   </h2>
-                  
                   <h1 
                     className="text-[5.5rem] sm:text-[8rem] md:text-[12rem] lg:text-[16rem] tracking-tighter uppercase leading-[0.8] text-white font-display transform-gpu"
-                    style={{ transform: `scale(${heroTitleScale})`, transformOrigin: 'left center' }}
+                    style={{ transform: `scale(${heroTitleScale})`, transformOrigin: 'left center', willChange: 'transform' }}
                   >
                     FLAVILAR
                   </h1>
                   <h2 className="text-base md:text-2xl tracking-[1em] text-gray-400 mt-4 md:mt-8 ml-2 font-light">
                     芙勒维拉
                   </h2>
-
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-24 text-sm md:text-base tracking-[0.2em] uppercase mt-16 md:mt-20 font-medium">
-                    <div>
-                      <span className="block text-[#00ff66] text-[10px] md:text-xs mb-2 opacity-60">RACE</span>
-                      DRAGONBORN
-                    </div>
-                    <div>
-                      <span className="block text-[#00ff66] text-[10px] md:text-xs mb-2 opacity-60">HEIGHT</span>
-                      ~ 2.7 METERS
-                    </div>
-                    <div>
-                      <span className="block text-[#00ff66] text-[10px] md:text-xs mb-2 opacity-60">AGE</span>
-                      21 YEARS
-                    </div>
-                    <div>
-                      <span className="block text-[#00ff66] text-[10px] md:text-xs mb-2 opacity-60">CLASS</span>
-                      BARBARIAN
-                    </div>
+                    <div><span className="block text-[#00ff66] text-[10px] md:text-xs mb-2 opacity-60">RACE</span>DRAGONBORN</div>
+                    <div><span className="block text-[#00ff66] text-[10px] md:text-xs mb-2 opacity-60">HEIGHT</span>~ 2.7 METERS</div>
+                    <div><span className="block text-[#00ff66] text-[10px] md:text-xs mb-2 opacity-60">AGE</span>21 YEARS</div>
+                    <div><span className="block text-[#00ff66] text-[10px] md:text-xs mb-2 opacity-60">CLASS</span>BARBARIAN</div>
                   </div>
                 </div>
 
-                {/* 核心特效层：受滚动驱动的动态反相切割面 */}
                 <div 
                   className="absolute inset-0 z-30 pointer-events-none"
                   style={{ 
@@ -187,44 +157,31 @@
                     clipPath: `polygon(${clipTop}% 0, 100% 0, 100% 100%, ${clipBottom}% 100%)` 
                   }}
                 ></div>
-
-                {/* 动态切割线 */}
                 <svg className="absolute inset-0 w-full h-full pointer-events-none z-40 drop-shadow-[0_0_15px_rgba(0,255,102,0.5)]">
                   <line x1={`${clipTop}%`} y1="0" x2={`${clipBottom}%`} y2="100%" stroke="#00ff66" strokeWidth="4" />
                 </svg>
               </header>
 
-              {/* =========================================
-                  BIO SECTION: 过去与失落
-                  ========================================= */}
+              {/* BIO SECTION */}
               <section className="relative w-full min-h-screen flex flex-col justify-center py-24 md:py-40 z-10 overflow-hidden">
                 <div className="absolute inset-0 bg-[#050505]/80 z-0 border-t border-[#111]"></div> 
-
-                {/* 背景巨型排版跑马灯：利用超宽容器与重复文本防止边缘穿帮，加入滚动物理倾斜 (Skew) */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300vw] pointer-events-none opacity-[0.03] z-0 flex justify-center">
                   <h2 
-                    className="text-[40vw] md:text-[30vw] leading-none whitespace-nowrap text-white font-display tracking-tighter transition-transform duration-100 ease-out"
-                    style={{ transform: `translate3d(${erasedTextTranslateX}px, 0, 0) skewX(${clampedVelocity * 0.3}deg)` }}
+                    className="text-[40vw] md:text-[30vw] leading-none whitespace-nowrap text-white font-display tracking-tighter ease-out"
+                    style={{ transform: `translate3d(${erasedTextTranslateX}px, 0, 0) skewX(${clampedVelocity * 0.3}deg)`, willChange: 'transform' }}
                   >
                     ERASED &nbsp; ERASED &nbsp; ERASED &nbsp; ERASED &nbsp; ERASED
                   </h2>
                 </div>
-
                 <div className="relative z-10 max-w-[100rem] mx-auto px-6 w-full">
                   <div className="flex flex-col lg:flex-row gap-12 lg:gap-32">
                     <div className="w-full lg:w-5/12">
                       <h3 className="text-[4rem] md:text-[6rem] lg:text-[8rem] uppercase text-white leading-[0.9] tracking-tighter font-display">
-                        MEMORY <br/>
-                        <span className="text-transparent" style={{ WebkitTextStroke: '2px #00ff66' }}>LOST.</span><br/>
-                        NO RULES.
+                        MEMORY <br/><span className="text-transparent" style={{ WebkitTextStroke: '2px #00ff66' }}>LOST.</span><br/>NO RULES.
                       </h3>
                       <div className="mt-8 md:mt-12 w-24 h-1 bg-[#00ff66]"></div>
                     </div>
-
-                    <div 
-                      className="w-full lg:w-7/12 flex flex-col justify-end pb-4 space-y-8"
-                      style={{ transform: `translate3d(0, ${contentParallax1}px, 0)` }}
-                    >
+                    <div className="w-full lg:w-7/12 flex flex-col justify-end pb-4 space-y-8" style={{ transform: `translate3d(0, ${contentParallax1}px, 0)`, willChange: 'transform' }}>
                       <p className="text-base md:text-lg text-gray-300 leading-loose tracking-wide font-light max-w-2xl">
                         她的野性却并不只是森林岁月留下的痕迹。更早以前，她的记忆曾被人主动清除，许多原本属于“人”的部分也随之一并剥落。后来她才长期生活在森林里，以近乎原始的方式活下去。换言之，并不是她先在森林里活得像野兽，而是她先失去了大半人性，才顺理成章地落进了那样的生活里。
                       </p>
@@ -238,85 +195,65 @@
                 </div>
               </section>
 
-              {/* =========================================
-                  COMBAT SECTION: 战斗方式
-                  ========================================= */}
-              <section className="relative w-full min-h-screen flex items-center py-24 md:py-40 z-20">
+              {/* COMBAT SECTION: 核心优化区域 - 将大面积反相改为克制的“切割带” */}
+              <section className="relative w-full min-h-screen flex flex-col justify-center py-24 md:py-40 z-20">
                 
-                {/* 核心反相撕裂效果 */}
+                {/* 修改：将其高度和面积大幅限制，不再铺满长篇背景，避免移动端过度瞎眼 */}
                 <div 
-                  className="absolute inset-0 z-0 pointer-events-none"
+                  className="absolute top-[10%] md:top-[15%] left-0 w-full h-[40vh] md:h-[60vh] z-0 pointer-events-none"
                   style={{ 
                     backdropFilter: 'invert(100%) hue-rotate(180deg)', 
                     WebkitBackdropFilter: 'invert(100%) hue-rotate(180deg)',
-                    clipPath: 'polygon(0 15%, 100% 0, 100% 85%, 0 100%)'
+                    clipPath: 'polygon(0 20%, 100% 0, 100% 80%, 0 100%)'
                   }}
                 ></div>
 
                 <div className="relative z-10 max-w-[100rem] mx-auto px-6 w-full mix-blend-difference">
                   <div className="flex flex-col md:flex-row items-center gap-12 mb-16 md:mb-32 overflow-visible">
-                    {/* 移除导致错误切边的无限滚动，改为纯粹的惯性弹射偏移！ */}
                     <h2 
-                      className="text-[4.5rem] md:text-[10rem] lg:text-[14rem] tracking-tighter leading-none text-white font-display whitespace-nowrap transition-transform duration-[50ms] ease-out origin-left"
-                      style={{ transform: `translate3d(${clampedVelocity * -1.5}px, 0, 0) skewX(${clampedVelocity * -0.4}deg)` }}
+                      className="text-[4.5rem] md:text-[10rem] lg:text-[14rem] tracking-tighter leading-none text-white font-display whitespace-nowrap origin-left ease-out"
+                      style={{ 
+                        transform: `translate3d(${clampedVelocity * -1.5}px, 0, 0) skewX(${clampedVelocity * -0.4}deg)`,
+                        willChange: 'transform'
+                      }}
                     >
                       VIOLENCE.
                     </h2>
                   </div>
 
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-32">
-                    <div 
-                      className="space-y-12"
-                      style={{ transform: `translate3d(0, ${contentParallax2}px, 0)` }}
-                    >
+                    <div className="space-y-12" style={{ transform: `translate3d(0, ${contentParallax2}px, 0)`, willChange: 'transform' }}>
                       <div className="border border-[#00ff66] inline-block px-6 py-2">
-                        <h3 className="text-sm md:text-base uppercase text-[#00ff66] tracking-[0.3em] font-medium">
-                          FRONT ROW EXECUTION
-                        </h3>
+                        <h3 className="text-sm md:text-base uppercase text-[#00ff66] tracking-[0.3em] font-medium">FRONT ROW EXECUTION</h3>
                       </div>
-                      <p className="text-base md:text-xl text-gray-300 leading-loose tracking-wide font-light max-w-xl">
+                      <p className="text-base md:text-xl text-gray-300 leading-loose tracking-wide font-light max-w-xl mix-blend-normal">
                         芙勒维拉在战斗中极具野性。她的侵略性很强，也很少迟疑。真正开打时，她并不依靠复杂的盘算，而更像顺着某种深埋在身体里的本能往前压去：直接、凶猛，带着巨物才有的力量感与压迫感。她不是轻灵型的战士，也不是需要一层层铺垫情绪才会进入状态的人。
                         <span className="text-white font-bold mt-6 block">战斗开始，她就已经在那里。冲得最快，压得最重，也最不犹豫。</span>
                       </p>
                     </div>
-
                     <div className="flex flex-col justify-end items-start lg:items-end text-left lg:text-right">
-                      <h4 className="text-[3.5rem] md:text-[6rem] lg:text-[8rem] text-transparent tracking-widest leading-[0.85] mb-2 font-display" style={{ WebkitTextStroke: '1px rgba(255,255,255,0.4)' }}>
-                        BORN TO
-                      </h4>
-                      <h4 className="text-[3.5rem] md:text-[6rem] lg:text-[8rem] text-[#00ff66] tracking-widest leading-[0.85] font-display">
-                        EXECUTE.
-                      </h4>
+                      <h4 className="text-[3.5rem] md:text-[6rem] lg:text-[8rem] text-transparent tracking-widest leading-[0.85] mb-2 font-display" style={{ WebkitTextStroke: '1px rgba(255,255,255,0.4)' }}>BORN TO</h4>
+                      <h4 className="text-[3.5rem] md:text-[6rem] lg:text-[8rem] text-[#00ff66] tracking-widest leading-[0.85] font-display">EXECUTE.</h4>
                     </div>
                   </div>
                 </div>
               </section>
 
-              {/* =========================================
-                  CONTRAST SECTION: 性格与微小偏爱
-                  ========================================= */}
+              {/* CONTRAST SECTION */}
               <section className="relative w-full min-h-screen flex items-center justify-center py-24 md:py-40 z-10 border-t border-[#111]">
                 <div className="absolute inset-0 bg-[#050505]/85 z-0"></div>
-                
                 <div className="relative z-10 w-full max-w-[100rem] mx-auto px-6">
                   <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-12 lg:gap-16">
-                    
                     <div className="w-full lg:w-5/12 text-left">
                        <h2 className="text-[3.5rem] md:text-[6rem] lg:text-[7rem] text-white tracking-tighter uppercase font-display leading-[0.9]">
-                         BRUTAL & <br/>
-                         <span className="text-[#00ff66]">FRAGILE.</span>
+                         BRUTAL & <br/><span className="text-[#00ff66]">FRAGILE.</span>
                        </h2>
                        <div className="mt-6 md:mt-8 w-16 h-1 bg-[#333]"></div>
                     </div>
-
-                    <div 
-                      className="w-full lg:w-6/12 flex flex-col space-y-8 md:space-y-12 pt-4"
-                      style={{ transform: `translate3d(0, ${contentParallax1}px, 0)` }}
-                    >
+                    <div className="w-full lg:w-6/12 flex flex-col space-y-8 md:space-y-12 pt-4" style={{ transform: `translate3d(0, ${contentParallax1}px, 0)`, willChange: 'transform' }}>
                       <p className="text-base md:text-lg text-gray-300 leading-loose tracking-wide font-light">
                         她的怒气大多不深，更像一种短促而直接的反弹。她原本没有完整的“自尊”概念，相较之下，她会更在意朋友被冒犯，也更在意熟悉的地方被外人闯入。她的愤怒并不首先指向“我”，而更多指向“我的同伴”与“我认得的范围”。
                       </p>
-                      
                       <div className="pl-6 border-l border-[#333]">
                         <p className="text-base md:text-lg text-gray-300 leading-loose tracking-wide font-light">
                           她身上并不只有粗粝。她会喜欢亮晶晶的小玩意，也会被颜色鲜亮的花吸引，还会很喜欢小猫和别的小动物。这样的偏爱并不会削弱她的野性，反而让她显得更像一种活着的生灵：
@@ -324,14 +261,11 @@
                         </p>
                       </div>
                     </div>
-                    
                   </div>
                 </div>
               </section>
 
-              {/* =========================================
-                  CONNECTIONS SECTION: 关系网
-                  ========================================= */}
+              {/* CONNECTIONS SECTION */}
               <section className="relative w-full min-h-screen py-24 md:py-40 z-10 bg-[#020202]">
                 <div className="max-w-[100rem] mx-auto px-6 w-full">
                   <div className="flex items-center gap-4 md:gap-6 mb-20 md:mb-32 opacity-80 border-b border-[#111] pb-6 md:pb-8">
@@ -339,20 +273,18 @@
                   </div>
 
                   <div className="flex flex-col gap-24 md:gap-40">
-                    {/* Alberina */}
                     <div ref={alberinaRef} className="flex flex-col xl:flex-row xl:items-start gap-6 md:gap-8 xl:gap-24">
-                      {/* 加入惯性拉扯动效，文本进入视口自动变色不再需要 hover */}
                       <h3 
                         className={`text-[4rem] md:text-[7rem] lg:text-[9rem] uppercase tracking-tighter leading-[0.8] transition-colors duration-700 font-display xl:w-5/12 ${alberinaInView ? 'text-white' : 'text-transparent'}`} 
                         style={{ 
                           WebkitTextStroke: '2px #222', 
-                          transform: `translate3d(${clampedVelocity * 0.8}px, 0, 0) skewX(${clampedVelocity * 0.2}deg)`,
-                          transitionProperty: 'color, -webkit-text-stroke'
+                          transform: `translate3d(${clampedVelocity * 0.5}px, 0, 0) skewX(${clampedVelocity * 0.2}deg)`,
+                          transitionProperty: 'color, -webkit-text-stroke',
+                          willChange: 'transform'
                         }}
                       >
                         ALBERINA
                       </h3>
-                      
                       <div className="flex-1 max-w-3xl pt-2">
                         <p className={`text-base md:text-lg transition-colors duration-1000 leading-loose font-light ${alberinaInView ? 'text-gray-200' : 'text-gray-600'}`}>
                           在整个队伍里，芙勒维拉最信任的人是阿尔贝莉娜。她觉得阿尔贝莉娜最靠谱，这种判断里甚至带着一点近乎朴素的权威感。阿尔贝莉娜会解释世界，会告诉她什么字怎么读、什么话是什么意思。
@@ -362,20 +294,18 @@
                       </div>
                     </div>
 
-                    {/* Shirul */}
                     <div ref={shirulRef} className="flex flex-col xl:flex-row xl:items-start gap-6 md:gap-8 xl:gap-24 mt-12 md:mt-24">
-                      {/* 根据您提供的截图，精准复刻亮绿色字体 + 黑色描边的样式 */}
                       <h3 
                         className={`text-[4rem] md:text-[7rem] lg:text-[9rem] uppercase tracking-tighter leading-[0.8] transition-colors duration-700 font-display xl:w-5/12 ${shirulInView ? 'text-[#00ff66]' : 'text-transparent'}`} 
                         style={{ 
                           WebkitTextStroke: '2px #222', 
-                          transform: `translate3d(${clampedVelocity * -0.8}px, 0, 0) skewX(${clampedVelocity * -0.2}deg)`,
-                          transitionProperty: 'color, -webkit-text-stroke'
+                          transform: `translate3d(${clampedVelocity * -0.5}px, 0, 0) skewX(${clampedVelocity * -0.2}deg)`,
+                          transitionProperty: 'color, -webkit-text-stroke',
+                          willChange: 'transform'
                         }}
                       >
                         SHIRUL
                       </h3>
-                      
                       <div className="flex-1 max-w-3xl pt-2">
                         <p className={`text-base md:text-lg transition-colors duration-1000 leading-loose font-light ${shirulInView ? 'text-gray-200' : 'text-gray-600'}`}>
                           芙勒维拉对雪露的感情很深。最初的喜欢来得很简单，因为她发现雪露喜欢小动物，而这件事几乎一下子就让她对雪露生出了好感。
@@ -384,16 +314,13 @@
                         </p>
                       </div>
                     </div>
-                    
                   </div>
                 </div>
               </section>
-
             </div>
           );
         };
 
-        // 渲染 React 到 DOM 中
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<FlavilarProfile />);
     </script>
