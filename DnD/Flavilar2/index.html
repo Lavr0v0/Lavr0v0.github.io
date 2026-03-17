@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>芙勒维拉 Flavilar</title>
+    <title>芙勒维拉 - 狂战士档案</title>
     
     <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -275,9 +275,9 @@
                   <div className="flex flex-col gap-24 md:gap-40">
                     <div ref={alberinaRef} className="flex flex-col xl:flex-row xl:items-start gap-6 md:gap-8 xl:gap-24">
                       <h3 
-                        className={`text-[4rem] md:text-[7rem] lg:text-[9rem] uppercase tracking-tighter leading-[0.8] transition-colors duration-700 font-display xl:w-5/12 ${alberinaInView ? 'text-white' : 'text-transparent'}`} 
+                        className={`text-[4rem] md:text-[7rem] lg:text-[9rem] uppercase tracking-tighter leading-[0.8] duration-700 font-display xl:w-5/12 ${alberinaInView ? 'text-white' : 'text-transparent'}`} 
                         style={{ 
-                          WebkitTextStroke: '2px #222', 
+                          WebkitTextStroke: alberinaInView ? '0px transparent' : '2px #222', 
                           transform: `translate3d(${clampedVelocity * 0.5}px, 0, 0) skewX(${clampedVelocity * 0.2}deg)`,
                           transitionProperty: 'color, -webkit-text-stroke',
                           willChange: 'transform'
@@ -296,9 +296,9 @@
 
                     <div ref={shirulRef} className="flex flex-col xl:flex-row xl:items-start gap-6 md:gap-8 xl:gap-24 mt-12 md:mt-24">
                       <h3 
-                        className={`text-[4rem] md:text-[7rem] lg:text-[9rem] uppercase tracking-tighter leading-[0.8] transition-colors duration-700 font-display xl:w-5/12 ${shirulInView ? 'text-[#00ff66]' : 'text-transparent'}`} 
+                        className={`text-[4rem] md:text-[7rem] lg:text-[9rem] uppercase tracking-tighter leading-[0.8] duration-700 font-display xl:w-5/12 ${shirulInView ? 'text-[#00ff66]' : 'text-transparent'}`} 
                         style={{ 
-                          WebkitTextStroke: '2px #222', 
+                          WebkitTextStroke: shirulInView ? '0px transparent' : '2px #222', 
                           transform: `translate3d(${clampedVelocity * -0.5}px, 0, 0) skewX(${clampedVelocity * -0.2}deg)`,
                           transitionProperty: 'color, -webkit-text-stroke',
                           willChange: 'transform'
