@@ -15,17 +15,20 @@
             --star-gold: #c7a76d;
             --paper: #f2f2ef;
             --scroll: 0;
-            --p-scale: 1;
+            /* 增强桌面端全局位移倍率 (从 1 提升至 1.35) */
+            --p-scale: 1.35; 
         }
 
         @media (max-width: 768px) {
-            :root { --p-scale: 0.25; }
+            /* 增强移动端全局位移倍率 (从 0.25 提升至 0.6，强化撕裂感) */
+            :root { --p-scale: 0.6; } 
         }
 
         body {
             background-color: var(--paper);
             color: var(--astral-blue);
-            font-family: 'Noto Serif SC', serif;
+            /* 加入 iOS/Android 原生优雅衬线字体作为保底方案，防止在移动端变为无衬线体 */
+            font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'PT Serif', serif;
             overflow-x: hidden;
             overscroll-behavior: none;
         }
@@ -153,7 +156,8 @@
         <!-- ================= HERO SECTION ================= -->
         <section class="relative w-full h-[140vh] flex items-center justify-center overflow-hidden">
             
-            <div class="relative w-full max-w-[1400px] h-screen flex items-center justify-center select-none mt-[-5vh]">
+            <!-- 将整个容器大幅度上提（从 -5vh 改为 -15vh），使其在首屏视觉上真正居中 -->
+            <div class="relative w-full max-w-[1400px] h-screen flex items-center justify-center select-none mt-[-15vh]">
                 
                 <!-- 背景几何与星图连线 -->
                 <svg class="absolute inset-0 w-full h-full pointer-events-none parallax-el z-0" data-speed="0.02" viewBox="0 0 1400 800">
@@ -174,54 +178,67 @@
                     </g>
                 </svg>
 
-                <!-- 单词重构：ALBERINA (可读顺序排列) -->
+                <!-- 单词重构：ALBERINA (紧凑排列融入几何，滑动时才触发剧烈错落) -->
                 <div class="relative w-full flex items-center justify-between px-[10%] font-divine z-10">
                     
-                    <!-- A -->
-                    <div class="parallax-el mt-8" data-speed="-0.12">
-                        <span class="text-[12vw] md:text-[8vw] leading-none text-hollow">A</span>
+                    <!-- 贯穿所有字母的全局辅助虚线 -->
+                    <div class="absolute top-1/2 left-[5%] right-[5%] h-[1px] border-t border-dashed border-[var(--astral-blue)] opacity-30 -translate-y-1/2 pointer-events-none"></div>
+
+                    <!-- A - 绑定实线圆环 -->
+                    <div class="parallax-el relative flex items-center justify-center" data-speed="-0.12">
+                        <div class="absolute w-[140%] aspect-square rounded-full border border-[var(--astral-blue)] opacity-30"></div>
+                        <span class="text-[12vw] md:text-[8vw] leading-none text-hollow relative z-10">A</span>
                     </div>
 
-                    <!-- L -->
-                    <div class="parallax-el -mt-12" data-speed="0.08">
-                        <span class="text-[10vw] md:text-[7vw] leading-none text-[var(--astral-blue)]">L</span>
+                    <!-- L - 绑定星芒点 -->
+                    <div class="parallax-el relative flex items-center justify-center" data-speed="0.08">
+                        <div class="absolute w-1.5 h-1.5 bg-[var(--star-gold)] rotate-45 -top-6"></div>
+                        <span class="text-[10vw] md:text-[7vw] leading-none text-[var(--astral-blue)] relative z-10">L</span>
                     </div>
 
-                    <!-- B -->
-                    <div class="parallax-el mt-4" data-speed="-0.18">
-                        <span class="text-[14vw] md:text-[9vw] leading-none font-bold text-hollow-gold">B</span>
+                    <!-- B - 绑定虚线光环 -->
+                    <div class="parallax-el relative flex items-center justify-center" data-speed="-0.18">
+                        <div class="absolute w-[160%] aspect-square rounded-full border border-dashed border-[var(--star-gold)] opacity-40"></div>
+                        <span class="text-[14vw] md:text-[9vw] leading-none font-bold text-hollow-gold relative z-10">B</span>
                     </div>
 
                     <!-- 中文核心与装饰：阿尔贝莉娜 -->
-                    <div class="flex flex-col items-center mx-4 parallax-el z-20" data-speed="-0.04">
+                    <div class="flex flex-col items-center mx-4 md:mx-8 parallax-el z-20" data-speed="-0.04">
                         <div class="w-[0.5px] h-16 bg-gradient-to-t from-[var(--astral-blue)] to-transparent mb-4 opacity-40"></div>
-                        <h2 class="vertical-rl font-semibold text-3xl md:text-5xl tracking-[0.6em] text-[var(--astral-blue)]">阿尔贝莉娜</h2>
+                        <h2 class="vertical-rl font-semibold text-3xl md:text-5xl tracking-[0.6em] text-[var(--astral-blue)] bg-[var(--paper)] py-2">阿尔贝莉娜</h2>
                         <div class="w-[0.5px] h-24 bg-gradient-to-b from-[var(--astral-blue)] to-transparent mt-4 opacity-40"></div>
                     </div>
 
-                    <!-- E -->
-                    <div class="parallax-el -mt-8" data-speed="0.12">
-                        <span class="text-[11vw] md:text-[7.5vw] leading-none text-[var(--astral-blue-light)]">E</span>
+                    <!-- E - 绑定交叉十字准星 -->
+                    <div class="parallax-el relative flex items-center justify-center" data-speed="0.12">
+                        <div class="absolute w-[150%] h-[0.5px] bg-[var(--astral-blue-light)] rotate-45 opacity-40"></div>
+                        <div class="absolute w-[150%] h-[0.5px] bg-[var(--astral-blue-light)] -rotate-45 opacity-40"></div>
+                        <span class="text-[11vw] md:text-[7.5vw] leading-none text-[var(--astral-blue-light)] relative z-10">E</span>
                     </div>
 
-                    <!-- R -->
-                    <div class="parallax-el mt-12" data-speed="-0.22">
-                        <span class="text-[13vw] md:text-[8.5vw] leading-none text-hollow">R</span>
+                    <!-- R - 绑定上下边界线 -->
+                    <div class="parallax-el relative flex items-center justify-center" data-speed="-0.22">
+                        <div class="absolute w-[120%] h-[80%] border-y border-[var(--astral-blue)] opacity-30"></div>
+                        <span class="text-[13vw] md:text-[8.5vw] leading-none text-hollow relative z-10">R</span>
                     </div>
 
-                    <!-- I -->
-                    <div class="parallax-el -mt-4" data-speed="0.06">
-                        <span class="text-[9vw] md:text-[6vw] leading-none text-[var(--star-gold)]">I</span>
+                    <!-- I - 绑定双重同心圆 -->
+                    <div class="parallax-el relative flex items-center justify-center" data-speed="0.06">
+                        <div class="absolute w-[250%] aspect-square rounded-full border border-[var(--star-gold)] opacity-20"></div>
+                        <div class="absolute w-[120%] aspect-square rounded-full border border-[var(--star-gold)] opacity-50"></div>
+                        <span class="text-[9vw] md:text-[6vw] leading-none text-[var(--star-gold)] relative z-10">I</span>
                     </div>
 
-                    <!-- N -->
-                    <div class="parallax-el mt-6" data-speed="-0.1">
-                        <span class="text-[11vw] md:text-[7.5vw] leading-none text-[var(--astral-blue)]">N</span>
+                    <!-- N - 绑定垂直分割线 -->
+                    <div class="parallax-el relative flex items-center justify-center" data-speed="-0.1">
+                        <div class="absolute w-[0.5px] h-[150%] bg-[var(--astral-blue)] opacity-30"></div>
+                        <span class="text-[11vw] md:text-[7.5vw] leading-none text-[var(--astral-blue)] relative z-10">N</span>
                     </div>
 
-                    <!-- A -->
-                    <div class="parallax-el -mt-10" data-speed="0.15">
-                        <span class="text-[13vw] md:text-[8.5vw] leading-none text-hollow-gold">A</span>
+                    <!-- A - 绑定菱形方框 -->
+                    <div class="parallax-el relative flex items-center justify-center" data-speed="0.15">
+                        <div class="absolute w-[130%] aspect-square border border-[var(--astral-blue)] rotate-45 opacity-20"></div>
+                        <span class="text-[13vw] md:text-[8.5vw] leading-none text-hollow-gold relative z-10">A</span>
                     </div>
                 </div>
 
