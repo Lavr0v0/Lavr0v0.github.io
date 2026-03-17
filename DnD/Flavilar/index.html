@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>芙勒维拉 Flavilar - 野蛮人档案</title>
+    <title>芙勒维拉 Flavilar</title>
     
     <!-- Tailwind CSS (通过 CDN 引入) -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,10 +14,10 @@
     <!-- Lenis Smooth Scroll (苹果级丝滑滚动核心) -->
     <script src="https://unpkg.com/@studio-freight/lenis@1.0.39/dist/lenis.min.js"></script>
 
-    <!-- Google Fonts: Cinzel (古典标题) & Cormorant Garamond (复古正文) -->
+    <!-- Google Fonts: Cinzel (古典标题) & Cormorant Garamond (复古正文) & Noto Serif SC (思源宋体中文) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
@@ -34,8 +34,8 @@
                         }
                     },
                     fontFamily: {
-                        cinzel: ['Cinzel', 'serif'],
-                        garamond: ['Cormorant Garamond', 'serif'],
+                        cinzel: ['Cinzel', 'Noto Serif SC', 'serif'],
+                        garamond: ['Cormorant Garamond', 'Noto Serif SC', 'serif'],
                     }
                 }
             }
@@ -47,10 +47,12 @@
         body {
             background-color: #0c0b0a;
             color: #eae4d9;
-            font-family: 'Cormorant Garamond', serif;
+            /* 优先使用 Garamond，中文自动 fallback 到 思源宋体 (Noto Serif SC) */
+            font-family: 'Cormorant Garamond', 'Noto Serif SC', serif;
             overflow-x: hidden;
             selection-background-color: #10b981;
             selection-color: white;
+            line-height: 1.8; /* 增加行高，提升小字体的阅读体验 */
         }
 
         /* 噪点纹理材质 */
@@ -150,7 +152,7 @@
                 </h1>
             </div>
             
-            <h2 class="font-cinzel text-2xl md:text-5xl text-dnd-gold mt-2 mb-16 md:mb-20 tracking-[0.2em] md:tracking-[0.3em] font-bold reveal reveal-delay-2">
+            <h2 class="font-cinzel text-2xl md:text-4xl text-dnd-gold mt-2 mb-16 md:mb-20 tracking-[0.2em] md:tracking-[0.3em] font-bold reveal reveal-delay-2">
                 芙勒维拉
             </h2>
 
@@ -226,13 +228,13 @@
                 <div class="w-full md:w-1/3 md:sticky md:top-32 reveal">
                     <div class="flex items-center gap-3 md:gap-4 text-dnd-gold mb-2">
                         <i data-lucide="flame" class="w-6 h-6 md:w-8 md:h-8"></i>
-                        <h3 class="font-cinzel text-3xl md:text-5xl text-dnd-light tracking-wider uppercase">Presence</h3>
+                        <h3 class="font-cinzel text-3xl md:text-4xl text-dnd-light tracking-wider uppercase">Presence</h3>
                     </div>
-                    <p class="font-cinzel text-dnd-gold tracking-[0.2em] text-sm md:text-lg uppercase ml-9 md:ml-12">存在感与来历</p>
+                    <p class="font-cinzel text-dnd-gold tracking-[0.2em] text-sm md:text-base uppercase ml-9 md:ml-12">存在感与来历</p>
                     <div class="h-[1px] bg-dnd-gold/40 mt-4 md:mt-6 w-16 md:w-24 ml-9 md:ml-12"></div>
                 </div>
-                <div class="w-full md:w-2/3 space-y-6 md:space-y-8 text-xl md:text-2xl leading-relaxed text-[#b5aa9d] reveal reveal-delay-1">
-                    <p class="first-letter:font-cinzel first-letter:text-5xl md:first-letter:text-6xl first-letter:text-dnd-gold first-letter:float-left first-letter:mr-3 md:first-letter:mr-4 first-letter:mt-1 md:first-letter:mt-2">
+                <div class="w-full md:w-2/3 space-y-6 md:space-y-8 text-sm md:text-base leading-relaxed text-[#b5aa9d] reveal reveal-delay-1">
+                    <p class="first-letter:font-cinzel first-letter:text-4xl md:first-letter:text-5xl first-letter:text-dnd-gold first-letter:float-left first-letter:mr-3 md:first-letter:mr-4 first-letter:mt-1 md:first-letter:mt-2">
                         芙勒维拉是风芦旅人中最具压迫感的成员之一。她高大、强壮，<strong class="text-dnd-emerald font-normal drop-shadow-[0_0_8px_rgba(16,185,129,0.3)]">黑鳞覆身，绿瞳锐利</strong>，站在那里便足以让人先感到一阵本能上的不安。若只是远远望去，她几乎不像一个会与人同行的旅者，更像是从密林深处走出来的某种古老生灵：沉重、直接，带着未经驯化的攻击性。
                     </p>
                     <p>
@@ -248,7 +250,7 @@
                         <div class="absolute -top-3 md:-top-4 left-4 md:left-8 px-2 md:px-4 bg-dnd-paper text-dnd-gold font-cinzel text-xs md:text-sm tracking-widest uppercase border border-dnd-gold/20 flex items-center">
                             <i data-lucide="sparkles" class="inline w-3 h-3 mr-1 md:mr-2"></i>Polymorph
                         </div>
-                        <p class="italic text-[#958c81] text-lg md:text-xl">
+                        <p class="italic text-[#958c81] text-sm md:text-base">
                             在城镇中，阿尔贝莉娜往往会为她施放变形术。那时的她化身为两米左右的黑发绿瞳女性，仍旧高大，却至少不至于在第一眼就惊动整条街。对她来说，这只是旅途中需要做的事，而不是某种伪装。
                         </p>
                     </div>
@@ -276,13 +278,13 @@
             <section class="relative flex flex-col md:flex-row gap-8 md:gap-16 items-start mb-24 md:mb-32">
                 <div class="w-full md:w-1/3 md:order-2 md:sticky md:top-32 md:text-right reveal">
                     <div class="flex items-center md:justify-end gap-3 md:gap-4 text-dnd-gold mb-2">
-                        <h3 class="font-cinzel text-3xl md:text-5xl text-dnd-light tracking-wider uppercase md:order-1 order-2">Combat</h3>
+                        <h3 class="font-cinzel text-3xl md:text-4xl text-dnd-light tracking-wider uppercase md:order-1 order-2">Combat</h3>
                         <i data-lucide="axe" class="w-6 h-6 md:w-8 md:h-8 md:order-2 order-1"></i>
                     </div>
-                    <p class="font-cinzel text-dnd-gold tracking-[0.2em] text-sm md:text-lg uppercase ml-9 md:ml-0 md:mr-12">战意与本能</p>
+                    <p class="font-cinzel text-dnd-gold tracking-[0.2em] text-sm md:text-base uppercase ml-9 md:ml-0 md:mr-12">战意与本能</p>
                     <div class="h-[1px] bg-dnd-gold/40 mt-4 md:mt-6 w-16 md:w-24 ml-9 md:ml-auto md:mr-12"></div>
                 </div>
-                <div class="w-full md:w-2/3 md:order-1 space-y-8 md:space-y-10 text-xl md:text-2xl leading-relaxed text-[#b5aa9d] reveal reveal-delay-1">
+                <div class="w-full md:w-2/3 md:order-1 space-y-8 md:space-y-10 text-sm md:text-base leading-relaxed text-[#b5aa9d] reveal reveal-delay-1">
                     <p>
                         在战斗中，她极具野性。她的侵略性很强，也很少迟疑。真正开打时，她并不依靠复杂的盘算，而更像顺着某种深埋在身体里的本能往前压去：<strong class="text-dnd-light font-normal">直接、凶猛，带着巨物才有的力量感与压迫感。</strong>战斗开始，她就已经在那里。
                     </p>
@@ -293,8 +295,8 @@
                                 <i data-lucide="shield" class="w-24 h-24 md:w-32 md:h-32 text-dnd-emerald"></i>
                             </div>
                             <i data-lucide="shield" class="w-6 h-6 md:w-8 md:h-8 text-dnd-emerald mb-4 md:mb-6 opacity-80"></i>
-                            <h4 class="font-cinzel text-dnd-light text-xl md:text-2xl mb-3 md:mb-4 font-bold tracking-wide">前排执行者<br><span class="text-xs md:text-sm text-dnd-gold tracking-widest font-normal">Vanguard</span></h4>
-                            <p class="text-base md:text-lg text-[#958c81]">冲得最快，压得最重，也最不犹豫。她不执着于包揽判断，只要有人给出指令，她就把那件事做到底。</p>
+                            <h4 class="font-cinzel text-dnd-light text-lg md:text-xl mb-2 md:mb-3 font-bold tracking-wide">前排执行者<br><span class="text-xs md:text-sm text-dnd-gold tracking-widest font-normal">Vanguard</span></h4>
+                            <p class="text-xs md:text-sm text-[#958c81] leading-relaxed">冲得最快，压得最重，也最不犹豫。她不执着于包揽判断，只要有人给出指令，她就把那件事做到底。</p>
                         </div>
                         
                         <div class="border border-dnd-gold/20 p-6 md:p-8 bg-dnd-paper relative overflow-hidden group hover:border-dnd-emerald/50 transition-colors duration-500 reveal reveal-delay-1">
@@ -302,8 +304,8 @@
                                 <i data-lucide="droplets" class="w-24 h-24 md:w-32 md:h-32 text-dnd-emerald"></i>
                             </div>
                             <i data-lucide="droplets" class="w-6 h-6 md:w-8 md:h-8 text-dnd-emerald mb-4 md:mb-6 opacity-80"></i>
-                            <h4 class="font-cinzel text-dnd-light text-xl md:text-2xl mb-3 md:mb-4 font-bold tracking-wide">山壁之重<br><span class="text-xs md:text-sm text-dnd-gold tracking-widest font-normal">The Bulwark</span></h4>
-                            <p class="text-base md:text-lg text-[#958c81]">与雪露并肩时，战斗感尤为鲜明。一个野性如山压过，一个以圣武士意志顶住，让“前排”变得极为具体。</p>
+                            <h4 class="font-cinzel text-dnd-light text-lg md:text-xl mb-2 md:mb-3 font-bold tracking-wide">山壁之重<br><span class="text-xs md:text-sm text-dnd-gold tracking-widest font-normal">The Bulwark</span></h4>
+                            <p class="text-xs md:text-sm text-[#958c81] leading-relaxed">与雪露并肩时，战斗感尤为鲜明。一个野性如山压过，一个以圣武士意志顶住，让“前排”变得极为具体。</p>
                         </div>
                     </div>
                 </div>
@@ -319,7 +321,7 @@
                 <div class="max-w-4xl mx-auto">
                     <div class="text-center mb-16 md:mb-24 reveal">
                         <h3 class="font-cinzel text-3xl md:text-4xl text-dnd-light tracking-[0.2em] md:tracking-[0.3em] mb-3 md:mb-4 uppercase">Traits & Paradox</h3>
-                        <p class="text-dnd-gold font-cinzel text-sm md:text-lg tracking-widest">性格与悖论</p>
+                        <p class="text-dnd-gold font-cinzel text-sm md:text-base tracking-widest">性格与悖论</p>
                         <div class="h-[1px] w-16 md:w-24 bg-dnd-gold/40 mx-auto mt-4 md:mt-6"></div>
                     </div>
 
@@ -327,42 +329,42 @@
                         <!-- 行 1 -->
                         <div class="flex flex-col md:flex-row gap-4 md:gap-8 items-start reveal">
                             <div class="md:w-1/3 flex items-start gap-3 md:gap-4">
-                                <div class="w-2 h-2 md:w-3 md:h-3 mt-2 md:mt-3 rotate-45 bg-dnd-gold shadow-[0_0_8px_#c5a059]"></div>
+                                <div class="w-2 h-2 md:w-3 md:h-3 mt-1.5 md:mt-2 rotate-45 bg-dnd-gold shadow-[0_0_8px_#c5a059]"></div>
                                 <div>
-                                    <h4 class="font-cinzel text-2xl md:text-3xl text-dnd-light font-bold">直接与纯粹</h4>
-                                    <p class="font-cinzel text-[10px] md:text-sm text-dnd-gold tracking-[0.2em] uppercase mt-1 md:mt-2">Communication</p>
+                                    <h4 class="font-cinzel text-lg md:text-xl text-dnd-light font-bold">直接与纯粹</h4>
+                                    <p class="font-cinzel text-[10px] md:text-xs text-dnd-gold tracking-[0.2em] uppercase mt-1">Communication</p>
                                 </div>
                             </div>
                             <div class="md:w-2/3 border-l-2 md:border-l border-dnd-gold/20 pl-4 md:pl-8 pb-2 md:pb-4">
-                                <p class="text-xl md:text-2xl text-[#b5aa9d] leading-relaxed">说话短，思路也短，不喜欢把一句话绕出几层意思。比起“从前发生了什么”，她更在乎“现在该做什么”。行动往往先于语言。</p>
+                                <p class="text-sm md:text-base text-[#b5aa9d] leading-relaxed">说话短，思路也短，不喜欢把一句话绕出几层意思。比起“从前发生了什么”，她更在乎“现在该做什么”。行动往往先于语言。</p>
                             </div>
                         </div>
                         
                         <!-- 行 2 -->
                         <div class="flex flex-col md:flex-row gap-4 md:gap-8 items-start reveal">
                             <div class="md:w-1/3 flex items-start gap-3 md:gap-4">
-                                <div class="w-2 h-2 md:w-3 md:h-3 mt-2 md:mt-3 rotate-45 bg-dnd-gold shadow-[0_0_8px_#c5a059]"></div>
+                                <div class="w-2 h-2 md:w-3 md:h-3 mt-1.5 md:mt-2 rotate-45 bg-dnd-gold shadow-[0_0_8px_#c5a059]"></div>
                                 <div>
-                                    <h4 class="font-cinzel text-2xl md:text-3xl text-dnd-light font-bold">群体的怒火</h4>
-                                    <p class="font-cinzel text-[10px] md:text-sm text-dnd-gold tracking-[0.2em] uppercase mt-1 md:mt-2">Instinct</p>
+                                    <h4 class="font-cinzel text-lg md:text-xl text-dnd-light font-bold">群体的怒火</h4>
+                                    <p class="font-cinzel text-[10px] md:text-xs text-dnd-gold tracking-[0.2em] uppercase mt-1">Instinct</p>
                                 </div>
                             </div>
                             <div class="md:w-2/3 border-l-2 md:border-l border-dnd-gold/20 pl-4 md:pl-8 pb-2 md:pb-4">
-                                <p class="text-xl md:text-2xl text-[#b5aa9d] leading-relaxed">愤怒大多不深，更像一种短促的反弹。比起自己被冒犯，她更在意朋友被冒犯，更在意熟悉的地方被外人闯入。愤怒首要指向“我的同伴”。</p>
+                                <p class="text-sm md:text-base text-[#b5aa9d] leading-relaxed">愤怒大多不深，更像一种短促的反弹。比起自己被冒犯，她更在意朋友被冒犯，更在意熟悉的地方被外人闯入。愤怒首要指向“我的同伴”。</p>
                             </div>
                         </div>
 
                         <!-- 行 3 -->
                         <div class="flex flex-col md:flex-row gap-4 md:gap-8 items-start reveal">
                             <div class="md:w-1/3 flex items-start gap-3 md:gap-4">
-                                <div class="w-2 h-2 md:w-3 md:h-3 mt-2 md:mt-3 rotate-45 bg-dnd-gold shadow-[0_0_8px_#c5a059]"></div>
+                                <div class="w-2 h-2 md:w-3 md:h-3 mt-1.5 md:mt-2 rotate-45 bg-dnd-gold shadow-[0_0_8px_#c5a059]"></div>
                                 <div>
-                                    <h4 class="font-cinzel text-2xl md:text-3xl text-dnd-light font-bold">巨兽的温柔</h4>
-                                    <p class="font-cinzel text-[10px] md:text-sm text-dnd-gold tracking-[0.2em] uppercase mt-1 md:mt-2">Nature</p>
+                                    <h4 class="font-cinzel text-lg md:text-xl text-dnd-light font-bold">巨兽的温柔</h4>
+                                    <p class="font-cinzel text-[10px] md:text-xs text-dnd-gold tracking-[0.2em] uppercase mt-1">Nature</p>
                                 </div>
                             </div>
                             <div class="md:w-2/3 border-l-2 md:border-l border-dnd-gold/20 pl-4 md:pl-8">
-                                <p class="text-xl md:text-2xl text-[#b5aa9d] leading-relaxed">身上并不只有粗粝。巨大的身体里，仍保留着对亮晶晶的小玩意、颜色鲜亮的花，以及小猫等弱小生命的天然偏爱。</p>
+                                <p class="text-sm md:text-base text-[#b5aa9d] leading-relaxed">身上并不只有粗粝。巨大的身体里，仍保留着对亮晶晶的小玩意、颜色鲜亮的花，以及小猫等弱小生命的天然偏爱。</p>
                             </div>
                         </div>
                     </div>
@@ -375,8 +377,8 @@
                     <div class="flex items-center justify-center gap-4 text-dnd-gold mb-2">
                         <i data-lucide="users" class="w-8 h-8 md:w-10 md:h-10"></i>
                     </div>
-                    <h3 class="font-cinzel text-4xl md:text-5xl text-dnd-light tracking-[0.2em] uppercase mt-4 md:mt-6 mb-3 md:mb-4">The Pack</h3>
-                    <p class="font-cinzel text-dnd-gold tracking-widest text-sm md:text-lg">羁绊与归属</p>
+                    <h3 class="font-cinzel text-3xl md:text-4xl text-dnd-light tracking-[0.2em] uppercase mt-4 md:mt-6 mb-3 md:mb-4">The Pack</h3>
+                    <p class="font-cinzel text-dnd-gold tracking-widest text-sm md:text-base">羁绊与归属</p>
                     <div class="h-[1px] w-16 md:w-24 bg-dnd-gold/40 mx-auto mt-4 md:mt-6"></div>
                 </div>
 
@@ -388,13 +390,13 @@
                         </div>
                         
                         <div class="text-center mt-6 md:mt-8 mb-6 md:mb-8">
-                            <h4 class="font-cinzel text-2xl md:text-3xl text-dnd-light font-bold">Alberina</h4>
-                            <p class="text-dnd-muted text-base md:text-lg mt-1 md:mt-2 font-bold">阿尔贝莉娜</p>
+                            <h4 class="font-cinzel text-lg md:text-xl text-dnd-light font-bold">Alberina</h4>
+                            <p class="text-dnd-muted text-xs md:text-sm mt-1 font-bold">阿尔贝莉娜</p>
                             <div class="inline-block border-b border-dnd-gold/40 pb-1 md:pb-2 mt-3 md:mt-4">
-                                <span class="font-cinzel text-xs md:text-sm text-dnd-gold tracking-widest uppercase">导师 / 权威</span>
+                                <span class="font-cinzel text-[10px] md:text-xs text-dnd-gold tracking-widest uppercase">导师 / 权威</span>
                             </div>
                         </div>
-                        <p class="text-[#958c81] text-lg md:text-xl leading-relaxed text-center">最信任的人。阿尔贝莉娜会解释世界，给出清楚的答案。芙勒维拉对她带有近乎学生气的敬重，被点名时会下意识坐直。她认这个人，认她的话。</p>
+                        <p class="text-[#958c81] text-xs md:text-sm leading-relaxed text-center">最信任的人。阿尔贝莉娜会解释世界，给出清楚的答案。芙勒维拉对她带有近乎学生气的敬重，被点名时会下意识坐直。她认这个人，认她的话。</p>
                     </div>
 
                     <!-- Bond 2 -->
@@ -404,13 +406,13 @@
                         </div>
                         
                         <div class="text-center mt-6 md:mt-8 mb-6 md:mb-8">
-                            <h4 class="font-cinzel text-2xl md:text-3xl text-dnd-light font-bold">Shirul</h4>
-                            <p class="text-dnd-muted text-base md:text-lg mt-1 md:mt-2 font-bold">雪露</p>
+                            <h4 class="font-cinzel text-lg md:text-xl text-dnd-light font-bold">Shirul</h4>
+                            <p class="text-dnd-muted text-xs md:text-sm mt-1 font-bold">雪露</p>
                             <div class="inline-block border-b border-dnd-gold/40 pb-1 md:pb-2 mt-3 md:mt-4">
-                                <span class="font-cinzel text-xs md:text-sm text-dnd-gold tracking-widest uppercase">战友 / 挚友</span>
+                                <span class="font-cinzel text-[10px] md:text-xs text-dnd-gold tracking-widest uppercase">战友 / 挚友</span>
                             </div>
                         </div>
-                        <p class="text-[#958c81] text-lg md:text-xl leading-relaxed text-center">起点源于雪露喜欢小动物。后来一起上课、吃苦、出丑，并肩作战。不只是“处得好”，更像是一起熬出来的朋友。她心里极深地认雪露。</p>
+                        <p class="text-[#958c81] text-xs md:text-sm leading-relaxed text-center">起点源于一次在野外的遇见。后来一起上课、吃苦、出丑，并肩作战。不只是“处得好”，更像是一起熬出来的朋友。她心里极深地认雪露。</p>
                     </div>
 
                     <!-- Bond 3 -->
@@ -420,13 +422,13 @@
                         </div>
                         
                         <div class="text-center mt-6 md:mt-8 mb-6 md:mb-8">
-                            <h4 class="font-cinzel text-2xl md:text-3xl text-dnd-light font-bold">Wind Reed</h4>
-                            <p class="text-dnd-muted text-base md:text-lg mt-1 md:mt-2 font-bold">风芦旅人</p>
+                            <h4 class="font-cinzel text-lg md:text-xl text-dnd-light font-bold">Wind Reed</h4>
+                            <p class="text-dnd-muted text-xs md:text-sm mt-1 font-bold">风芦旅人</p>
                             <div class="inline-block border-b border-dnd-gold/40 pb-1 md:pb-2 mt-3 md:mt-4">
-                                <span class="font-cinzel text-xs md:text-sm text-dnd-gold tracking-widest uppercase">归属 / 现实</span>
+                                <span class="font-cinzel text-[10px] md:text-xs text-dnd-gold tracking-widest uppercase">归属 / 现实</span>
                             </div>
                         </div>
-                        <p class="text-[#958c81] text-lg md:text-xl leading-relaxed text-center">重新走回“人”的世界的现实。在这里学着说话、生活、做错事、往前走。她记住谁和自己一起上路，谁没有把她当怪物扔下。</p>
+                        <p class="text-[#958c81] text-xs md:text-sm leading-relaxed text-center">重新走回“人”的世界的现实。在这里学着说话、生活、做错事、往前走。她记住谁和自己一起上路，谁没有把她当怪物扔下。</p>
                     </div>
                 </div>
             </section>
