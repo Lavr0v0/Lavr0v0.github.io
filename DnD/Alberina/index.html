@@ -22,13 +22,13 @@
             --star-gold: #c7a76d;
             --paper: #f2f2ef;
             --scroll: 0;
-            /* 增强桌面端全局位移倍率 (从 1 提升至 1.35) */
-            --p-scale: 1.35; 
+            /* 桌面端全局位移倍率 */
+            --p-scale: 0.7; 
         }
 
         @media (max-width: 768px) {
-            /* 增强移动端全局位移倍率 (从 0.25 提升至 0.6，强化撕裂感) */
-            :root { --p-scale: 0.6; } 
+            /* 移动端全局位移倍率 */
+            :root { --p-scale: 0.35; } 
         }
 
         body {
@@ -194,35 +194,35 @@
                 <div class="relative w-full flex items-center justify-between px-[10%] font-divine z-10">
 
                     <!-- A - 绑定实线圆环 -->
-                    <div class="parallax-el relative flex items-center justify-center hero-enter hero-enter-up" data-speed="-0.25" style="--settle-y: -14px">
+                    <div class="parallax-el relative flex items-center justify-center hero-enter hero-enter-up" data-speed="-0.12" style="--settle-y: -8px">
                         <div class="absolute w-[140%] aspect-square rounded-full border-[1.5px] border-[var(--astral-blue)] opacity-30"></div>
                         <div class="absolute w-[80%] aspect-square rounded-full border-[1px] border-dashed border-[var(--astral-blue)] opacity-15"></div>
                         <span class="text-[12vw] md:text-[8vw] leading-none text-hollow relative z-10">A</span>
                     </div>
 
                     <!-- L - 绑定星芒点 -->
-                    <div class="parallax-el relative flex items-center justify-center hero-enter" data-speed="0.15" style="--settle-y: 10px">
+                    <div class="parallax-el relative flex items-center justify-center hero-enter" data-speed="0.08" style="--settle-y: 6px">
                         <div class="absolute w-2 h-2 bg-[var(--star-gold)] rotate-45 -top-6 opacity-30"></div>
                         <div class="absolute w-[0.75px] h-[120%] bg-[var(--star-gold)] opacity-15"></div>
                         <span class="text-[10vw] md:text-[7vw] leading-none text-[var(--astral-blue)] relative z-10">L</span>
                     </div>
 
                     <!-- B - 绑定虚线光环 -->
-                    <div class="parallax-el relative flex items-center justify-center hero-enter hero-enter-up" data-speed="-0.35" style="--settle-y: -18px">
+                    <div class="parallax-el relative flex items-center justify-center hero-enter hero-enter-up" data-speed="-0.18" style="--settle-y: -12px">
                         <div class="absolute w-[160%] aspect-square rounded-full border-[1.5px] border-dashed border-[var(--star-gold)] opacity-30"></div>
                         <div class="absolute w-[100%] aspect-square rounded-full border-[1px] border-[var(--star-gold)] opacity-15"></div>
                         <span class="text-[14vw] md:text-[9vw] leading-none font-bold text-hollow-gold relative z-10">B</span>
                     </div>
 
                     <!-- 中文核心与装饰：阿尔贝莉娜 -->
-                    <div class="flex flex-col items-center mx-4 md:mx-8 parallax-el z-20 hero-enter" data-speed="-0.08">
+                    <div class="flex flex-col items-center mx-4 md:mx-8 parallax-el z-20 hero-enter" data-speed="-0.04">
                         <div class="w-[0.75px] h-16 bg-gradient-to-t from-[var(--astral-blue)] to-transparent mb-4 opacity-30"></div>
                         <h2 class="vertical-rl font-semibold text-3xl md:text-5xl tracking-[0.6em] text-[var(--astral-blue)] py-2" style="font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;">阿尔贝莉娜</h2>
                         <div class="w-[0.75px] h-24 bg-gradient-to-b from-[var(--astral-blue)] to-transparent mt-4 opacity-30"></div>
                     </div>
 
                     <!-- E - 绑定交叉十字准星 -->
-                    <div class="parallax-el relative flex items-center justify-center hero-enter hero-enter-up" data-speed="0.22" style="--settle-y: 8px">
+                    <div class="parallax-el relative flex items-center justify-center hero-enter hero-enter-up" data-speed="0.12" style="--settle-y: 5px">
                         <div class="absolute w-[150%] h-[0.75px] bg-[var(--astral-blue-light)] rotate-45 opacity-30"></div>
                         <div class="absolute w-[150%] h-[0.75px] bg-[var(--astral-blue-light)] -rotate-45 opacity-30"></div>
                         <div class="absolute w-[80%] aspect-square rounded-full border-[1px] border-[var(--astral-blue-light)] opacity-15"></div>
@@ -230,13 +230,13 @@
                     </div>
 
                     <!-- R - 绑定上下边界线 -->
-                    <div class="parallax-el relative flex items-center justify-center hero-enter" data-speed="-0.4" style="--settle-y: -16px">
+                    <div class="parallax-el relative flex items-center justify-center hero-enter" data-speed="-0.22" style="--settle-y: -10px">
                         <div class="absolute w-[120%] h-[80%] border-y-[1.5px] border-[var(--astral-blue)] opacity-30"></div>
                         <span class="text-[13vw] md:text-[8.5vw] leading-none text-hollow relative z-10">R</span>
                     </div>
 
                     <!-- I - 绑定双重同心圆 -->
-                    <div class="parallax-el relative flex items-center justify-center hero-enter hero-enter-up" data-speed="0.12" style="--settle-y: 12px">
+                    <div class="parallax-el relative flex items-center justify-center hero-enter hero-enter-up" data-speed="0.06" style="--settle-y: 7px">
                         <div class="absolute w-[250%] aspect-square rounded-full border-[1.5px] border-[var(--star-gold)] opacity-30"></div>
                         <div class="absolute w-[120%] aspect-square rounded-full border-[1.5px] border-[var(--star-gold)] opacity-30"></div>
                         <div class="absolute w-[180%] aspect-square rounded-full border-[1px] border-dashed border-[var(--star-gold)] opacity-15"></div>
@@ -244,14 +244,14 @@
                     </div>
 
                     <!-- N - 绑定垂直分割线 -->
-                    <div class="parallax-el relative flex items-center justify-center hero-enter" data-speed="-0.2" style="--settle-y: -10px">
+                    <div class="parallax-el relative flex items-center justify-center hero-enter" data-speed="-0.1" style="--settle-y: -6px">
                         <div class="absolute w-[0.75px] h-[150%] bg-[var(--astral-blue)] opacity-30"></div>
                         <div class="absolute w-[100%] h-[0.75px] bg-[var(--astral-blue)] opacity-15"></div>
                         <span class="text-[11vw] md:text-[7.5vw] leading-none text-[var(--astral-blue)] relative z-10">N</span>
                     </div>
 
                     <!-- A - 绑定菱形方框 -->
-                    <div class="parallax-el relative flex items-center justify-center hero-enter hero-enter-up" data-speed="0.3" style="--settle-y: 15px">
+                    <div class="parallax-el relative flex items-center justify-center hero-enter hero-enter-up" data-speed="0.15" style="--settle-y: 9px">
                         <div class="absolute w-[130%] aspect-square border-[1.5px] border-[var(--astral-blue)] rotate-45 opacity-30"></div>
                         <div class="absolute w-[80%] aspect-square border-[1px] border-[var(--astral-blue)] rotate-45 opacity-15"></div>
                         <span class="text-[13vw] md:text-[8.5vw] leading-none text-hollow-gold relative z-10">A</span>
@@ -551,6 +551,27 @@
 
             let currentScrollY = 0;
 
+            // 缓存所有视差元素的初始页面位置
+            const elOriginalTop = new Map();
+            parallaxEls.forEach(el => {
+                let top = 0, node = el;
+                while (node && node !== document.body) {
+                    top += node.offsetTop;
+                    node = node.offsetParent;
+                }
+                elOriginalTop.set(el, top);
+            });
+            tweens.forEach(tw => {
+                if (!elOriginalTop.has(tw.el)) {
+                    let top = 0, node = tw.el;
+                    while (node && node !== document.body) {
+                        top += node.offsetTop;
+                        node = node.offsetParent;
+                    }
+                    elOriginalTop.set(tw.el, top);
+                }
+            });
+
             lenis.on('scroll', (e) => {
                 currentScrollY = e.scroll;
                 
@@ -560,6 +581,15 @@
                     astrolabe.style.transform = `translate(-50%, -50%) rotate(${-rotation}deg)`;
                 }
             });
+
+            function getParallaxY(el, pScale) {
+                const speed = parseFloat(el.getAttribute('data-speed')) || 0;
+                const origTop = elOriginalTop.get(el) || 0;
+                const windowH = window.innerHeight;
+                // 元素原始中心相对视口中心的距离
+                const dist = (origTop - currentScrollY + windowH * 0.3) - (windowH / 2);
+                return dist * speed * pScale;
+            }
 
             function update() {
                 const now = performance.now();
@@ -571,17 +601,15 @@
                     if (el.classList.contains('hero-enter')) return;
                     const speed = parseFloat(el.getAttribute('data-speed'));
                     if (isNaN(speed)) return;
-                    const yOffset = currentScrollY * speed * pScale;
+                    const yOffset = getParallaxY(el, pScale);
                     el.style.transform = `translate3d(0, ${yOffset}px, 0)`;
                 });
 
                 // 更新 hero 元素：入场 tween + 视差同时计算
                 tweens.forEach(tw => {
-                    const speed = parseFloat(tw.el.getAttribute('data-speed')) || 0;
-                    const parallaxY = currentScrollY * speed * pScale;
+                    const parallaxY = getParallaxY(tw.el, pScale);
 
                     if (elapsed < tw.triggerAt) {
-                        // 还没触发，保持在屏幕外
                         tw.el.style.opacity = '0';
                         tw.el.style.transform = `translate3d(0, ${tw.startY + parallaxY}px, 0)`;
                         return;
@@ -592,7 +620,7 @@
                     const e = ease(progress);
 
                     const tweenY = tw.startY + (tw.settleY - tw.startY) * e;
-                    tw.el.style.opacity = String(Math.min(e * 2.5, 1)); // 淡入稍快于位移
+                    tw.el.style.opacity = String(Math.min(e * 2.5, 1));
                     tw.el.style.transform = `translate3d(0, ${tweenY + parallaxY}px, 0)`;
 
                     if (progress >= 1) tw.done = true;
