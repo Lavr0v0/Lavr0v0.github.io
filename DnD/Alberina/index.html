@@ -6,9 +6,16 @@
     <title>ALBERINA · Astral Chronicle</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@studio-freight/lenis@1.0.39/dist/lenis.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Noto+Serif+SC:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     
     <style>
+        @font-face {
+            font-family: 'Noto Serif SC';
+            src: url('fonts/NotoSerifSC-subset.woff2') format('woff2');
+            font-weight: 300 700;
+            font-style: normal;
+            font-display: swap;
+        }
         :root {
             --astral-blue: #040d1c;
             --astral-blue-light: #12347a;
@@ -28,7 +35,8 @@
             background-color: var(--paper);
             color: var(--astral-blue);
             /* 加入 iOS/Android 原生优雅衬线字体作为保底方案，防止在移动端变为无衬线体 */
-            font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'PT Serif', serif;
+            font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', 'PT Serif', 'Georgia', serif;
+            -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
             overscroll-behavior: none;
         }
@@ -140,7 +148,7 @@
     <div class="bg-grid"></div>
     <div class="bg-nodes"></div>
 
-    <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150vw] h-[150vw] md:w-[80vw] md:h-[80vw] opacity-[0.08] pointer-events-none z-0" id="astrolabe">
+    <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150vw] h-[150vw] md:w-[80vw] md:h-[80vw] opacity-[0.3] pointer-events-none z-0" id="astrolabe">
         <svg viewBox="0 0 100 100" class="w-full h-full stroke-[var(--astral-blue)] fill-none" stroke-width="0.05">
             <circle cx="50" cy="50" r="48" stroke-dasharray="0.5 1.5"/>
             <circle cx="50" cy="50" r="40" />
@@ -156,20 +164,19 @@
         <!-- ================= HERO SECTION ================= -->
         <section class="relative w-full h-[140vh] flex items-center justify-center overflow-hidden">
             
-            <!-- 将整个容器大幅度上提（从 -5vh 改为 -15vh），使其在首屏视觉上真正居中 -->
-            <div class="relative w-full max-w-[1400px] h-screen flex items-center justify-center select-none mt-[-15vh]">
+            <!-- 将整个容器大幅度上提，使其在首屏视觉上真正居中 -->
+            <div class="relative w-full max-w-[1400px] h-screen flex items-center justify-center select-none mt-[-35vh]">
                 
                 <!-- 背景几何与星图连线 -->
                 <svg class="absolute inset-0 w-full h-full pointer-events-none parallax-el z-0" data-speed="0.02" viewBox="0 0 1400 800">
                     <!-- 核心刻度轴 -->
                     <line x1="100" y1="400" x2="1300" y2="400" stroke="var(--astral-blue)" stroke-width="0.3" stroke-dasharray="10 20" opacity="0.2"/>
-                    <circle cx="700" cy="400" r="280" fill="none" stroke="var(--astral-blue)" stroke-width="0.5" opacity="0.1"/>
                     
                     <!-- 字母引导线 (波浪形连贯线) -->
-                    <path d="M 150 420 Q 300 300 450 400 T 750 400 T 1050 400 T 1250 380" fill="none" stroke="var(--star-gold)" stroke-width="0.6" stroke-dasharray="2 4" opacity="0.4"/>
+                    <path d="M 150 420 Q 300 300 450 400 T 750 400 T 1050 400 T 1250 380" fill="none" stroke="var(--star-gold)" stroke-width="0.6" stroke-dasharray="2 4" opacity="0.3"/>
                     
                     <!-- 装饰星芒节点 -->
-                    <g opacity="0.6">
+                    <g opacity="0.3">
                         <circle cx="150" cy="420" r="2" fill="var(--star-gold)"/>
                         <circle cx="450" cy="400" r="3" fill="none" stroke="var(--star-gold)" stroke-width="0.8"/>
                         <circle cx="700" cy="400" r="6" fill="none" stroke="var(--star-gold)" stroke-width="1.2"/>
@@ -192,27 +199,27 @@
 
                     <!-- L - 绑定星芒点 -->
                     <div class="parallax-el relative flex items-center justify-center" data-speed="0.08">
-                        <div class="absolute w-1.5 h-1.5 bg-[var(--star-gold)] rotate-45 -top-6"></div>
+                        <div class="absolute w-1.5 h-1.5 bg-[var(--star-gold)] rotate-45 -top-6 opacity-30"></div>
                         <span class="text-[10vw] md:text-[7vw] leading-none text-[var(--astral-blue)] relative z-10">L</span>
                     </div>
 
                     <!-- B - 绑定虚线光环 -->
                     <div class="parallax-el relative flex items-center justify-center" data-speed="-0.18">
-                        <div class="absolute w-[160%] aspect-square rounded-full border border-dashed border-[var(--star-gold)] opacity-40"></div>
+                        <div class="absolute w-[160%] aspect-square rounded-full border border-dashed border-[var(--star-gold)] opacity-30"></div>
                         <span class="text-[14vw] md:text-[9vw] leading-none font-bold text-hollow-gold relative z-10">B</span>
                     </div>
 
                     <!-- 中文核心与装饰：阿尔贝莉娜 -->
                     <div class="flex flex-col items-center mx-4 md:mx-8 parallax-el z-20" data-speed="-0.04">
-                        <div class="w-[0.5px] h-16 bg-gradient-to-t from-[var(--astral-blue)] to-transparent mb-4 opacity-40"></div>
-                        <h2 class="vertical-rl font-semibold text-3xl md:text-5xl tracking-[0.6em] text-[var(--astral-blue)] bg-[var(--paper)] py-2">阿尔贝莉娜</h2>
-                        <div class="w-[0.5px] h-24 bg-gradient-to-b from-[var(--astral-blue)] to-transparent mt-4 opacity-40"></div>
+                        <div class="w-[0.5px] h-16 bg-gradient-to-t from-[var(--astral-blue)] to-transparent mb-4 opacity-30"></div>
+                        <h2 class="vertical-rl font-semibold text-3xl md:text-5xl tracking-[0.6em] text-[var(--astral-blue)] py-2" style="font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;">阿尔贝莉娜</h2>
+                        <div class="w-[0.5px] h-24 bg-gradient-to-b from-[var(--astral-blue)] to-transparent mt-4 opacity-30"></div>
                     </div>
 
                     <!-- E - 绑定交叉十字准星 -->
                     <div class="parallax-el relative flex items-center justify-center" data-speed="0.12">
-                        <div class="absolute w-[150%] h-[0.5px] bg-[var(--astral-blue-light)] rotate-45 opacity-40"></div>
-                        <div class="absolute w-[150%] h-[0.5px] bg-[var(--astral-blue-light)] -rotate-45 opacity-40"></div>
+                        <div class="absolute w-[150%] h-[0.5px] bg-[var(--astral-blue-light)] rotate-45 opacity-30"></div>
+                        <div class="absolute w-[150%] h-[0.5px] bg-[var(--astral-blue-light)] -rotate-45 opacity-30"></div>
                         <span class="text-[11vw] md:text-[7.5vw] leading-none text-[var(--astral-blue-light)] relative z-10">E</span>
                     </div>
 
@@ -224,8 +231,8 @@
 
                     <!-- I - 绑定双重同心圆 -->
                     <div class="parallax-el relative flex items-center justify-center" data-speed="0.06">
-                        <div class="absolute w-[250%] aspect-square rounded-full border border-[var(--star-gold)] opacity-20"></div>
-                        <div class="absolute w-[120%] aspect-square rounded-full border border-[var(--star-gold)] opacity-50"></div>
+                        <div class="absolute w-[250%] aspect-square rounded-full border border-[var(--star-gold)] opacity-30"></div>
+                        <div class="absolute w-[120%] aspect-square rounded-full border border-[var(--star-gold)] opacity-30"></div>
                         <span class="text-[9vw] md:text-[6vw] leading-none text-[var(--star-gold)] relative z-10">I</span>
                     </div>
 
@@ -237,7 +244,7 @@
 
                     <!-- A - 绑定菱形方框 -->
                     <div class="parallax-el relative flex items-center justify-center" data-speed="0.15">
-                        <div class="absolute w-[130%] aspect-square border border-[var(--astral-blue)] rotate-45 opacity-20"></div>
+                        <div class="absolute w-[130%] aspect-square border border-[var(--astral-blue)] rotate-45 opacity-30"></div>
                         <span class="text-[13vw] md:text-[8.5vw] leading-none text-hollow-gold relative z-10">A</span>
                     </div>
                 </div>
@@ -307,7 +314,7 @@
                     <div class="thread h-[200%] -top-32 hidden md:block"></div>
                     
                     <div class="glass-card p-8 md:p-12 relative z-10 parallax-el" data-speed="-0.15">
-                        <svg class="w-5 h-5 text-[var(--star-gold)] absolute -top-2.5 left-1/2 -translate-x-1/2 bg-[var(--paper)]" viewBox="0 0 24 24" fill="currentColor">
+                        <svg class="w-5 h-5 text-[var(--star-gold)] absolute -top-2.5 left-1/2 -translate-x-1/2 bg-[var(--paper)] opacity-30" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 0 C12 8 16 12 24 12 C16 12 12 16 12 24 C12 16 8 12 0 12 C8 12 12 8 12 0 Z"/>
                         </svg>
                         
@@ -426,7 +433,7 @@
             <div class="text-center mb-32 parallax-el" data-speed="-0.1">
                 <h2 class="font-divine text-4xl md:text-5xl tracking-[0.3em] text-[var(--astral-blue)] text-hollow relative inline-block">
                     RESONANCE
-                    <svg class="absolute -top-6 -right-8 w-6 h-6 text-[var(--star-gold)]" viewBox="0 0 24 24" fill="currentColor">
+                    <svg class="absolute -top-6 -right-8 w-6 h-6 text-[var(--star-gold)] opacity-30" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 0 C12 8 16 12 24 12 C16 12 12 16 12 24 C12 16 8 12 0 12 C8 12 12 8 12 0 Z"/>
                     </svg>
                 </h2>
