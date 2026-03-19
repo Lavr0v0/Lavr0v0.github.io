@@ -115,12 +115,17 @@ const MonumentalLink = ({ title, subtitle, link, copyText, index, color = "white
       className: titleClass + ' cursor-pointer hover:opacity-70 ' + (inView ? activeColor : 'text-transparent'),
       style: titleStyle
     }, title, copied && h('span', { className: 'text-[#00ff66] text-sm md:text-base font-mono ml-4 align-middle tracking-widest' }, 'COPIED'));
-  } else {
+  } else if (link) {
     titleEl = h('a', {
       href: link,
-      target: link && (link.startsWith('http') || link.startsWith('mailto')) ? '_blank' : '_self',
+      target: (link.startsWith('http') || link.startsWith('mailto')) ? '_blank' : '_self',
       rel: 'noreferrer',
-      className: titleClass + ' ' + (link ? 'cursor-pointer hover:opacity-70' : 'cursor-default') + ' ' + (inView ? activeColor : 'text-transparent'),
+      className: titleClass + ' cursor-pointer hover:opacity-70 ' + (inView ? activeColor : 'text-transparent'),
+      style: titleStyle
+    }, title);
+  } else {
+    titleEl = h('span', {
+      className: titleClass + ' cursor-default ' + (inView ? activeColor : 'text-transparent'),
       style: titleStyle
     }, title);
   }
