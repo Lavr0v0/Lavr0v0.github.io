@@ -12,8 +12,7 @@
 ├── LSimulator/              Life Simulator – 多分支事件模拟游戏
 ├── DnD/
 │   ├── Alberina/            D&D 同人自设 · 阿尔贝莉娜（高精灵法师）
-│   ├── Flavilar/            D&D 同人自设 · 芙勒维拉（龙裔野蛮人）
-│   └── Flavilar2/           Flavilar 草稿（未公开）
+│   └── Flavilar/           D&D 同人自设 · 芙勒维拉（龙裔野蛮人）
 ├── HomePageAssets/           主站图片资源（WebP）
 ├── tailwind.css              主站预编译 Tailwind CSS
 ├── react.production.min.js   自托管 React 18
