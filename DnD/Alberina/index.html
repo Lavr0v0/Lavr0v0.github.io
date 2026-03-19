@@ -22,19 +22,19 @@
             --star-gold: #c7a76d;
             --paper: #f2f2ef;
             --scroll: 0;
-            /* 桌面端全局位移倍率 */
+            
             --p-scale: 0.7; 
         }
 
         @media (max-width: 768px) {
-            /* 移动端全局位移倍率 */
+            
             :root { --p-scale: 0.35; } 
         }
 
         body {
             background-color: var(--paper);
             color: var(--astral-blue);
-            /* 加入 iOS/Android 原生优雅衬线字体作为保底方案，防止在移动端变为无衬线体 */
+            
             font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', 'PT Serif', 'Georgia', serif;
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
@@ -142,7 +142,7 @@
             will-change: transform;
         }
 
-        /* 入场动画 */
+        
         .hero-enter {
             opacity: 0;
         }
@@ -166,21 +166,21 @@
 
     <main class="relative z-10 w-full">
         
-        <!-- ================= HERO SECTION ================= -->
+        
         <section class="relative w-full h-[140vh] flex items-center justify-center">
             
-            <!-- 将整个容器大幅度上提，使其在首屏视觉上真正居中 -->
+            
             <div class="relative w-full max-w-[1400px] h-screen flex items-center justify-center select-none mt-[-35vh]">
                 
-                <!-- 背景几何与星图连线 -->
+                
                 <svg class="absolute inset-0 w-full h-full pointer-events-none parallax-el z-0" data-speed="0.02" viewBox="0 0 1400 800">
-                    <!-- 核心刻度轴 -->
+                    
                     <line x1="100" y1="400" x2="1300" y2="400" stroke="var(--astral-blue)" stroke-width="0.3" stroke-dasharray="10 20" opacity="0.2"/>
                     
-                    <!-- 字母引导线 (波浪形连贯线) -->
+                    
                     <path d="M 150 420 Q 300 300 450 400 T 750 400 T 1050 400 T 1250 380" fill="none" stroke="var(--star-gold)" stroke-width="0.6" stroke-dasharray="2 4" opacity="0.3"/>
                     
-                    <!-- 装饰星芒节点 -->
+                    
                     <g opacity="0.3">
                         <circle cx="150" cy="420" r="2" fill="var(--star-gold)"/>
                         <circle cx="450" cy="400" r="3" fill="none" stroke="var(--star-gold)" stroke-width="0.8"/>
@@ -190,76 +190,76 @@
                     </g>
                 </svg>
 
-                <!-- 单词重构：ALBERINA (紧凑排列融入几何，滑动时才触发剧烈错落) -->
+                
                 <div class="relative w-full flex items-center justify-between px-[10%] font-divine z-10">
 
-                    <!-- A - 绑定实线圆环 -->
-                    <div class="parallax-el relative flex items-center justify-center hero-enter hero-enter-up" data-speed="-0.12" style="--settle-y: -8px">
+                    
+                    <div class="parallax-el relative flex items-center justify-center hero-enter hero-enter-up ml-3" data-speed="-0.12" style="--settle-y: -8px">
                         <div class="absolute w-[140%] aspect-square rounded-full border-[1.5px] border-[var(--astral-blue)] opacity-30"></div>
                         <div class="absolute w-[80%] aspect-square rounded-full border-[1px] border-dashed border-[var(--astral-blue)] opacity-15"></div>
                         <span class="text-[12vw] md:text-[8vw] leading-none text-hollow relative z-10">A</span>
                     </div>
 
-                    <!-- L - 绑定星芒点 -->
-                    <div class="parallax-el relative flex items-center justify-center hero-enter" data-speed="0.08" style="--settle-y: 6px">
+                    
+                    <div class="parallax-el relative flex items-center justify-center hero-enter -ml-4" data-speed="0.08" style="--settle-y: 6px">
                         <div class="absolute w-2 h-2 bg-[var(--star-gold)] rotate-45 -top-6 opacity-30"></div>
                         <div class="absolute w-[0.75px] h-[120%] bg-[var(--star-gold)] opacity-15"></div>
                         <span class="text-[10vw] md:text-[7vw] leading-none text-[var(--astral-blue)] relative z-10">L</span>
                     </div>
 
-                    <!-- B - 绑定虚线光环 -->
-                    <div class="parallax-el relative flex items-center justify-center hero-enter hero-enter-up" data-speed="-0.18" style="--settle-y: -12px">
+                    
+                    <div class="parallax-el relative flex items-center justify-center hero-enter hero-enter-up mr-2" data-speed="-0.18" style="--settle-y: -12px">
                         <div class="absolute w-[160%] aspect-square rounded-full border-[1.5px] border-dashed border-[var(--star-gold)] opacity-30"></div>
                         <div class="absolute w-[100%] aspect-square rounded-full border-[1px] border-[var(--star-gold)] opacity-15"></div>
                         <span class="text-[14vw] md:text-[9vw] leading-none font-bold text-hollow-gold relative z-10">B</span>
                     </div>
 
-                    <!-- 中文核心与装饰：阿尔贝莉娜 -->
+                    
                     <div class="flex flex-col items-center mx-4 md:mx-8 parallax-el z-20 hero-enter" data-speed="-0.04">
                         <div class="w-[0.75px] h-16 bg-gradient-to-t from-[var(--astral-blue)] to-transparent mb-4 opacity-30"></div>
                         <h2 class="vertical-rl font-semibold text-3xl md:text-5xl tracking-[0.6em] text-[var(--astral-blue)] py-2" style="font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;">阿尔贝莉娜</h2>
                         <div class="w-[0.75px] h-24 bg-gradient-to-b from-[var(--astral-blue)] to-transparent mt-4 opacity-30"></div>
                     </div>
 
-                    <!-- E - 绑定交叉十字准星 -->
-                    <div class="parallax-el relative flex items-center justify-center hero-enter hero-enter-up" data-speed="0.12" style="--settle-y: 5px">
+                    
+                    <div class="parallax-el relative flex items-center justify-center hero-enter hero-enter-up -ml-5" data-speed="0.12" style="--settle-y: 5px">
                         <div class="absolute w-[150%] h-[0.75px] bg-[var(--astral-blue-light)] rotate-45 opacity-30"></div>
                         <div class="absolute w-[150%] h-[0.75px] bg-[var(--astral-blue-light)] -rotate-45 opacity-30"></div>
                         <div class="absolute w-[80%] aspect-square rounded-full border-[1px] border-[var(--astral-blue-light)] opacity-15"></div>
                         <span class="text-[11vw] md:text-[7.5vw] leading-none text-[var(--astral-blue-light)] relative z-10">E</span>
                     </div>
 
-                    <!-- R - 绑定上下边界线 -->
-                    <div class="parallax-el relative flex items-center justify-center hero-enter" data-speed="-0.22" style="--settle-y: -10px">
+                    
+                    <div class="parallax-el relative flex items-center justify-center hero-enter ml-3" data-speed="-0.22" style="--settle-y: -10px">
                         <div class="absolute w-[120%] h-[80%] border-y-[1.5px] border-[var(--astral-blue)] opacity-30"></div>
                         <span class="text-[13vw] md:text-[8.5vw] leading-none text-hollow relative z-10">R</span>
                     </div>
 
-                    <!-- I - 绑定双重同心圆 -->
-                    <div class="parallax-el relative flex items-center justify-center hero-enter hero-enter-up" data-speed="0.06" style="--settle-y: 7px">
+                    
+                    <div class="parallax-el relative flex items-center justify-center hero-enter hero-enter-up -mr-3" data-speed="0.06" style="--settle-y: 7px">
                         <div class="absolute w-[250%] aspect-square rounded-full border-[1.5px] border-[var(--star-gold)] opacity-30"></div>
                         <div class="absolute w-[120%] aspect-square rounded-full border-[1.5px] border-[var(--star-gold)] opacity-30"></div>
                         <div class="absolute w-[180%] aspect-square rounded-full border-[1px] border-dashed border-[var(--star-gold)] opacity-15"></div>
                         <span class="text-[9vw] md:text-[6vw] leading-none text-[var(--star-gold)] relative z-10">I</span>
                     </div>
 
-                    <!-- N - 绑定垂直分割线 -->
-                    <div class="parallax-el relative flex items-center justify-center hero-enter" data-speed="-0.1" style="--settle-y: -6px">
+                    
+                    <div class="parallax-el relative flex items-center justify-center hero-enter ml-4" data-speed="-0.1" style="--settle-y: -6px">
                         <div class="absolute w-[0.75px] h-[150%] bg-[var(--astral-blue)] opacity-30"></div>
                         <div class="absolute w-[100%] h-[0.75px] bg-[var(--astral-blue)] opacity-15"></div>
                         <span class="text-[11vw] md:text-[7.5vw] leading-none text-[var(--astral-blue)] relative z-10">N</span>
                     </div>
 
-                    <!-- A - 绑定菱形方框 -->
-                    <div class="parallax-el relative flex items-center justify-center hero-enter hero-enter-up" data-speed="0.15" style="--settle-y: 9px">
+                    
+                    <div class="parallax-el relative flex items-center justify-center hero-enter hero-enter-up -ml-2" data-speed="0.15" style="--settle-y: 9px">
                         <div class="absolute w-[130%] aspect-square border-[1.5px] border-[var(--astral-blue)] rotate-45 opacity-30"></div>
                         <div class="absolute w-[80%] aspect-square border-[1px] border-[var(--astral-blue)] rotate-45 opacity-15"></div>
                         <span class="text-[13vw] md:text-[8.5vw] leading-none text-hollow-gold relative z-10">A</span>
                     </div>
                 </div>
 
-                <!-- 身份标注与环境元数据 (Metadata Nodes) -->
-                <!-- 左侧：种族信息 -->
+                
+                
                 <div class="absolute left-[12%] bottom-[20%] md:bottom-[25%] flex items-start space-x-4 parallax-el hero-enter" data-speed="-0.08">
                     <div class="flex flex-col items-center">
                         <div class="w-[1px] h-12 bg-[var(--star-gold)] mb-2"></div>
@@ -272,7 +272,7 @@
                     </div>
                 </div>
 
-                <!-- 右侧：职业与所属 -->
+                
                 <div class="absolute right-[12%] top-[15%] md:top-[20%] flex flex-row-reverse items-start space-x-reverse space-x-4 text-right parallax-el hero-enter hero-enter-up" data-speed="0.06">
                     <div class="flex flex-col items-center">
                         <div class="w-2 h-2 bg-[var(--astral-blue-light)] rotate-45"></div>
@@ -285,7 +285,7 @@
                     </div>
                 </div>
 
-                <!-- 底部：核心属性标签 -->
+                
                 <div class="absolute left-1/2 bottom-[15%] -translate-x-1/2 flex items-center space-x-8 opacity-40 parallax-el hero-enter" data-speed="-0.1">
                     <p class="font-editorial italic text-xs tracking-[0.4em] uppercase">Quiet</p>
                     <div class="w-1 h-1 bg-current rounded-full"></div>
@@ -296,20 +296,20 @@
 
             </div>
 
-            <!-- 滚动引导 -->
+            
             <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center opacity-40 parallax-el hero-enter" data-speed="0.3">
                 <div class="w-[0.5px] h-16 bg-gradient-to-b from-[var(--astral-blue)] to-transparent"></div>
             </div>
         </section>
 
-        <!-- ================= CHRONICLE & ORIGIN ================= -->
+        
         <section class="relative w-full min-h-screen px-4 md:px-12 py-32 mt-20">
-            <!-- 背景巨型罗马数字 (缓慢下沉) -->
+            
             <div class="bg-text-massive top-0 left-[-5%] font-divine parallax-el text-hollow" data-speed="0.2">I.</div>
 
             <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-16 relative">
                 
-                <!-- 左侧航道：悬垂文字 -->
+                
                 <div class="md:col-span-2 hidden md:flex flex-col items-center relative pt-32">
                     <div class="thread h-full top-0"></div>
                     <div class="parallax-el bg-[var(--paper)] py-8 z-10" data-speed="0.1">
@@ -317,7 +317,7 @@
                     </div>
                 </div>
 
-                <!-- 中间航道：简介卡片 -->
+                
                 <div class="md:col-span-5 relative mt-12 md:mt-32">
                     <div class="thread h-[200%] -top-32 hidden md:block"></div>
                     
@@ -330,7 +330,7 @@
                             <span class="text-xs text-[var(--star-gold)] align-top mr-2">01</span> THE SCHOLAR
                         </h2>
                         
-                        <!-- 内部嵌套视差文本 -->
+                        
                         <div class="parallax-el" data-speed="-0.05">
                             <p class="text-sm md:text-base leading-relaxed mb-6 drop-cap text-justify">
                                 阿尔贝莉娜是风芦旅人中的高精灵法师，也是队伍中学识最完整的人。她出身优渥，自幼接受良好教育，长期浸润于书籍、法术与系统性的知识训练之中，因此拥有远高于常人的阅读量、理解力与施法素养。
@@ -342,7 +342,7 @@
                     </div>
                 </div>
 
-                <!-- 右侧航道：成长背景 -->
+                
                 <div class="md:col-span-5 relative mt-32 md:mt-64">
                     <div class="thread thread-gold h-[150%] -top-20 hidden md:block"></div>
                     
@@ -365,19 +365,19 @@
             </div>
         </section>
 
-        <!-- ================= NATURE & ASTRAL_NODE ================= -->
+        
         <section class="relative w-full py-40 mt-20">
-            <!-- 横向分割线 -->
+            
             <div class="absolute top-0 left-0 w-full h-[0.5px] bg-[var(--astral-blue)]/20"></div>
             
             <div class="bg-text-massive top-10 right-[-5%] font-divine parallax-el text-[var(--star-gold)]/10" data-speed="0.15">II.</div>
 
             <div class="max-w-6xl mx-auto px-4 md:px-12 grid grid-cols-1 md:grid-cols-2 gap-16 relative">
                 
-                <!-- 极速上升的深蓝色魔晶卡片 -->
+                
                 <div class="relative w-full parallax-el z-20" data-speed="-0.3">
                     <div class="glass-card-dark p-10 md:p-16 relative overflow-hidden group">
-                        <!-- 装饰用神圣几何 -->
+                        
                         <svg class="absolute -bottom-10 -right-10 w-48 h-48 text-[var(--star-gold)] opacity-10 group-hover:rotate-45 transition-transform duration-1000" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="0.5">
                             <circle cx="50" cy="50" r="40"/>
                             <path d="M50 0 L50 100 M0 50 L100 50" />
@@ -406,12 +406,12 @@
                     </div>
                 </div>
 
-                <!-- 相对静止的右侧文本 -->
+                
                 <div class="relative pt-20 md:pt-40 parallax-el z-10" data-speed="0.05">
                     <h2 class="font-divine text-2xl mb-8 tracking-[0.2em] text-[var(--astral-blue-light)]">ASTRAL NODE</h2>
                     
                     <ul class="space-y-12 relative border-l-[0.5px] border-[var(--astral-blue)]/30 pl-8 ml-2">
-                        <!-- 装饰点 -->
+                        
                         <div class="absolute w-2 h-2 bg-[var(--star-gold)] rotate-45 -left-[4.5px] top-2"></div>
                         <div class="absolute w-1.5 h-1.5 border border-[var(--astral-blue)] rotate-45 -left-[3.5px] top-36 bg-[var(--paper)]"></div>
                         <div class="absolute w-1.5 h-1.5 border border-[var(--astral-blue)] rotate-45 -left-[3.5px] top-64 bg-[var(--paper)]"></div>
@@ -434,7 +434,7 @@
             </div>
         </section>
 
-        <!-- ================= RESONANCE (Relationships) ================= -->
+        
         <section class="relative w-full min-h-screen py-32 mt-20 overflow-hidden">
             <div class="bg-text-massive bottom-[-10%] right-[10%] font-divine parallax-el text-hollow" data-speed="0.25">III.</div>
             
@@ -526,32 +526,33 @@
 
             const parallaxEls = document.querySelectorAll('.parallax-el');
             const astrolabe = document.getElementById('astrolabe');
-
-            // 入场动画状态
             const heroEls = document.querySelectorAll('.hero-enter');
             const tweens = [];
-            const DURATION = 1200; // ms
+            const DURATION = 720;
             let n = heroEls.length;
-            let cumulative = 130;
+            const letterContainer = document.querySelector('.font-divine.z-10');
+            let cumulative = 80;
             heroEls.forEach((el, i) => {
                 const isUp = el.classList.contains('hero-enter-up');
                 const startY = isUp ? -window.innerHeight : window.innerHeight;
                 const settleY = parseFloat(getComputedStyle(el).getPropertyValue('--settle-y')) || 0;
-                tweens.push({ el, startY, settleY, triggerAt: cumulative, startTime: null, done: false });
-                const t = n > 1 ? i / (n - 1) : 0;
-                cumulative += 167 + 333 * Math.pow(t, 3);
+                const isLetter = letterContainer && letterContainer.contains(el);
+                if (!isLetter) {
+                    tweens.push({ el, startY, settleY, triggerAt: cumulative * 0.5 + 50, startTime: null, done: false });
+                } else {
+                    tweens.push({ el, startY, settleY, triggerAt: cumulative, startTime: null, done: false });
+                    const t = n > 1 ? i / (n - 1) : 0;
+                    const interval = 100 + 350 * Math.pow(t, 3);
+                    cumulative += interval + (Math.random() - 0.5) * 80;
+                }
             });
 
             const pageStart = performance.now();
-
-            // easeOutExpo
             function ease(t) {
                 return t >= 1 ? 1 : 1 - Math.pow(2, -10 * t);
             }
 
             let currentScrollY = 0;
-
-            // 缓存所有视差元素的初始页面位置
             const elOriginalTop = new Map();
             parallaxEls.forEach(el => {
                 let top = 0, node = el;
@@ -586,7 +587,6 @@
                 const speed = parseFloat(el.getAttribute('data-speed')) || 0;
                 const origTop = elOriginalTop.get(el) || 0;
                 const windowH = window.innerHeight;
-                // 元素原始中心相对视口中心的距离
                 const dist = (origTop - currentScrollY + windowH * 0.3) - (windowH / 2);
                 return dist * speed * pScale;
             }
@@ -595,8 +595,6 @@
                 const now = performance.now();
                 const elapsed = now - pageStart;
                 const pScale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--p-scale').trim()) || 1;
-
-                // 更新非 hero 的视差元素
                 parallaxEls.forEach(el => {
                     if (el.classList.contains('hero-enter')) return;
                     const speed = parseFloat(el.getAttribute('data-speed'));
@@ -604,8 +602,6 @@
                     const yOffset = getParallaxY(el, pScale);
                     el.style.transform = `translate3d(0, ${yOffset}px, 0)`;
                 });
-
-                // 更新 hero 元素：入场 tween + 视差同时计算
                 tweens.forEach(tw => {
                     const parallaxY = getParallaxY(tw.el, pScale);
 
