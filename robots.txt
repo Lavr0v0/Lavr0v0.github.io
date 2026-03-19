@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /HomePageAssets/
+Disallow: /CForge/tests/
 
 Sitemap: https://lavro.org/sitemap.xml
