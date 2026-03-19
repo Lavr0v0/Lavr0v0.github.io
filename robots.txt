@@ -2,6 +2,5 @@ User-agent: *
 Allow: /
 Disallow: /HomePageAssets/
 Disallow: /CForge/tests/
-Disallow: /DnD/Flavilar2/
 
 Sitemap: https://lavro.org/sitemap.xml
