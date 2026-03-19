@@ -176,6 +176,13 @@ const globalCSS = `
   font-style: normal;
   font-display: swap;
 }
+@font-face {
+  font-family: 'EasterEgg';
+  src: url('./HomePageAssets/EasterEgg-subset.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -206,8 +213,9 @@ body {
 .animate-scroll-fade { animation: scroll-hint-fade 0.5s ease forwards; }
 @keyframes rainbow-hue { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
 html.rainbow-mode { animation: rainbow-hue 3s linear infinite; }
-html.rainbow-mode .konami-toast { display: block; }
-.konami-toast { display: none; position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); z-index: 9999; font-family: 'Anton', monospace; font-size: 1rem; letter-spacing: 0.3em; color: #00ff66; background: rgba(0,0,0,0.85); border: 1px solid #00ff66; padding: 0.6rem 2rem; pointer-events: none; animation: toast-fade 3s ease forwards; }
+html.rainbow-mode .toast-rainbow { display: block; }
+.toast-rainbow { display: none; position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); z-index: 9999; font-family: 'Alibaba PuHuiTi', system-ui, sans-serif; font-size: 1rem; letter-spacing: 0.3em; background: rgba(0,0,0,0.85); padding: 0.6rem 2rem; pointer-events: none; animation: toast-fade 3s ease forwards; }
+.toast-rainbow { color: #00ff66; border: 1px solid #00ff66; }
 @keyframes toast-fade { 0% { opacity: 0; transform: translateX(-50%) translateY(-10px); } 10% { opacity: 1; transform: translateX(-50%) translateY(0); } 80% { opacity: 1; } 100% { opacity: 0; } }
 `;
 
@@ -458,7 +466,7 @@ const LavroPortfolio = () => {
                   h('h4', { className: 'text-[#00ff66] text-xs font-mono mb-4 tracking-widest opacity-80' }, '>> MANGA & ANIME / \u756A\u5267\u4E0E\u6F2B\u753B'),
                   h('ul', { className: 'space-y-3 font-mono text-sm tracking-wider text-white' },
                     ['\u5951\u7EA6\u4E4B\u543B','\u65E0\u804C\u8F6C\u751F','\u9882\u4E50\u4EBA\u5076','\u91D1\u724C\u5F97\u4E3B','\u5800\u4E0E\u5BAB\u6751'].map((a,i) =>
-                      h('li', { key: i, className: 'flex items-center gap-3' }, h('span', { className: 'text-[#333]' }, '-'), ' ', a)
+                      h('li', { key: i, className: 'flex items-center gap-3', 'data-anime': a }, h('span', { className: 'text-[#333]' }, '-'), ' ', a)
                     )
                   )
                 )
@@ -553,7 +561,7 @@ requestAnimationFrame(function() {
   var clickCount = 0;
   var clickTimer = null;
   var toast = document.createElement('div');
-  toast.className = 'konami-toast';
+  toast.className = 'toast-rainbow';
   toast.textContent = '\u2605 RAINBOW MODE ACTIVATED \u2605';
   document.body.appendChild(toast);
 
@@ -573,6 +581,196 @@ requestAnimationFrame(function() {
       toast.style.animation = 'none';
       void toast.offsetWidth;
       toast.style.animation = '';
+    }
+  });
+});
+
+// 彩蛋: 点击"颂乐人偶"三下触发三角初音模式
+requestAnimationFrame(function() {
+  var xxClickCount = 0;
+  var xxClickTimer = null;
+  var xxActive = false;
+  var xxOriginals = [];
+
+  // 黑屏遮罩
+  var overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#000;display:none;align-items:center;justify-content:center;flex-direction:column;opacity:0;transition:opacity 0.4s ease;';
+  var overlayText = document.createElement('div');
+  overlayText.style.cssText = "font-family:'EasterEgg','Alibaba PuHuiTi',system-ui,sans-serif;font-size:clamp(1.2rem,4vw,2rem);letter-spacing:0.3em;color:#7799CC;opacity:0;transition:opacity 0.5s ease;";
+  overlayText.textContent = '\u2605 \u4E09\u89D2\u521D\u97F3\u6A21\u5F0F \u2605';
+  overlay.appendChild(overlayText);
+  document.body.appendChild(overlay);
+
+  var songLe = document.querySelector('[data-anime="\u9882\u4E50\u4EBA\u5076"]');
+  if (!songLe) return;
+  songLe.style.cursor = 'pointer';
+  songLe.style.userSelect = 'none';
+  songLe.style.webkitUserSelect = 'none';
+
+  function fillXiaoxiang(str) {
+    var xx = '\u5C0F\u7965';
+    var result = '';
+    for (var i = 0; i < str.length; i++) {
+      result += xx[i % xx.length];
+    }
+    return result;
+  }
+
+  function getTextNodes(el) {
+    var nodes = [];
+    var walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+    var node;
+    while (node = walker.nextNode()) {
+      if (node.textContent.trim().length > 0) nodes.push(node);
+    }
+    return nodes;
+  }
+
+  function applyXiaoxiang() {
+    var rootEl = document.getElementById('root');
+    var textNodes = getTextNodes(rootEl);
+    xxOriginals = [];
+    textNodes.forEach(function(n) { xxOriginals.push({ node: n, text: n.textContent }); });
+
+    // 先静默替换所有文字为小祥（黑屏期间）
+    textNodes.forEach(function(n, idx) {
+      n.textContent = fillXiaoxiang(xxOriginals[idx].text);
+    });
+
+    // 强制字体：注入 style 标签确保覆盖一切
+    var forceStyle = document.createElement('style');
+    forceStyle.id = 'xiaoxiang-force-font';
+    forceStyle.textContent = 'html.xiaoxiang-mode, html.xiaoxiang-mode *, html.xiaoxiang-mode *::before, html.xiaoxiang-mode *::after { font-family: "EasterEgg", "Alibaba PuHuiTi", system-ui, sans-serif !important; }';
+    document.head.appendChild(forceStyle);
+
+    // 主题色 + class
+    document.documentElement.classList.add('xiaoxiang-mode');
+    document.querySelectorAll('[class*="text-[#00ff66]"]').forEach(function(el) {
+      el.dataset.xxOldColor = el.style.color; el.style.color = '#7799CC';
+    });
+    document.querySelectorAll('[class*="border-[#00ff66]"]').forEach(function(el) {
+      el.dataset.xxOldBorder = el.style.borderColor; el.style.borderColor = '#7799CC';
+    });
+    document.querySelectorAll('[class*="bg-[#00ff66]"]').forEach(function(el) {
+      el.dataset.xxOldBg = el.style.backgroundColor; el.style.backgroundColor = '#7799CC';
+    });
+  }
+
+  // 黑屏结束后播放的乱码动画（从五十音 → 小祥）
+  function playScrambleAnimation() {
+    var rootEl = document.getElementById('root');
+    var textNodes = getTextNodes(rootEl);
+    var chars = '\u30A2\u30A4\u30A6\u30A8\u30AA\u30AB\u30AD\u30AF\u30B1\u30B3\u30B5\u30B7\u30B9\u30BB\u30BD\u30BF\u30C1\u30C4\u30C6\u30C8\u30CA\u30CB\u30CC\u30CD\u30CE\u30CF\u30D2\u30D5\u30D8\u30DB\u30DE\u30DF\u30E0\u30E1\u30E2\u30E4\u30E6\u30E8\u30E9\u30EA\u30EB\u30EC\u30ED\u30EF\u30F2\u30F3';
+    // 先把所有文字打乱成五十音
+    textNodes.forEach(function(n) {
+      var text = '';
+      for (var i = 0; i < n.textContent.length; i++) {
+        if (n.textContent[i] === ' ' || n.textContent[i] === '\n') { text += n.textContent[i]; }
+        else { text += chars[Math.floor(Math.random() * chars.length)]; }
+      }
+      n.textContent = text;
+    });
+    // 然后逐步恢复为小祥
+    var iteration = 0;
+    var maxIter = 30;
+    var interval = setInterval(function() {
+      textNodes.forEach(function(n, idx) {
+        var target = fillXiaoxiang(xxOriginals[idx].text);
+        var text = '';
+        for (var i = 0; i < target.length; i++) {
+          if (target[i] === ' ' || target[i] === '\n') { text += target[i]; continue; }
+          if (i < Math.floor(iteration / (maxIter / Math.max(target.length, 1)))) {
+            text += target[i];
+          } else {
+            text += chars[Math.floor(Math.random() * chars.length)];
+          }
+        }
+        n.textContent = text;
+      });
+      iteration++;
+      if (iteration >= maxIter) {
+        clearInterval(interval);
+        textNodes.forEach(function(n, idx) {
+          n.textContent = fillXiaoxiang(xxOriginals[idx].text);
+        });
+      }
+    }, 80);
+  }
+
+  function restoreOriginal() {
+    xxOriginals.forEach(function(item) { item.node.textContent = item.text; });
+    xxOriginals = [];
+    document.documentElement.classList.remove('xiaoxiang-mode');
+    var forceStyle = document.getElementById('xiaoxiang-force-font');
+    if (forceStyle) forceStyle.remove();
+    document.querySelectorAll('[data-xx-old-color]').forEach(function(el) {
+      el.style.color = el.dataset.xxOldColor || ''; delete el.dataset.xxOldColor;
+    });
+    document.querySelectorAll('[data-xx-old-border]').forEach(function(el) {
+      el.style.borderColor = el.dataset.xxOldBorder || ''; delete el.dataset.xxOldBorder;
+    });
+    document.querySelectorAll('[data-xx-old-bg]').forEach(function(el) {
+      el.style.backgroundColor = el.dataset.xxOldBg || ''; delete el.dataset.xxOldBg;
+    });
+  }
+
+  function activateWithOverlay() {
+    // 1. 黑屏淡入
+    overlay.style.display = 'flex';
+    void overlay.offsetWidth;
+    overlay.style.opacity = '1';
+    // 2. 显示文字
+    setTimeout(function() {
+      overlayText.style.opacity = '1';
+    }, 400);
+    // 3. 黑屏期间静默替换 + 滚回顶部
+    setTimeout(function() {
+      window.scrollTo(0, 0);
+      applyXiaoxiang();
+    }, 800);
+    // 4. 淡出遮罩，然后播放乱码动画
+    setTimeout(function() {
+      overlayText.style.opacity = '0';
+      setTimeout(function() {
+        overlay.style.opacity = '0';
+        setTimeout(function() {
+          overlay.style.display = 'none';
+          // 黑屏完全消失后开始乱码
+          playScrambleAnimation();
+        }, 400);
+      }, 300);
+    }, 2000);
+  }
+
+  function deactivateWithOverlay() {
+    overlay.style.display = 'flex';
+    void overlay.offsetWidth;
+    overlay.style.opacity = '1';
+    setTimeout(function() {
+      restoreOriginal();
+    }, 400);
+    setTimeout(function() {
+      overlay.style.opacity = '0';
+      setTimeout(function() {
+        overlay.style.display = 'none';
+      }, 400);
+    }, 800);
+  }
+
+  songLe.addEventListener('mousedown', function(e) {
+    e.preventDefault();
+    xxClickCount++;
+    clearTimeout(xxClickTimer);
+    xxClickTimer = setTimeout(function() { xxClickCount = 0; }, 800);
+    if (xxClickCount >= 3) {
+      xxClickCount = 0;
+      if (xxActive) {
+        deactivateWithOverlay();
+        xxActive = false;
+      } else {
+        activateWithOverlay();
+        xxActive = true;
+      }
     }
   });
 });
