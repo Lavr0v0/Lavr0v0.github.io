@@ -1,46 +1,31 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
+    <link rel="canonical" href="https://lavro.org/DnD/Flavilar/" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>芙勒维拉 Flavilar</title>
-    
-    <!-- Tailwind CSS (通过 CDN 引入) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <title>Flavilar · 芙勒维拉 – D&D 同人自设角色展示 | Lavro</title>
+    <meta name="description" content="Flavilar（芙勒维拉）是基于龙与地下城（D&D）规则的同人自设（OC）角色展示页面。龙裔野蛮人，风芦旅人成员。非官方内容，由 Lavro 个人创作。">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Flavilar · 芙勒维拉 – D&D 同人自设角色">
+    <meta property="og:description" content="基于 D&D 规则的同人自设（OC）龙裔野蛮人角色展示。非官方内容，由 Lavro 创作。">
+    <meta property="og:url" content="https://lavro.org/DnD/Flavilar/">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="zh_CN">
+    <meta property="og:site_name" content="Lavro">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Flavilar – D&D 同人自设角色展示">
+    <meta name="twitter:description" content="基于 D&D 规则的同人自设龙裔野蛮人角色展示页面。非官方内容。">
+    <meta name="author" content="Lavro">
+    <meta name="theme-color" content="#0c0b0a">
+    <link rel="icon" type="image/png" href="/favicon.png" />
 
-    <!-- Lenis Smooth Scroll (苹果级丝滑滚动核心) -->
-    <script src="https://unpkg.com/@studio-freight/lenis@1.0.39/dist/lenis.min.js"></script>
-
-    <!-- Google Fonts: Cinzel (古典标题) & Cormorant Garamond (复古正文) & Noto Serif SC (思源宋体中文) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        dnd: {
-                            dark: '#0c0b0a',
-                            paper: '#11100e',
-                            light: '#eae4d9',
-                            gold: '#c5a059',
-                            emerald: '#10b981',
-                            muted: '#8c8273'
-                        }
-                    },
-                    fontFamily: {
-                        cinzel: ['Cinzel', 'Noto Serif SC', 'serif'],
-                        garamond: ['Cormorant Garamond', 'Noto Serif SC', 'serif'],
-                    }
-                }
-            }
-        }
-    </script>
+    <link rel="preconnect" href="https://esm.sh">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif+SC:wght@400;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif+SC:wght@400;600;700&display=swap"></noscript>
+    <link rel="stylesheet" href="tailwind.css">
 
     <style>
         /* 基础与排版 */
@@ -117,6 +102,33 @@
     </style>
 </head>
 <body class="antialiased">
+    <!-- SEO 静态骨架 -->
+    <div id="seo-fallback" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">
+      <h1>Flavilar · 芙勒维拉 – D&amp;D 同人自设角色展示</h1>
+      <p>本页面为基于龙与地下城（D&amp;D）规则的同人自设（OC / Original Character）角色展示，非威世智（Wizards of the Coast）官方内容。角色人设由椿创作，界面与文案由 Lavro 制作。</p>
+      <h2>角色概述</h2>
+      <p>种族：龙裔（Dragonborn）/ 黑鳞。职业：野蛮人（Barbarian）。身高约 2.7m。所属：风芦旅人（自设团队）。</p>
+      <p>她高大、强壮，黑鳞覆身，绿瞳锐利。记忆曾被清除，在同伴帮助下重新学会与人并肩。战斗中极具野性，直接凶猛。</p>
+      <h2>人际羁绊</h2>
+      <ul>
+        <li>阿尔贝莉娜（Alberina）– 导师与权威，最信任的人。</li>
+        <li>雪露（Shirul）– 战友与挚友，一起熬出来的朋友。</li>
+        <li>风芦旅人（Wind Reed Travelers）– 归属与现实。</li>
+      </ul>
+      <p><a href="https://lavro.org/">返回 Lavro 主站</a> | <a href="https://lavro.org/DnD/Alberina/">查看 Alberina 角色页</a></p>
+    </div>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CreativeWork",
+      "name": "Flavilar – D&D 同人自设角色展示",
+      "description": "基于 D&D 规则的同人自设（OC）角色 Flavilar（芙勒维拉），龙裔野蛮人。非官方内容，由 Lavro 个人创作。",
+      "genre": "Fan-made Original Character (OC)",
+      "url": "https://lavro.org/DnD/Flavilar/",
+      "author": { "@type": "Person", "name": "Lavro", "url": "https://lavro.org/" },
+      "isPartOf": { "@type": "WebSite", "name": "Lavro", "url": "https://lavro.org/" }
+    }
+    </script>
 
     <!-- 全局噪点与光晕 -->
     <div class="bg-noise"></div>
@@ -447,17 +459,20 @@
             Flavilar • Dragonborn • Barbarian
         </p>
         <p class="font-garamond text-dnd-muted text-xs md:text-sm mt-3 md:mt-4 italic">The Wind Reed Travelers Archives</p>
+        <p class="text-dnd-muted/40 text-[10px] md:text-xs mt-4 md:mt-6 leading-relaxed">角色人设 / Character by 椿 · 界面与文案 / Page & Copy by Lavro</p>
     </footer>
 
     <!-- 脚本逻辑 -->
-    <script>
-        // 1. 初始化 Lucide 图标
-        lucide.createIcons();
+    <script type="module">
+        // Lucide icons via esm.sh
+        import { createIcons } from 'https://esm.sh/lucide@0.460.0';
+        createIcons();
 
-        // 检测是否为移动端 (简单检测宽度)
+        // 检测是否为移动端
         const isMobile = window.innerWidth < 768;
 
-        // 2. 初始化 Lenis (平滑滚动)
+        // Lenis smooth scroll via esm.sh
+        import Lenis from 'https://esm.sh/lenis@1.1.18';
         const lenis = new Lenis({
             duration: isMobile ? 1.2 : 1.5, // 手机端稍微快一点响应手指
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),

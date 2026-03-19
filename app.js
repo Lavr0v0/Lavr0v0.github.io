@@ -44,7 +44,7 @@ const ScrambledText = ({ text, phase }) => {
     let iteration = 0;
     const maxIterations = 24;
     const interval = setInterval(() => {
-      setDisplayText(text.split('').map((char, index) => {
+      setDisplayText(text.split('').map((_char, index) => {
         if (index < Math.floor(iteration / (maxIterations / text.length))) return text[index];
         return chars[Math.floor(Math.random() * chars.length)];
       }).join(''));

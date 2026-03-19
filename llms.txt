@@ -10,8 +10,8 @@ Lavro is a student specializing in graphic design and creative web development. 
 
 - [Character Forge](https://lavro.org/CForge/): Character building and data core logic tool with multi-step creation and export.
 - [Life Simulator](https://lavro.org/LSimulator/): Branching event simulation game exploring different life choices.
-- [Alberina - D&D Character](https://lavro.org/DnD/Alberina/): Dungeons & Dragons character design showcase.
-- [Flavilar - D&D Character](https://lavro.org/DnD/Flavilar/): D&D character visual packaging practice.
+- [Alberina - D&D Character](https://lavro.org/DnD/Alberina/): Fan-made original character (OC) based on D&D rules. High elf wizard, Wind Reed Travelers. Not official Wizards of the Coast content.
+- [Flavilar - D&D Character](https://lavro.org/DnD/Flavilar/): Fan-made original character (OC) based on D&D rules. Dragonborn barbarian, Wind Reed Travelers. Not official Wizards of the Coast content.
 
 ## Contact
 
