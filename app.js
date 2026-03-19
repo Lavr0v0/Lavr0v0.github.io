@@ -54,15 +54,20 @@ const MonumentalLink = ({ title, subtitle, link, copyText, index, color = "white
 
   useEffect(() => {
     if (!containerRef.current || !iconName) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const elementCenterY = rect.top + rect.height / 2;
-    const screenCenterY = window.innerHeight / 2;
-    const distance = Math.abs(elementCenterY - screenCenterY);
-    const maxDistance = window.innerHeight / 1.2;
-    let normalized = Math.max(0, 1 - (distance / maxDistance));
-    const curved = Math.pow(normalized, 2);
-    const opacity = curved * 0.2;
-    setLogoStyle({ opacity });
+    // 延迟到下一帧读取布局，避免强制重排
+    const id = requestAnimationFrame(() => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const elementCenterY = rect.top + rect.height / 2;
+      const screenCenterY = window.innerHeight / 2;
+      const distance = Math.abs(elementCenterY - screenCenterY);
+      const maxDistance = window.innerHeight / 1.2;
+      let normalized = Math.max(0, 1 - (distance / maxDistance));
+      const curved = Math.pow(normalized, 2);
+      const opacity = curved * 0.2;
+      setLogoStyle({ opacity });
+    });
+    return () => cancelAnimationFrame(id);
   }, [scrollY, iconName]);
 
   const direction = align === 'right' ? 1 : align === 'left' ? -1 : 0;
@@ -145,7 +150,7 @@ const MonumentalLink = ({ title, subtitle, link, copyText, index, color = "white
 const globalCSS = `
 @font-face {
   font-family: 'Alibaba PuHuiTi';
-  src: url('./HomePageAssets/AlibabaPuHuiTi-Light.woff2') format('woff2');
+  src: url('./HomePageAssets/AlibabaPuHuiTi-Light-subset.woff2') format('woff2');
   font-weight: 300;
   font-style: normal;
   font-display: swap;

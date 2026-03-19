@@ -35,15 +35,13 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&display=swap"></noscript>
     
     <!-- 预加载首屏关键字体 -->
-    <link rel="preload" href="./HomePageAssets/AlibabaPuHuiTi-Light.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="./HomePageAssets/AlibabaPuHuiTi-Light-subset.woff2" as="font" type="font/woff2" crossorigin>
     <!-- 预加载首屏背景图 -->
     <link rel="preload" href="./HomePageAssets/bg.jpg" as="image">
 
-    <script src="https://cdn.tailwindcss.com" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-      // Tailwind config 会在 tailwind defer 加载后自动应用
-      window.tailwind = window.tailwind || {};
-      window.tailwind.config = {
+      tailwind.config = {
         theme: {
           fontFamily: {
             sans: ['"Alibaba PuHuiTi"', 'system-ui', 'sans-serif'],
@@ -53,9 +51,19 @@
       }
     </script>
     
-    <!-- Font Awesome: 异步加载，不阻塞首屏渲染 -->
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <!-- Font Awesome: 只加载 solid + brands（不加载 all.min.css） -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/fontawesome.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/solid.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/brands.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/fontawesome.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/solid.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/brands.min.css">
+    </noscript>
+    <style>
+      @font-face { font-family: 'Font Awesome 6 Free'; font-display: swap; src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2') format('woff2'); font-weight: 900; }
+      @font-face { font-family: 'Font Awesome 6 Brands'; font-display: swap; src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff2') format('woff2'); font-weight: 400; }
+    </style>
     
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js" defer></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" defer></script>
