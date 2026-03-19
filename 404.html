@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 – Lavro.org</title>
+    <meta name="robots" content="noindex">
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #050505;
+            color: #f0f0f0;
+            font-family: system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        .noise {
+            position: fixed; inset: 0; z-index: 0; opacity: 0.05; pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+        .scanlines {
+            position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0.03;
+            background: repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,255,102,0.1) 1px, rgba(0,255,102,0.1) 2px);
+        }
+        .sweep {
+            position: fixed; top: 0; left: -100%; z-index: 1; pointer-events: none;
+            width: 60%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,255,102,0.02), transparent);
+            animation: sweep 6s ease-in-out infinite;
+        }
+        @keyframes sweep { 0%{left:-60%} 50%{left:100%} 100%{left:-60%} }
+
+        .corner {
+            position: fixed; z-index: 10;
+            width: 30px; height: 30px;
+            border-color: #1a1a1a;
+            border-style: solid;
+        }
+        .corner-tl { top: 20px; left: 20px; border-width: 1px 0 0 1px; }
+        .corner-tr { top: 20px; right: 20px; border-width: 1px 1px 0 0; }
+        .corner-bl { bottom: 20px; left: 20px; border-width: 0 0 1px 1px; }
+        .corner-br { bottom: 20px; right: 20px; border-width: 0 1px 1px 0; }
+
+        .container {
+            position: relative; z-index: 10;
+            text-align: center; padding: 2rem;
+            transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* 404 大字 */
+        .code-wrap { position: relative; display: inline-block; }
+        .code {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(8rem, 28vw, 18rem);
+            line-height: 0.85;
+            letter-spacing: -0.05em;
+            color: #fff;
+            user-select: none;
+            position: relative;
+            backface-visibility: hidden;
+            transform: translateZ(0);
+        }
+        .code-shadow {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(14rem, 50vw, 32rem);
+            color: #00ff66;
+            opacity: 0.02;
+            pointer-events: none; user-select: none;
+            white-space: nowrap;
+        }
+
+        /* 主站同款 brutal-glitch 开屏动画 */
+        .brutal-glitch {
+            animation: main-flash 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+        }
+        .brutal-glitch::before, .brutal-glitch::after {
+            content: attr(data-text);
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: transparent;
+            pointer-events: none;
+            backface-visibility: hidden;
+            font-family: 'Anton', sans-serif;
+            font-size: inherit; line-height: inherit;
+            letter-spacing: inherit;
+        }
+        .brutal-glitch::before {
+            left: 3px;
+            text-shadow: -2px 0 #fff;
+            animation: glitch-slice-1 0.2s infinite linear alternate-reverse;
+        }
+        .brutal-glitch::after {
+            left: -3px;
+            text-shadow: 2px 0 #00ff66;
+            animation: glitch-slice-2 0.3s infinite linear alternate-reverse;
+            z-index: -1;
+        }
+
+        @keyframes main-flash {
+            0% { opacity: 0; color: #fff; }
+            10% { opacity: 1; color: transparent; -webkit-text-stroke: 3px #fff; }
+            25% { color: #00ff66; -webkit-text-stroke: 0px; }
+            40% { color: transparent; -webkit-text-stroke: 4px #fff; }
+            60% { color: #fff; -webkit-text-stroke: 0px transparent; }
+            80% { color: transparent; -webkit-text-stroke: 1px #00ff66; }
+            100% { color: #fff; }
+        }
+        @keyframes glitch-slice-1 {
+            0% { clip-path: inset(20% 0 80% 0); transform: translateX(-10px); }
+            20% { clip-path: inset(60% 0 10% 0); transform: translateX(10px); }
+            40% { clip-path: inset(40% 0 50% 0); transform: translateX(-10px); }
+            60% { clip-path: inset(80% 0 5% 0); transform: translateX(10px); }
+            80% { clip-path: inset(10% 0 70% 0); transform: translateX(-10px); }
+            100% { clip-path: inset(30% 0 40% 0); transform: translateX(10px); }
+        }
+        @keyframes glitch-slice-2 {
+            0% { clip-path: inset(10% 0 60% 0); transform: translateX(10px); }
+            20% { clip-path: inset(70% 0 10% 0); transform: translateX(-10px); }
+            40% { clip-path: inset(50% 0 30% 0); transform: translateX(10px); }
+            60% { clip-path: inset(5% 0 80% 0); transform: translateX(-10px); }
+            80% { clip-path: inset(80% 0 5% 0); transform: translateX(10px); }
+            100% { clip-path: inset(20% 0 70% 0); transform: translateX(-10px); }
+        }
+
+        .label {
+            font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.5em;
+            color: #00ff66;
+            margin-top: 2rem;
+            opacity: 0.8;
+        }
+        .desc {
+            color: #555;
+            font-size: 0.9rem;
+            margin-top: 1.2rem;
+            line-height: 1.7;
+        }
+        .path-display {
+            font-family: monospace;
+            font-size: 0.7rem;
+            color: #333;
+            margin-top: 1rem;
+            word-break: break-all;
+            max-width: 400px;
+            margin-left: auto; margin-right: auto;
+        }
+        .actions {
+            margin-top: 2.5rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 0.65rem 2rem;
+            font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            text-decoration: none;
+            border: 1px solid #222;
+            color: #888;
+            background: transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .btn:hover {
+            border-color: #00ff66;
+            color: #00ff66;
+            box-shadow: 0 0 20px rgba(0,255,102,0.08);
+        }
+        .btn-primary {
+            border-color: #00ff66;
+            color: #00ff66;
+        }
+        .btn-primary:hover {
+            background: #00ff66;
+            color: #050505;
+            box-shadow: 0 0 30px rgba(0,255,102,0.15);
+        }
+        .footer-deco {
+            position: fixed; bottom: 2rem; left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            font-family: monospace;
+            font-size: 0.6rem;
+            color: #222;
+            letter-spacing: 0.3em;
+        }
+        /* 网格背景 */
+        .grid-bg {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background-image:
+                linear-gradient(rgba(0,255,102,0.16) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,102,0.16) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 30%, transparent 80%);
+            -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 30%, transparent 80%);
+        }
+        /* 中心辉光 */
+        .glow {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(0,255,102,0.04) 0%, transparent 70%);
+            z-index: 0; pointer-events: none;
+            animation: glow-pulse 4s ease-in-out infinite;
+        }
+        @keyframes glow-pulse {
+            0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+        }
+    </style>
+</head>
+<body>
+    <div class="noise"></div>
+    <div class="grid-bg"></div>
+    <div class="glow"></div>
+    <div class="scanlines"></div>
+    <div class="sweep"></div>
+
+    <div class="corner corner-tl"></div>
+    <div class="corner corner-tr"></div>
+    <div class="corner corner-bl"></div>
+    <div class="corner corner-br"></div>
+
+    <div class="container">
+        <div class="code-wrap">
+            <span class="code-shadow">404</span>
+            <div class="code" id="code" data-text="404"></div>
+        </div>
+        <p class="label" id="label" style="opacity:0;transform:translateY(12px)">// PAGE NOT FOUND</p>
+        <p class="desc" id="desc" style="opacity:0;transform:translateY(12px)">这个页面不存在，可能已被移除或者你迷路了。</p>
+        <p class="path-display" id="pathDisplay" style="opacity:0;transform:translateY(12px)"></p>
+        <div class="actions" id="actions" style="opacity:0;transform:translateY(12px)">
+            <a href="/" class="btn btn-primary">[ BACK TO HOME ]</a>
+            <a href="javascript:history.back()" class="btn">[ GO BACK ]</a>
+        </div>
+    </div>
+
+    <div class="footer-deco" id="footerDeco" style="opacity:0">LAVRO.ORG // <span id="year"></span> // ERR_NOT_FOUND</div>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+        document.getElementById('pathDisplay').textContent = '> ' + window.location.pathname;
+
+        var codeEl = document.getElementById('code');
+        var container = document.querySelector('.container');
+        var target = '404';
+        var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*+<>アイウエオカキクケコ';
+
+        // 初始状态：居中偏下，禁用过渡
+        container.style.transition = 'none';
+        container.style.transform = 'translateY(18vh)';
+        // 强制应用
+        void container.offsetWidth;
+
+        // === 1. 乱码打字机效果（首次加载） ===
+        function scramble(callback) {
+            var iteration = 0;
+            var maxIterations = 24;
+            var interval = setInterval(function() {
+                var text = '';
+                for (var i = 0; i < target.length; i++) {
+                    if (i < Math.floor(iteration / (maxIterations / target.length))) {
+                        text += target[i];
+                    } else {
+                        text += chars[Math.floor(Math.random() * chars.length)];
+                    }
+                }
+                codeEl.textContent = text;
+                iteration++;
+                if (iteration >= maxIterations) {
+                    clearInterval(interval);
+                    codeEl.textContent = target;
+                    if (callback) callback();
+                }
+            }, 50);
+        }
+
+        // === 2. brutal-glitch 开屏闪烁（定期重播） ===
+        function playGlitch() {
+            codeEl.classList.remove('brutal-glitch');
+            void codeEl.offsetWidth;
+            codeEl.classList.add('brutal-glitch');
+            setTimeout(function() {
+                codeEl.classList.remove('brutal-glitch');
+            }, 800);
+        }
+
+        // === 3. 揭示序列：上移 + 淡入信息 ===
+        function reveal() {
+            // 恢复过渡，上移
+            container.style.transition = 'transform 1s cubic-bezier(0.22, 1, 0.36, 1)';
+            container.style.transform = 'translateY(0)';
+
+            // 子元素依次淡入
+            var fadeEls = ['label', 'desc', 'pathDisplay', 'actions'];
+            fadeEls.forEach(function(id, i) {
+                var el = document.getElementById(id);
+                el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                setTimeout(function() {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, 300 + i * 150);
+            });
+
+            // footer 淡入
+            setTimeout(function() {
+                document.getElementById('footerDeco').style.transition = 'opacity 0.8s ease';
+                document.getElementById('footerDeco').style.opacity = '1';
+            }, 900);
+        }
+
+        // === 启动序列 ===
+        codeEl.textContent = '';
+        scramble(function() {
+            // 乱码结束 → glitch 一次 → 揭示
+            setTimeout(function() {
+                playGlitch();
+                setTimeout(reveal, 400);
+            }, 200);
+            // 每 3 秒重播 glitch
+            setInterval(playGlitch, 3000);
+        });
+    </script>
+</body>
+</html>
