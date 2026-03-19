@@ -223,16 +223,16 @@ const LavroPortfolio = () => {
   const [contactTitleRef, contactTitleInView] = useInView({ threshold: 0.8 });
 
   const gameImages = [
-    './HomePageAssets/Games/games-1.png','./HomePageAssets/Games/games-2.png','./HomePageAssets/Games/games-3.jpg','./HomePageAssets/Games/games-4.png',
-    './HomePageAssets/Games/games-5.png','./HomePageAssets/Games/games-6.png','./HomePageAssets/Games/games-7.jpg','./HomePageAssets/Games/games-8.png',
-    './HomePageAssets/Games/games-9.png','./HomePageAssets/Games/games-10.png','./HomePageAssets/Games/games-11.png','./HomePageAssets/Games/games-12.png',
-    './HomePageAssets/Games/games-13.png','./HomePageAssets/Games/games-14.jpg','./HomePageAssets/Games/games-15.jpg','./HomePageAssets/Games/games-16.png',
-    './HomePageAssets/Games/games-17.png'
+    './HomePageAssets/Games/games-1.webp','./HomePageAssets/Games/games-2.webp','./HomePageAssets/Games/games-3.webp','./HomePageAssets/Games/games-4.webp',
+    './HomePageAssets/Games/games-5.webp','./HomePageAssets/Games/games-6.webp','./HomePageAssets/Games/games-7.webp','./HomePageAssets/Games/games-8.webp',
+    './HomePageAssets/Games/games-9.webp','./HomePageAssets/Games/games-10.webp','./HomePageAssets/Games/games-11.webp','./HomePageAssets/Games/games-12.webp',
+    './HomePageAssets/Games/games-13.webp','./HomePageAssets/Games/games-14.webp','./HomePageAssets/Games/games-15.webp','./HomePageAssets/Games/games-16.webp',
+    './HomePageAssets/Games/games-17.webp'
   ];
   const animeImages = [
-    './HomePageAssets/Anime/anime-1.jpg','./HomePageAssets/Anime/anime-2.jpg','./HomePageAssets/Anime/anime-3.jpg','./HomePageAssets/Anime/anime-4.jpg',
-    './HomePageAssets/Anime/anime-5.jpg','./HomePageAssets/Anime/anime-6.jpg','./HomePageAssets/Anime/anime-7.jpg','./HomePageAssets/Anime/anime-8.jpg',
-    './HomePageAssets/Anime/anime-9.jpg','./HomePageAssets/Anime/anime-10.jpg'
+    './HomePageAssets/Anime/anime-1.webp','./HomePageAssets/Anime/anime-2.webp','./HomePageAssets/Anime/anime-3.webp','./HomePageAssets/Anime/anime-4.webp',
+    './HomePageAssets/Anime/anime-5.webp','./HomePageAssets/Anime/anime-6.webp','./HomePageAssets/Anime/anime-7.webp','./HomePageAssets/Anime/anime-8.webp',
+    './HomePageAssets/Anime/anime-9.webp','./HomePageAssets/Anime/anime-10.webp'
   ];
 
   useEffect(() => { window.history.scrollRestoration = 'manual'; window.scrollTo(0, 0); }, []);
@@ -262,10 +262,13 @@ const LavroPortfolio = () => {
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, []);
 
-  // Helper: create marquee image row
-  const marqueeRow = (images, cls) => h('div', { className: cls + ' gap-3' },
-    [...images, ...images].map((img, i) => h('div', { key: i, className: 'w-[40vw] md:w-[15vw] aspect-[3/4] flex-shrink-0 bg-cover bg-center rounded-sm bg-[#111]', style: { backgroundImage: 'url(' + img + ')' } }))
-  );
+  // Helper: create marquee image row (offset = start index for stagger)
+  const marqueeRow = (images, cls, offset) => {
+    const staggered = [...images.slice(offset % images.length), ...images.slice(0, offset % images.length)];
+    return h('div', { className: cls + ' gap-3' },
+      [...staggered, ...staggered].map((img, i) => h('div', { key: i, className: 'w-[36vw] md:w-[13.5vw] aspect-[3/4] flex-shrink-0 bg-cover bg-center rounded-sm bg-[#111]', style: { backgroundImage: 'url(' + img + ')' } }))
+    );
+  };
 
   const introTransition = (delay) => ({
     opacity: introPhase === 'done' ? 1 : 0,
@@ -378,9 +381,9 @@ const LavroPortfolio = () => {
         // Marquee poster wall
         h('div', { ref: hobbyParallaxRef, className: 'absolute inset-0 z-0 pointer-events-none mix-blend-screen opacity-[0.35] overflow-hidden transform-gpu', style: { willChange: 'transform' } },
           h('div', { className: 'absolute top-1/2 left-1/2 w-[140vw] h-[140vh] -translate-x-1/2 -translate-y-1/2 -rotate-[15deg] scale-110 flex flex-col gap-3 justify-center grayscale-[40%]' },
-            marqueeRow(gameImages, 'animate-marquee'),
-            marqueeRow(animeImages, 'animate-marquee-reverse'),
-            marqueeRow(gameImages, 'animate-marquee')
+            marqueeRow(gameImages, 'animate-marquee', 0),
+            marqueeRow(animeImages, 'animate-marquee-reverse', 4),
+            marqueeRow([...gameImages].reverse(), 'animate-marquee', 8)
           )
         ),
         h('div', { className: 'absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/60 to-[#050505] z-0 pointer-events-none' }),

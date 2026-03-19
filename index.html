@@ -27,11 +27,8 @@
 
     <link rel="icon" type="image/png" href="/favicon.png" />
 
-    <!-- preconnect 关键 CDN，减少 DNS+TLS 延迟 -->
-    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <!-- preconnect 关键 CDN -->
     <link rel="preconnect" href="https://unpkg.com">
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Anton 字体：异步加载 -->
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Anton&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -42,9 +39,11 @@
     <!-- 预加载首屏背景图 -->
     <link rel="preload" href="./HomePageAssets/bg.jpg" as="image">
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com" defer></script>
     <script>
-      tailwind.config = {
+      // Tailwind config 会在 tailwind defer 加载后自动应用
+      window.tailwind = window.tailwind || {};
+      window.tailwind.config = {
         theme: {
           fontFamily: {
             sans: ['"Alibaba PuHuiTi"', 'system-ui', 'sans-serif'],
@@ -58,8 +57,8 @@
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
     
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js" defer></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" defer></script>
 
     <style>
 		#seo-content {
@@ -70,10 +69,13 @@
 			overflow: hidden;
 		}
 		#root {
+			visibility: hidden;
 			opacity: 0;
 		}
 		#root.hydrated {
+			visibility: visible;
 			opacity: 1;
+			transition: opacity 0.3s ease;
 		}
     </style>
 	<script type="application/ld+json">
@@ -175,36 +177,36 @@
 
           <!-- 游戏海报图片（带 alt，供 Google 图片索引） -->
           <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:40px;opacity:0.35;">
-            <img src="./HomePageAssets/Games/games-1.png" alt="Lavro 喜爱的游戏海报 1" width="120" height="160" loading="lazy">
-            <img src="./HomePageAssets/Games/games-2.png" alt="Lavro 喜爱的游戏海报 2" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-1.webp" alt="Lavro 喜爱的游戏海报 1" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-2.webp" alt="Lavro 喜爱的游戏海报 2" width="120" height="160" loading="lazy">
             <img src="./HomePageAssets/Games/games-3.jpg" alt="Lavro 喜爱的游戏海报 3" width="120" height="160" loading="lazy">
-            <img src="./HomePageAssets/Games/games-4.png" alt="Lavro 喜爱的游戏海报 4" width="120" height="160" loading="lazy">
-            <img src="./HomePageAssets/Games/games-5.png" alt="Lavro 喜爱的游戏海报 5" width="120" height="160" loading="lazy">
-            <img src="./HomePageAssets/Games/games-6.png" alt="Lavro 喜爱的游戏海报 6" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-4.webp" alt="Lavro 喜爱的游戏海报 4" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-5.webp" alt="Lavro 喜爱的游戏海报 5" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-6.webp" alt="Lavro 喜爱的游戏海报 6" width="120" height="160" loading="lazy">
             <img src="./HomePageAssets/Games/games-7.jpg" alt="Lavro 喜爱的游戏海报 7" width="120" height="160" loading="lazy">
-            <img src="./HomePageAssets/Games/games-8.png" alt="Lavro 喜爱的游戏海报 8" width="120" height="160" loading="lazy">
-            <img src="./HomePageAssets/Games/games-9.png" alt="Lavro 喜爱的游戏海报 9" width="120" height="160" loading="lazy">
-            <img src="./HomePageAssets/Games/games-10.png" alt="Lavro 喜爱的游戏海报 10" width="120" height="160" loading="lazy">
-            <img src="./HomePageAssets/Games/games-11.png" alt="Lavro 喜爱的游戏海报 11" width="120" height="160" loading="lazy">
-            <img src="./HomePageAssets/Games/games-12.png" alt="Lavro 喜爱的游戏海报 12" width="120" height="160" loading="lazy">
-            <img src="./HomePageAssets/Games/games-13.png" alt="Lavro 喜爱的游戏海报 13" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-8.webp" alt="Lavro 喜爱的游戏海报 8" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-9.webp" alt="Lavro 喜爱的游戏海报 9" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-10.webp" alt="Lavro 喜爱的游戏海报 10" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-11.webp" alt="Lavro 喜爱的游戏海报 11" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-12.webp" alt="Lavro 喜爱的游戏海报 12" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-13.webp" alt="Lavro 喜爱的游戏海报 13" width="120" height="160" loading="lazy">
             <img src="./HomePageAssets/Games/games-14.jpg" alt="Lavro 喜爱的游戏海报 14" width="120" height="160" loading="lazy">
             <img src="./HomePageAssets/Games/games-15.jpg" alt="Lavro 喜爱的游戏海报 15" width="120" height="160" loading="lazy">
-            <img src="./HomePageAssets/Games/games-16.png" alt="Lavro 喜爱的游戏海报 16" width="120" height="160" loading="lazy">
-            <img src="./HomePageAssets/Games/games-17.png" alt="Lavro 喜爱的游戏海报 17" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-16.webp" alt="Lavro 喜爱的游戏海报 16" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-17.webp" alt="Lavro 喜爱的游戏海报 17" width="120" height="160" loading="lazy">
           </div>
           <!-- 动漫海报图片 -->
           <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;opacity:0.35;">
-            <img src="./HomePageAssets/Anime/anime-1.jpg" alt="Lavro 喜爱的动漫海报 1" width="120" height="160" loading="lazy">
-            <img src="./HomePageAssets/Anime/anime-2.jpg" alt="Lavro 喜爱的动漫海报 2" width="120" height="160" loading="lazy">
-            <img src="./HomePageAssets/Anime/anime-3.jpg" alt="Lavro 喜爱的动漫海报 3" width="120" height="160" loading="lazy">
-            <img src="./HomePageAssets/Anime/anime-4.jpg" alt="Lavro 喜爱的动漫海报 4" width="120" height="160" loading="lazy">
-            <img src="./HomePageAssets/Anime/anime-5.jpg" alt="Lavro 喜爱的动漫海报 5" width="120" height="160" loading="lazy">
-            <img src="./HomePageAssets/Anime/anime-6.jpg" alt="Lavro 喜爱的动漫海报 6" width="120" height="160" loading="lazy">
-            <img src="./HomePageAssets/Anime/anime-7.jpg" alt="Lavro 喜爱的动漫海报 7" width="120" height="160" loading="lazy">
-            <img src="./HomePageAssets/Anime/anime-8.jpg" alt="Lavro 喜爱的动漫海报 8" width="120" height="160" loading="lazy">
-            <img src="./HomePageAssets/Anime/anime-9.jpg" alt="Lavro 喜爱的动漫海报 9" width="120" height="160" loading="lazy">
-            <img src="./HomePageAssets/Anime/anime-10.jpg" alt="Lavro 喜爱的动漫海报 10" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Anime/anime-1.webp" alt="Lavro 喜爱的动漫海报 1" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Anime/anime-2.webp" alt="Lavro 喜爱的动漫海报 2" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Anime/anime-3.webp" alt="Lavro 喜爱的动漫海报 3" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Anime/anime-4.webp" alt="Lavro 喜爱的动漫海报 4" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Anime/anime-5.webp" alt="Lavro 喜爱的动漫海报 5" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Anime/anime-6.webp" alt="Lavro 喜爱的动漫海报 6" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Anime/anime-7.webp" alt="Lavro 喜爱的动漫海报 7" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Anime/anime-8.webp" alt="Lavro 喜爱的动漫海报 8" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Anime/anime-9.webp" alt="Lavro 喜爱的动漫海报 9" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Anime/anime-10.webp" alt="Lavro 喜爱的动漫海报 10" width="120" height="160" loading="lazy">
           </div>
         </section>
 
