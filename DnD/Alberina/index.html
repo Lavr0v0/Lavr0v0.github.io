@@ -20,12 +20,9 @@
     <meta name="theme-color" content="#040d1c">
     <link rel="icon" type="image/png" href="/favicon.png" />
 
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://esm.sh">
-    <link rel="preload" href="fonts/NotoSerifSC-subset.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap"></noscript>
-    <link rel="stylesheet" href="tailwind.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.39/dist/lenis.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     
     <style>
         @font-face {
@@ -178,7 +175,7 @@
       <h2>人际关系</h2>
       <ul>
         <li>雪露（Shirul）– 最特殊的人，几乎从雪露出生起就陪在身边。</li>
-        <li>芙勒唯拉（Flavilar）– 安静稳定的教导关系。</li>
+        <li>芙勒维拉（Flavilar）– 安静稳定的教导关系。</li>
         <li>风芦旅人（Wind Reed Travelers）– 默认会继续下去的自然同行。</li>
       </ul>
       <p><a href="https://lavro.org/">返回 Lavro 主站</a> | <a href="https://lavro.org/DnD/Flavilar/">查看 Flavilar 角色页</a></p>
@@ -515,7 +512,7 @@
                     <div class="glass-card p-8 w-full max-w-sm relative z-10 parallax-el" data-speed="-0.28">
                         <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-2 h-2 bg-[var(--astral-blue)] rotate-45"></div>
                         <div class="text-[var(--star-gold)] font-divine text-sm mb-2">02</div>
-                        <h3 class="font-bold text-xl mb-4 text-[var(--astral-blue-light)]">芙勒唯拉 <span class="font-editorial text-sm italic font-normal text-[var(--astral-blue)]/60">Flavilar</span></h3>
+                        <h3 class="font-bold text-xl mb-4 text-[var(--astral-blue-light)]">芙勒维拉 <span class="font-editorial text-sm italic font-normal text-[var(--astral-blue)]/60">Flavilar</span></h3>
                         <p class="text-sm leading-relaxed text-justify mb-4">
                             接近安静稳定的教导关系。承担起为失忆的她解释基础认知的责任。
                         </p>
@@ -559,7 +556,6 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            import('https://esm.sh/lenis@1.1.18').then(({ default: Lenis }) => {
             const lenis = new Lenis({
                 duration: 1.8,
                 easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -675,7 +671,6 @@
             requestAnimationFrame(update);
             
             lenis.emit();
-            }).catch(err => console.log("Lenis load failed.", err));
         });
     </script>
 </body>

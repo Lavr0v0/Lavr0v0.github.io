@@ -22,10 +22,37 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://esm.sh">
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif+SC:wght@400;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif+SC:wght@400;600;700&display=swap"></noscript>
-    <link rel="stylesheet" href="tailwind.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;800;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Serif+SC:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Lenis Smooth Scroll -->
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.39/dist/lenis.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dnd: {
+                            dark: '#0c0b0a',
+                            paper: '#11100e',
+                            light: '#eae4d9',
+                            gold: '#c5a059',
+                            emerald: '#10b981',
+                            muted: '#8c8273'
+                        }
+                    },
+                    fontFamily: {
+                        cinzel: ['Cinzel', 'Noto Serif SC', 'serif'],
+                        garamond: ['Cormorant Garamond', 'Noto Serif SC', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
 
     <style>
         /* 基础与排版 */
@@ -463,29 +490,26 @@
     </footer>
 
     <!-- 脚本逻辑 -->
-    <script type="module">
-        // Lucide icons via esm.sh
-        import { createIcons } from 'https://esm.sh/lucide@0.460.0';
-        createIcons();
+    <script>
+        // 1. 初始化 Lucide 图标
+        lucide.createIcons();
 
         // 检测是否为移动端
         const isMobile = window.innerWidth < 768;
 
-        // Lenis smooth scroll via esm.sh
-        import Lenis from 'https://esm.sh/lenis@1.1.18';
+        // 2. 初始化 Lenis (平滑滚动)
         const lenis = new Lenis({
-            duration: isMobile ? 1.2 : 1.5, // 手机端稍微快一点响应手指
+            duration: isMobile ? 1.2 : 1.5,
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
             direction: 'vertical',
             gestureDirection: 'vertical',
             smooth: true,
             mouseMultiplier: 1,
-            smoothTouch: false, // 手机端触控通常浏览器原生足够好，如果需要丝滑可改为true，但容易与某些手势冲突
+            smoothTouch: false,
             touchMultiplier: 2,
             infinite: false,
         });
 
-        // 将 lenis 挂载到 requestAnimationFrame
         function raf(time) {
             lenis.raf(time);
             requestAnimationFrame(raf);
@@ -497,25 +521,21 @@
         
         lenis.on('scroll', (e) => {
             const scrollY = window.scrollY;
-            
-            // 只有在屏幕顶部一定范围内才计算首屏视差，提升性能
             if (scrollY < window.innerHeight && heroContent) {
-                // 移动端缩小位移和放大比例，避免视觉跳跃
                 const yPos = scrollY * (isMobile ? 0.25 : 0.4);
                 const scale = 1 + (scrollY * (isMobile ? 0.0002 : 0.0005));
                 const opacity = Math.max(0, 1 - (scrollY / (window.innerHeight * (isMobile ? 0.5 : 0.7))));
                 const blur = Math.min(10, scrollY * 0.02);
-                
                 heroContent.style.transform = `translate3d(0, ${yPos}px, 0) scale(${scale})`;
                 heroContent.style.opacity = opacity;
                 heroContent.style.filter = `blur(${blur}px)`;
             }
         });
 
-        // 4. Scroll Reveal (滚动显现监听器)
+        // 4. Scroll Reveal
         const observerOptions = {
             root: null,
-            rootMargin: isMobile ? '0px 0px 0px 0px' : '0px 0px -10% 0px', // 手机端提前一点触发显现
+            rootMargin: isMobile ? '0px 0px 0px 0px' : '0px 0px -10% 0px',
             threshold: 0.1
         };
 
@@ -531,7 +551,6 @@
         document.querySelectorAll('.reveal').forEach((el) => {
             revealObserver.observe(el);
         });
-
     </script>
 </body>
 </html>
