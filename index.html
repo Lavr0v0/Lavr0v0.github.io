@@ -4,11 +4,17 @@
     <link rel="canonical" href="https://lavro.org/" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lavro</title>
-<meta name="description" content="Lavro personal website with navigation, projects, and contact information.">
-    <link rel="icon" type="image/png" href="./favicon.png" />
+    <title>Lavro 个人网站 | Projects, Contact, Creative Work</title>
+    <meta name="description" content="Lavro 个人网站，包含项目导航、创意内容与联系方式。 Personal website of Lavro with projects, creative work, and contact information.">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:title" content="Lavro – Personal Website, Projects, and Contact">
+    <meta property="og:description" content="Lavro personal website with navigation, projects, and contact information.">
+    <meta property="og:url" content="https://lavro.org/">
+    <meta property="og:type" content="website">
+
+    <link rel="icon" type="image/png" href="/favicon.png" />
     
-    <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -21,41 +27,78 @@
       }
     </script>
     
-    <!-- 引入 FontAwesome 图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- 引入 React 和 ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
-    <!-- 引入 Babel 用于在浏览器中解析 JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+      #seo-content {
+        position: absolute;
+        left: -9999px;
+        top: auto;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+      }
+    </style>
 </head>
 <body class="bg-[#050505] overflow-x-hidden antialiased">
-    <div id="root">
+<div id="seo-content">
   <main>
-    <h1>Lavro – Personal Website, Projects, and Contact</h1>
+    <h1>Lavro 个人网站：项目、导航与联系方式</h1>
 
     <p>
-      Lavro.org is the personal website of Lavro. This site serves as a navigation hub
-      for projects, creative works, worldbuilding pages, and personal experiments on the web.
+      Lavro.org 是 Lavro 的个人网站，用于展示项目、创意内容、
+      个人实验以及联系方式。
     </p>
 
     <p>
-      Visitors can use this site to explore project pages, character and DnD-related content,
-      and other sections connected to Lavro’s creative and technical work.
+      访问者可以通过本站进入项目页面、互动工具以及其他与 Lavro
+      创作和技术相关的内容。
+    </p>
+
+    <h2>关于本站</h2>
+    <p>
+      Lavro 是一名学生和创作者，正在进行个人网站、互动工具、
+      创意项目页面与网页实验的构建。
+    </p>
+
+    <h2>主要栏目</h2>
+    <ul>
+      <li><a href="/CForge/">Character Forge</a></li>
+      <li><a href="/LSimulator/">Life Simulator</a></li>
+    </ul>
+
+    <h2>联系方式</h2>
+    <p>
+      本站提供与项目、合作和一般交流相关的联系信息。
+    </p>
+
+    <hr>
+
+    <h1>Lavro – Personal Website, Projects, and Contact</h1>
+
+    <p>
+      Lavro.org is the personal website of Lavro, providing navigation to projects,
+      creative works, and contact information.
+    </p>
+
+    <p>
+      Visitors can explore project pages, interactive tools, and other sections
+      related to Lavro’s creative and technical work.
     </p>
 
     <h2>About</h2>
     <p>
-      Lavro is a student and creator working on personal websites, interactive tools,
-      fictional settings, and web-based experiments.
+      Lavro is a student and creator building personal websites, interactive tools,
+      creative project pages, and experimental web experiences.
     </p>
 
     <h2>Main Sections</h2>
     <ul>
-      <li><a href="/DnD/Alberina">DnD / Alberina</a></li>
-      <li><a href="/DnD/Flavilar">DnD / Flavilar</a></li> 
       <li><a href="/CForge/">Character Forge</a></li>
       <li><a href="/LSimulator/">Life Simulator</a></li>
     </ul>
@@ -66,7 +109,8 @@
       and general communication purposes.
     </p>
   </main>
-    </div>
+</div>
+    <div id="root"></div>
     <script type="text/babel" data-type="module">
         const { useEffect, useState, useRef } = React;
 
