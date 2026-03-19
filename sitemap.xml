@@ -3,12 +3,33 @@
 
   <url>
     <loc>https://lavro.org/</loc>
+    <lastmod>2026-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
   </url>
   <url>
     <loc>https://lavro.org/CForge/</loc>
+    <lastmod>2026-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://lavro.org/LSimulator/</loc>
+    <lastmod>2026-03-19</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://lavro.org/DnD/Alberina/</loc>
+    <lastmod>2026-03-19</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://lavro.org/DnD/Flavilar/</loc>
+    <lastmod>2026-03-19</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.5</priority>
   </url>
 
 </urlset>

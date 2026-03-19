@@ -12,6 +12,18 @@
     <meta property="og:description" content="Lavro personal website with navigation, projects, and contact information.">
     <meta property="og:url" content="https://lavro.org/">
     <meta property="og:type" content="website">
+    <meta property="og:locale" content="zh_CN">
+    <meta property="og:locale:alternate" content="en_US">
+    <meta property="og:image" content="https://lavro.org/favicon.png">
+    <meta property="og:site_name" content="Lavro">
+
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Lavro – Personal Website, Projects, and Contact">
+    <meta name="twitter:description" content="Lavro personal website with projects, creative work, and contact information.">
+
+    <meta name="keywords" content="Lavro, portfolio, personal website, character forge, life simulator, web developer, graphic design, creative developer">
+    <meta name="author" content="Lavro">
+    <meta name="theme-color" content="#050505">
 
     <link rel="icon" type="image/png" href="/favicon.png" />
     
@@ -35,14 +47,13 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
-      #seo-content {
-        position: absolute;
-        left: -9999px;
-        top: auto;
-        width: 1px;
-        height: 1px;
-        overflow: hidden;
-      }
+		#seo-content {
+			position: absolute;
+			left: -9999px;
+			width: 1px;
+			height: 1px;
+			overflow: hidden;
+		}
     </style>
 	<script type="application/ld+json">
 {
@@ -68,71 +79,169 @@
 </script>
 </head>
 <body class="bg-[#050505] overflow-x-hidden antialiased">
-<div id="seo-content">
+<div id="seo-content" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden;">
   <main>
-    <h1>Lavro 个人网站：项目、导航与联系方式</h1>
+    <h1>Lavro 个人网站 – Portfolio, Projects &amp; Contact</h1>
 
     <p>
-      Lavro.org 是 Lavro 的个人网站，用于展示项目、创意内容、
-      个人实验以及联系方式。
+      Lavro.org 是 Lavro 的个人作品集网站，专注于平面设计与创意开发。
+      本站展示互动项目、角色设计、网页实验以及联系方式。
+      Lavro.org is the portfolio of Lavro, a student focused on graphic design and creative development.
     </p>
 
-    <p>
-      访问者可以通过本站进入项目页面、互动工具以及其他与 Lavro
-      创作和技术相关的内容。
-    </p>
-
-    <h2>关于本站</h2>
-    <p>
-      Lavro 是一名学生和创作者，正在进行个人网站、互动工具、
-      创意项目页面与网页实验的构建。
-    </p>
-
-    <h2>主要栏目</h2>
+    <h2>项目 / Projects</h2>
     <ul>
-      <li><a href="/CForge/">Character Forge</a></li>
-      <li><a href="/LSimulator/">Life Simulator</a></li>
+      <li><a href="/CForge/">Character Forge (灵感铸造厂)</a> – 角色构建与数据核心逻辑工具，支持多步骤角色创建与导出。</li>
+      <li><a href="/LSimulator/">Life Simulator (人生轨迹模拟器)</a> – 多分支事件模拟游戏，探索不同人生选择的结果。</li>
     </ul>
 
-    <h2>联系方式</h2>
-    <p>
-      本站提供与项目、合作和一般交流相关的联系信息。
-    </p>
-
-    <hr>
-
-    <h1>Lavro – Personal Website, Projects, and Contact</h1>
-
-    <p>
-      Lavro.org is the personal website of Lavro, providing navigation to projects,
-      creative works, and contact information.
-    </p>
-
-    <p>
-      Visitors can explore project pages, interactive tools, and other sections
-      related to Lavro’s creative and technical work.
-    </p>
-
-    <h2>About</h2>
-    <p>
-      Lavro is a student and creator building personal websites, interactive tools,
-      creative project pages, and experimental web experiences.
-    </p>
-
-    <h2>Main Sections</h2>
+    <h2>设计作品 / Design Works</h2>
     <ul>
-      <li><a href="/CForge/">Character Forge</a></li>
-      <li><a href="/LSimulator/">Life Simulator</a></li>
+      <li><a href="/DnD/Alberina/">Alberina – D&amp;D Astral Chronicle</a> – 龙与地下城角色设计网页展示。</li>
+      <li><a href="/DnD/Flavilar/">Flavilar – D&amp;D Character Page</a> – D&amp;D角色视觉包装实践。</li>
     </ul>
 
-    <h2>Contact</h2>
+    <h2>关于 / About</h2>
     <p>
-      Contact information is available on this website for project, collaboration,
-      and general communication purposes.
+      Lavro 是一名国际学生，主攻平面设计与创意开发，热衷于游戏、动漫与网页实验。
+      Lavro is an international student specializing in graphic design and creative web development.
     </p>
+
+    <h2>联系 / Contact</h2>
+    <p>Email: <a href="mailto:Lavro@lavro.org">Lavro@lavro.org</a></p>
+    <p>GitHub: <a href="https://github.com/Lavr0v0">github.com/Lavr0v0</a></p>
   </main>
 </div>
-    <div id="root"></div>
+    <div id="root">
+      <!-- 静态 HTML 骨架：React 挂载后会替换此内容，但 Google 爬虫首次抓取时可直接读取 -->
+      <div style="background:#050505;color:#f0f0f0;min-height:100vh;font-family:system-ui,sans-serif;">
+
+        <!-- Hero -->
+        <header style="padding:80px 24px;max-width:1200px;margin:0 auto;">
+          <p style="color:#00ff66;font-size:12px;letter-spacing:0.3em;font-family:monospace;">LAVRO.ORG // PORTFOLIO</p>
+          <h1 style="font-size:clamp(4rem,15vw,18rem);line-height:0.8;letter-spacing:-0.05em;margin:16px 0;">LAVRO</h1>
+          <p style="font-size:clamp(14px,2vw,24px);letter-spacing:0.5em;color:#e5e7eb;margin-top:24px;">国际学生 / 平面设计 / 创意开发</p>
+        </header>
+
+        <!-- About -->
+        <section style="padding:80px 24px;max-width:1200px;margin:0 auto;border-top:1px solid #222;">
+          <h2 style="font-size:clamp(3rem,8vw,8rem);line-height:0.9;letter-spacing:-0.05em;">ONLINE ROUTINE. UTC SYNC.</h2>
+          <p style="color:#d1d5db;font-size:18px;line-height:1.8;margin-top:32px;max-width:700px;">
+            我是一名学生，主攻平面设计与创意开发。工作之外，我是一名绝对的 OTAKU，沉浸于各类游戏世界之中。生活与设计的灵感，往往就在这些纯粹的娱乐与创作边界交织处发生。
+          </p>
+        </section>
+
+        <!-- Hobbies - 带 alt 的真实图片 -->
+        <section style="padding:80px 24px;max-width:1200px;margin:0 auto;border-top:1px solid #222;">
+          <h2 style="font-size:clamp(3rem,8vw,7.5rem);line-height:0.9;letter-spacing:-0.05em;">GAMES &amp; ANIME.</h2>
+          <p style="color:#e5e7eb;font-size:18px;line-height:1.8;margin-top:32px;max-width:700px;">
+            平时大部分时间都活跃在各类游戏与番剧的平行世界中。对我而言，这些不仅是简单的消遣，更是维持创造力、审美直觉以及保持热爱的最佳方式。
+          </p>
+
+          <h3 style="color:#00ff66;font-size:12px;font-family:monospace;margin-top:40px;letter-spacing:0.2em;">CURRENTLY PLAYING / 游戏</h3>
+          <ul style="list-style:none;padding:0;margin-top:12px;font-family:monospace;font-size:14px;">
+            <li>APEX LEGENDS</li><li>VALORANT</li><li>MINECRAFT</li><li>OVERWATCH</li><li>ARKNIGHTS</li>
+          </ul>
+
+          <h3 style="color:#00ff66;font-size:12px;font-family:monospace;margin-top:32px;letter-spacing:0.2em;">MANGA &amp; ANIME / 番剧与漫画</h3>
+          <ul style="list-style:none;padding:0;margin-top:12px;font-family:monospace;font-size:14px;">
+            <li>契约之吻</li><li>无职转生</li><li>颂乐人偶</li><li>金牌得主</li><li>堀与宫村</li>
+          </ul>
+
+          <!-- 游戏海报图片（带 alt，供 Google 图片索引） -->
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:40px;opacity:0.35;">
+            <img src="./HomePageAssets/Games/games-1.png" alt="Lavro 喜爱的游戏海报 1" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-2.png" alt="Lavro 喜爱的游戏海报 2" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-3.jpg" alt="Lavro 喜爱的游戏海报 3" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-4.png" alt="Lavro 喜爱的游戏海报 4" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-5.png" alt="Lavro 喜爱的游戏海报 5" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-6.png" alt="Lavro 喜爱的游戏海报 6" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-7.jpg" alt="Lavro 喜爱的游戏海报 7" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-8.png" alt="Lavro 喜爱的游戏海报 8" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-9.png" alt="Lavro 喜爱的游戏海报 9" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-10.png" alt="Lavro 喜爱的游戏海报 10" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-11.png" alt="Lavro 喜爱的游戏海报 11" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-12.png" alt="Lavro 喜爱的游戏海报 12" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-13.png" alt="Lavro 喜爱的游戏海报 13" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-14.jpg" alt="Lavro 喜爱的游戏海报 14" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-15.jpg" alt="Lavro 喜爱的游戏海报 15" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-16.png" alt="Lavro 喜爱的游戏海报 16" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Games/games-17.png" alt="Lavro 喜爱的游戏海报 17" width="120" height="160" loading="lazy">
+          </div>
+          <!-- 动漫海报图片 -->
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;opacity:0.35;">
+            <img src="./HomePageAssets/Anime/anime-1.jpg" alt="Lavro 喜爱的动漫海报 1" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Anime/anime-2.jpg" alt="Lavro 喜爱的动漫海报 2" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Anime/anime-3.jpg" alt="Lavro 喜爱的动漫海报 3" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Anime/anime-4.jpg" alt="Lavro 喜爱的动漫海报 4" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Anime/anime-5.jpg" alt="Lavro 喜爱的动漫海报 5" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Anime/anime-6.jpg" alt="Lavro 喜爱的动漫海报 6" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Anime/anime-7.jpg" alt="Lavro 喜爱的动漫海报 7" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Anime/anime-8.jpg" alt="Lavro 喜爱的动漫海报 8" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Anime/anime-9.jpg" alt="Lavro 喜爱的动漫海报 9" width="120" height="160" loading="lazy">
+            <img src="./HomePageAssets/Anime/anime-10.jpg" alt="Lavro 喜爱的动漫海报 10" width="120" height="160" loading="lazy">
+          </div>
+        </section>
+
+        <!-- Projects: Development -->
+        <section style="padding:80px 24px;max-width:1200px;margin:0 auto;border-top:1px solid #222;">
+          <h2 style="color:#00ff66;font-size:12px;font-family:monospace;letter-spacing:0.4em;">/// 01. DEVELOPMENT WORKS</h2>
+          <div style="margin-top:48px;">
+            <a href="https://lavro.org/CForge" style="color:white;text-decoration:none;display:block;margin-bottom:48px;">
+              <h3 style="font-size:clamp(3rem,8vw,8.5rem);line-height:0.8;letter-spacing:-0.05em;">C. FORGE</h3>
+              <p style="font-family:monospace;font-size:14px;color:#00ff66;margin-top:16px;">&gt; lavro.org/CForge</p>
+              <p style="color:#9ca3af;font-size:18px;margin-top:8px;">CharacterForge - 角色构建与数据核心逻辑</p>
+            </a>
+            <a href="https://lavro.org/LSimulator" style="color:white;text-decoration:none;display:block;">
+              <h3 style="font-size:clamp(3rem,8vw,8.5rem);line-height:0.8;letter-spacing:-0.05em;color:#00ff66;">LIFE SIM.</h3>
+              <p style="font-family:monospace;font-size:14px;color:#00ff66;margin-top:16px;">&gt; lavro.org/LSimulator</p>
+              <p style="color:#9ca3af;font-size:18px;margin-top:8px;">Life Simulator - 游戏机制设计与数值模拟系统</p>
+            </a>
+          </div>
+        </section>
+
+        <!-- Projects: Design -->
+        <section style="padding:80px 24px;max-width:1200px;margin:0 auto;border-top:1px solid #222;">
+          <h2 style="font-size:12px;font-family:monospace;letter-spacing:0.4em;">/// 02. DESIGN AESTHETICS</h2>
+          <div style="margin-top:48px;text-align:center;">
+            <h3 style="font-size:clamp(3rem,8vw,8.5rem);line-height:0.8;letter-spacing:-0.05em;">D&amp;D ARCHIVES</h3>
+            <p style="font-family:monospace;font-size:14px;color:#00ff66;margin-top:16px;">&gt; Dungeons &amp; Dragons</p>
+            <p style="color:#9ca3af;font-size:18px;margin-top:8px;">D&amp;D角色设计网页展示及视觉包装实践</p>
+            <nav style="margin-top:24px;display:flex;justify-content:center;gap:24px;">
+              <a href="https://lavro.org/DnD/Alberina" style="color:white;font-family:monospace;font-size:14px;text-decoration:none;">[ ALBERINA ]</a>
+              <a href="https://lavro.org/DnD/Flavilar" style="color:white;font-family:monospace;font-size:14px;text-decoration:none;">[ FLAVILAR ]</a>
+            </nav>
+          </div>
+        </section>
+
+        <!-- Contact -->
+        <section style="padding:80px 24px;max-width:1200px;margin:0 auto;border-top:1px solid #222;">
+          <h2 style="color:#00ff66;font-size:12px;font-family:monospace;letter-spacing:0.4em;">/// 03. CONTACT NETWORK</h2>
+          <div style="margin-top:48px;">
+            <a href="mailto:Lavro@lavro.org" style="color:white;text-decoration:none;display:block;margin-bottom:32px;">
+              <h3 style="font-size:clamp(3rem,8vw,8.5rem);line-height:0.8;letter-spacing:-0.05em;">EMAIL</h3>
+              <p style="color:#9ca3af;margin-top:8px;">Lavro@lavro.org – 主线联系方式，处理重要事务与项目</p>
+            </a>
+            <a href="https://github.com/Lavr0v0" style="color:white;text-decoration:none;display:block;margin-bottom:32px;">
+              <h3 style="font-size:clamp(3rem,8vw,8.5rem);line-height:0.8;letter-spacing:-0.05em;">GITHUB</h3>
+              <p style="color:#9ca3af;margin-top:8px;">Lavr0v0 – 代码的骨架与开源记录，底层逻辑存放处</p>
+            </a>
+            <div style="margin-bottom:32px;">
+              <h3 style="font-size:clamp(3rem,8vw,8.5rem);line-height:0.8;letter-spacing:-0.05em;color:#00ff66;">DISCORD</h3>
+              <p style="color:#9ca3af;margin-top:8px;">lavro_ – 日常吹水、组排上分，或者赛博空间的快速召唤</p>
+            </div>
+            <a href="https://steamcommunity.com/profiles/76561199125299095/" style="color:white;text-decoration:none;display:block;margin-bottom:32px;">
+              <h3 style="font-size:clamp(3rem,8vw,8.5rem);line-height:0.8;letter-spacing:-0.05em;color:#00ff66;">STEAM</h3>
+              <p style="color:#9ca3af;margin-top:8px;">游戏库与联机状态</p>
+            </a>
+          </div>
+        </section>
+
+        <footer style="padding:48px 24px;text-align:center;font-family:monospace;font-size:12px;color:#4b5563;border-top:1px solid #222;">
+          LAVRO.ORG &copy; 2026 // STAY ONLINE.
+        </footer>
+      </div>
+    </div>
     <script type="text/babel" data-type="module">
         const { useEffect, useState, useRef } = React;
 
