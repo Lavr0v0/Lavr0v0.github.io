@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>借物表 – Lavro.org</title>
+    <meta name="description" content="Lavro.org 使用的所有第三方资源、库、字体与工具的完整归属列表。">
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="canonical" href="https://lavro.org/credits" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Anton&display=swap');
+        @font-face {
+            font-family: 'Alibaba PuHuiTi';
+            src: url('./HomePageAssets/AlibabaPuHuiTi-Light-subset.woff2') format('woff2');
+            font-weight: 300;
+            font-style: normal;
+            font-display: swap;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #050505;
+            color: #f0f0f0;
+            font-family: 'Alibaba PuHuiTi', system-ui, sans-serif;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+        .noise {
+            position: fixed; inset: 0; z-index: 0; opacity: 0.04; pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+        .grid-bg {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background-image:
+                linear-gradient(rgba(0,255,102,0.12) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,102,0.12) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 20%, transparent 70%);
+            -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 20%, transparent 70%);
+        }
+        .mono { font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace; }
+
+        /* Scanlines & sweep */
+        .scanlines {
+            position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0.06;
+            background: repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,255,102,0.1) 1px, rgba(0,255,102,0.1) 2px);
+        }
+        .sweep {
+            position: fixed; top: 0; left: -100%; z-index: 1; pointer-events: none;
+            width: 60%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,255,102,0.04), transparent);
+            animation: sweep 6s ease-in-out infinite;
+        }
+        @keyframes sweep { 0%{left:-60%} 50%{left:100%} 100%{left:-60%} }
+
+        /* Hover glow on items */
+        .item {
+            position: relative;
+        }
+        .item::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 0;
+            background: linear-gradient(90deg, rgba(0,255,102,0.05), transparent);
+            transition: width 0.4s ease;
+            pointer-events: none;
+        }
+        .item:hover::before {
+            width: 100%;
+        }
+
+        /* Category title */
+        .category-title {
+            position: relative;
+            cursor: default;
+        }
+
+        /* Header glow ring */
+        .header-glow {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -55%);
+            width: clamp(500px, 90vw, 900px);
+            height: clamp(500px, 90vw, 900px);
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,255,102,0.15) 0%, rgba(0,255,102,0.05) 40%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+            animation: glow-ring 4s ease-in-out infinite;
+        }
+        .header-glow::after {
+            content: '';
+            position: absolute; inset: -40px;
+            border-radius: 50%;
+            border: 1px solid rgba(0,255,102,0.08);
+            animation: glow-ring 4s ease-in-out infinite reverse;
+        }
+        @keyframes glow-ring {
+            0%, 100% { opacity: 0.5; transform: translate(-50%, -55%) scale(1); }
+            50% { opacity: 1; transform: translate(-50%, -55%) scale(1.08); }
+        }
+
+        /* Thanks section */
+        .thanks {
+            position: relative; z-index: 10;
+            text-align: center;
+            padding: 4rem 2rem 2rem;
+        }
+        .thanks h2 {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(4rem, 15vw, 10rem);
+            letter-spacing: -0.03em;
+            color: transparent;
+            -webkit-text-stroke: 1px #222;
+            line-height: 1;
+            user-select: none;
+            transition: all 1s ease;
+        }
+        .thanks h2.visible {
+            color: transparent;
+            -webkit-text-stroke: 1px #00ff66;
+            text-shadow: 0 0 60px rgba(0,255,102,0.1);
+        }
+        .thanks .thanks-sub {
+            font-size: 0.7rem;
+            color: #333;
+            letter-spacing: 0.4em;
+            margin-top: 1rem;
+        }
+
+        /* Header */
+        .header {
+            position: relative; z-index: 10;
+            text-align: center;
+            padding: 6rem 2rem 3rem;
+        }
+        .header h1 {
+            font-family: 'Anton', sans-serif;
+            font-size: clamp(5rem, 18vw, 12rem);
+            letter-spacing: -0.03em;
+            color: #fff;
+            line-height: 1;
+            position: relative;
+            backface-visibility: hidden;
+            transform: translateZ(0);
+        }
+
+        /* 主站同款 brutal-glitch */
+        .animate-brutal-glitch {
+            animation: main-flash 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+        }
+        .animate-brutal-glitch::before, .animate-brutal-glitch::after {
+            content: attr(data-text);
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: transparent;
+            pointer-events: none;
+            backface-visibility: hidden;
+            font-family: 'Anton', sans-serif;
+            font-size: inherit; line-height: inherit;
+            letter-spacing: inherit;
+        }
+        .animate-brutal-glitch::before {
+            left: 3px;
+            text-shadow: -2px 0 #fff;
+            animation: glitch-slice-1 0.2s infinite linear alternate-reverse;
+        }
+        .animate-brutal-glitch::after {
+            left: -3px;
+            text-shadow: 2px 0 #00ff66;
+            animation: glitch-slice-2 0.3s infinite linear alternate-reverse;
+            z-index: -1;
+        }
+
+        @keyframes main-flash {
+            0% { opacity: 0; color: #fff; }
+            10% { opacity: 1; color: transparent; -webkit-text-stroke: 3px #fff; }
+            25% { color: #00ff66; -webkit-text-stroke: 0px; }
+            40% { color: transparent; -webkit-text-stroke: 4px #fff; }
+            60% { color: #fff; -webkit-text-stroke: 0px transparent; }
+            80% { color: transparent; -webkit-text-stroke: 1px #00ff66; }
+            100% { color: #fff; }
+        }
+        @keyframes glitch-slice-1 {
+            0% { clip-path: inset(20% 0 80% 0); transform: translateX(-10px); }
+            10% { clip-path: inset(60% 0 10% 0); transform: translateX(10px); }
+            20% { clip-path: inset(40% 0 50% 0); transform: translateX(-10px); }
+            30% { clip-path: inset(80% 0 5% 0); transform: translateX(10px); }
+            40% { clip-path: inset(10% 0 70% 0); transform: translateX(-10px); }
+            50% { clip-path: inset(30% 0 40% 0); transform: translateX(10px); }
+            60% { clip-path: inset(70% 0 20% 0); transform: translateX(-10px); }
+            70% { clip-path: inset(5% 0 80% 0); transform: translateX(10px); }
+            80% { clip-path: inset(50% 0 30% 0); transform: translateX(-10px); }
+            90% { clip-path: inset(90% 0 5% 0); transform: translateX(10px); }
+            100% { clip-path: inset(15% 0 60% 0); transform: translateX(-10px); }
+        }
+        @keyframes glitch-slice-2 {
+            0% { clip-path: inset(10% 0 60% 0); transform: translateX(10px); }
+            10% { clip-path: inset(30% 0 20% 0); transform: translateX(-10px); }
+            20% { clip-path: inset(70% 0 10% 0); transform: translateX(10px); }
+            30% { clip-path: inset(20% 0 50% 0); transform: translateX(-10px); }
+            40% { clip-path: inset(50% 0 30% 0); transform: translateX(10px); }
+            50% { clip-path: inset(5% 0 80% 0); transform: translateX(-10px); }
+            60% { clip-path: inset(80% 0 5% 0); transform: translateX(10px); }
+            70% { clip-path: inset(40% 0 40% 0); transform: translateX(-10px); }
+            80% { clip-path: inset(60% 0 10% 0); transform: translateX(10px); }
+            90% { clip-path: inset(20% 0 70% 0); transform: translateX(-10px); }
+            100% { clip-path: inset(10% 0 50% 0); transform: translateX(10px); }
+        }
+        .header .sub {
+            font-size: 0.7rem;
+            letter-spacing: 0.5em;
+            color: #00ff66;
+            margin-top: 1.2rem;
+            opacity: 0.8;
+        }
+        .header .desc {
+            color: #555;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            max-width: 500px;
+            margin-left: auto; margin-right: auto;
+            line-height: 1.8;
+        }
+
+        /* Content */
+        .content {
+            position: relative; z-index: 10;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 2rem 6rem;
+        }
+
+        /* Category */
+        .category {
+            margin-bottom: 3rem;
+        }
+        .category-title {
+            font-size: 0.65rem;
+            letter-spacing: 0.4em;
+            color: #00ff66;
+            opacity: 0.7;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        /* Item */
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 0.7rem 0;
+            border-bottom: 1px solid #0d0d0d;
+            gap: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        .item:hover {
+            border-color: #1a1a1a;
+        }
+        .item-name {
+            color: #ccc;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+        .item-dots {
+            flex: 1;
+            border-bottom: 1px dotted #1a1a1a;
+            min-width: 2rem;
+            margin-bottom: 0.3em;
+        }
+        .item-detail {
+            color: #555;
+            font-size: 0.7rem;
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .item-detail a {
+            color: #555;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .item-detail a:hover {
+            color: #00ff66;
+        }
+
+        /* Tag */
+        .tag {
+            display: inline-block;
+            font-size: 0.55rem;
+            letter-spacing: 0.1em;
+            padding: 0.15rem 0.5rem;
+            border: 1px solid #222;
+            color: #444;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        /* Back link */
+        .back {
+            position: relative; z-index: 10;
+            text-align: center;
+            padding-bottom: 4rem;
+        }
+        .back a {
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            color: #333;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            border: 1px solid #1a1a1a;
+            padding: 0.6rem 2rem;
+        }
+        .back a:hover {
+            color: #00ff66;
+            border-color: #00ff66;
+        }
+
+        /* Footer */
+        .footer-deco {
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.55rem;
+            color: #1a1a1a;
+            letter-spacing: 0.3em;
+        }
+    </style>
+</head>
+<body>
+    <div class="noise"></div>
+    <div class="grid-bg"></div>
+    <div class="scanlines"></div>
+    <div class="sweep"></div>
+
+    <header class="header">
+        <div class="header-glow"></div>
+        <h1 id="title" data-text="CREDITS" class="animate-brutal-glitch">CREDITS</h1>
+        <p class="sub mono">// 借物表</p>
+        <p class="desc">本站使用的所有第三方资源归属列表。感谢开源社区与创作者们。</p>
+    </header>
+
+    <main class="content">
+
+        <!-- 框架与运行时 -->
+        <section class="category">
+            <h2 class="category-title mono">FRAMEWORKS & RUNTIME</h2>
+            <div class="item">
+                <span class="item-name">React 18 <span class="tag mono">SELF-HOSTED</span></span>
+                <span class="item-dots"></span>
+                <span class="item-detail mono"><a href="https://react.dev" target="_blank" rel="noreferrer">react.dev</a></span>
+            </div>
+            <div class="item">
+                <span class="item-name">ReactDOM 18 <span class="tag mono">SELF-HOSTED</span></span>
+                <span class="item-dots"></span>
+                <span class="item-detail mono"><a href="https://react.dev" target="_blank" rel="noreferrer">react.dev</a></span>
+            </div>
+            <div class="item">
+                <span class="item-name">Tailwind CSS 3 <span class="tag mono">PRECOMPILED</span></span>
+                <span class="item-dots"></span>
+                <span class="item-detail mono"><a href="https://tailwindcss.com" target="_blank" rel="noreferrer">tailwindcss.com</a></span>
+            </div>
+        </section>
+
+        <!-- 库与工具 -->
+        <section class="category">
+            <h2 class="category-title mono">LIBRARIES & TOOLS</h2>
+            <div class="item">
+                <span class="item-name">Lenis <span class="tag mono">v1.1.18</span></span>
+                <span class="item-dots"></span>
+                <span class="item-detail mono"><a href="https://lenis.darkroom.engineering" target="_blank" rel="noreferrer">平滑滚动</a></span>
+            </div>
+            <div class="item">
+                <span class="item-name">Lucide Icons</span>
+                <span class="item-dots"></span>
+                <span class="item-detail mono"><a href="https://lucide.dev" target="_blank" rel="noreferrer">DnD 页面图标</a></span>
+            </div>
+        </section>
+
+        <!-- 字体 -->
+        <section class="category">
+            <h2 class="category-title mono">FONTS</h2>
+            <div class="item">
+                <span class="item-name">Anton</span>
+                <span class="item-dots"></span>
+                <span class="item-detail mono"><a href="https://fonts.google.com/specimen/Anton" target="_blank" rel="noreferrer">Google Fonts / OFL</a></span>
+            </div>
+            <div class="item">
+                <span class="item-name">阿里巴巴普惠体 Light <span class="tag mono">SUBSET</span></span>
+                <span class="item-dots"></span>
+                <span class="item-detail mono"><a href="https://www.alibabafonts.com" target="_blank" rel="noreferrer">Alibaba / 免费商用</a></span>
+            </div>
+            <div class="item">
+                <span class="item-name">Cinzel</span>
+                <span class="item-dots"></span>
+                <span class="item-detail mono"><a href="https://fonts.google.com/specimen/Cinzel" target="_blank" rel="noreferrer">Google Fonts / OFL</a></span>
+            </div>
+            <div class="item">
+                <span class="item-name">Playfair Display</span>
+                <span class="item-dots"></span>
+                <span class="item-detail mono"><a href="https://fonts.google.com/specimen/Playfair+Display" target="_blank" rel="noreferrer">Google Fonts / OFL</a></span>
+            </div>
+            <div class="item">
+                <span class="item-name">Cormorant Garamond</span>
+                <span class="item-dots"></span>
+                <span class="item-detail mono"><a href="https://fonts.google.com/specimen/Cormorant+Garamond" target="_blank" rel="noreferrer">Google Fonts / OFL</a></span>
+            </div>
+            <div class="item">
+                <span class="item-name">Noto Serif SC <span class="tag mono">SUBSET</span></span>
+                <span class="item-dots"></span>
+                <span class="item-detail mono"><a href="https://fonts.google.com/noto/specimen/Noto+Serif+SC" target="_blank" rel="noreferrer">Google Fonts / OFL</a></span>
+            </div>
+            <div class="item">
+                <span class="item-name">Noto Sans SC</span>
+                <span class="item-dots"></span>
+                <span class="item-detail mono"><a href="https://fonts.google.com/noto/specimen/Noto+Sans+SC" target="_blank" rel="noreferrer">Google Fonts / OFL</a></span>
+            </div>
+        </section>
+
+        <!-- 图标 -->
+        <section class="category">
+            <h2 class="category-title mono">ICONS</h2>
+            <div class="item">
+                <span class="item-name">Font Awesome 6 Free <span class="tag mono">SVG PATHS</span></span>
+                <span class="item-dots"></span>
+                <span class="item-detail mono"><a href="https://fontawesome.com" target="_blank" rel="noreferrer">CC BY 4.0 / MIT</a></span>
+            </div>
+            <div class="item">
+                <span class="item-name">Lucide</span>
+                <span class="item-dots"></span>
+                <span class="item-detail mono"><a href="https://lucide.dev" target="_blank" rel="noreferrer">ISC License</a></span>
+            </div>
+        </section>
+
+        <!-- CDN 与托管 -->
+        <section class="category">
+            <h2 class="category-title mono">CDN & HOSTING</h2>
+            <div class="item">
+                <span class="item-name">GitHub Pages</span>
+                <span class="item-dots"></span>
+                <span class="item-detail mono"><a href="https://pages.github.com" target="_blank" rel="noreferrer">静态托管</a></span>
+            </div>
+            <div class="item">
+                <span class="item-name">Porkbun</span>
+                <span class="item-dots"></span>
+                <span class="item-detail mono"><a href="https://porkbun.com" target="_blank" rel="noreferrer">域名注册</a></span>
+            </div>
+            <div class="item">
+                <span class="item-name">esm.sh</span>
+                <span class="item-dots"></span>
+                <span class="item-detail mono"><a href="https://esm.sh" target="_blank" rel="noreferrer">ESM CDN / Lenis</a></span>
+            </div>
+            <div class="item">
+                <span class="item-name">Google Fonts</span>
+                <span class="item-dots"></span>
+                <span class="item-detail mono"><a href="https://fonts.google.com" target="_blank" rel="noreferrer">字体 CDN</a></span>
+            </div>
+            <div class="item">
+                <span class="item-name">unpkg</span>
+                <span class="item-dots"></span>
+                <span class="item-detail mono"><a href="https://unpkg.com" target="_blank" rel="noreferrer">DnD 页面 CDN</a></span>
+            </div>
+        </section>
+
+        <!-- 构建工具 -->
+        <section class="category">
+            <h2 class="category-title mono">BUILD TOOLS</h2>
+            <div class="item">
+                <span class="item-name">Tailwind CSS CLI</span>
+                <span class="item-dots"></span>
+                <span class="item-detail mono">CSS 预编译</span>
+            </div>
+            <div class="item">
+                <span class="item-name">pyftsubset (fonttools)</span>
+                <span class="item-dots"></span>
+                <span class="item-detail mono"><a href="https://github.com/fonttools/fonttools" target="_blank" rel="noreferrer">字体子集化</a></span>
+            </div>
+        </section>
+
+        <!-- 特别感谢 -->
+        <section class="category">
+            <h2 class="category-title mono">SPECIAL THANKS</h2>
+            <div class="item">
+                <span class="item-name">SSnO</span>
+                <span class="item-dots"></span>
+                <span class="item-detail mono">阿尔贝丽娜 角色人设</span>
+            </div>
+            <div class="item">
+                <span class="item-name">椿</span>
+                <span class="item-dots"></span>
+                <span class="item-detail mono">芙勒维拉 角色人设</span>
+            </div>
+            <div class="item">
+                <span class="item-name">Kiro (AI Assistant)</span>
+                <span class="item-dots"></span>
+                <span class="item-detail mono">开发辅助与优化</span>
+            </div>
+        </section>
+
+    </main>
+
+    <div class="thanks">
+        <h2 id="thanksText">THANKS.</h2>
+        <p class="thanks-sub mono">// 感谢每一位创作者</p>
+    </div>
+
+    <div class="back">
+        <a href="/" class="mono">[ BACK TO HOME ]</a>
+    </div>
+
+    <footer class="footer-deco mono">
+        LAVRO.ORG // <span id="year"></span> // CREDITS
+    </footer>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // 标题乱码 + brutal-glitch（与主站一致）
+        (function() {
+            var el = document.getElementById('title');
+            var target = 'CREDITS';
+            var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*+<>アイウエオカキクケコ';
+            var iteration = 0;
+            var max = 24;
+            // 开始乱码，glitch 动画同时播放
+            el.textContent = '';
+            var interval = setInterval(function() {
+                var text = '';
+                for (var i = 0; i < target.length; i++) {
+                    if (i < Math.floor(iteration / (max / target.length))) {
+                        text += target[i];
+                    } else {
+                        text += chars[Math.floor(Math.random() * chars.length)];
+                    }
+                }
+                el.textContent = text;
+                iteration++;
+                if (iteration >= max) {
+                    clearInterval(interval);
+                    el.textContent = target;
+                    // 乱码结束后移除 glitch（和主站 introPhase==='done' 一致）
+                    setTimeout(function() {
+                        el.classList.remove('animate-brutal-glitch');
+                    }, 500);
+                }
+            }, 50);
+        })();
+
+        // 入场动画
+        var items = document.querySelectorAll('.item, .category-title');
+        items.forEach(function(el, i) {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(8px)';
+            el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        });
+        var observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        items.forEach(function(el) { observer.observe(el); });
+
+        // THANKS 文字入场
+        var thanksEl = document.getElementById('thanksText');
+        var thanksObs = new IntersectionObserver(function(entries) {
+            if (entries[0].isIntersecting) {
+                thanksEl.classList.add('visible');
+                thanksObs.unobserve(thanksEl);
+            }
+        }, { threshold: 0.3 });
+        thanksObs.observe(thanksEl);
+    </script>
+</body>
+</html>

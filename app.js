@@ -204,6 +204,11 @@ body {
 .animate-fade-in-out { animation: fade-in-out 2s ease forwards; }
 @keyframes scroll-hint-fade { 0% { opacity: 0.7; } 100% { opacity: 0; } }
 .animate-scroll-fade { animation: scroll-hint-fade 0.5s ease forwards; }
+@keyframes rainbow-hue { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
+html.rainbow-mode { animation: rainbow-hue 3s linear infinite; }
+html.rainbow-mode .konami-toast { display: block; }
+.konami-toast { display: none; position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); z-index: 9999; font-family: 'Anton', monospace; font-size: 1rem; letter-spacing: 0.3em; color: #00ff66; background: rgba(0,0,0,0.85); border: 1px solid #00ff66; padding: 0.6rem 2rem; pointer-events: none; animation: toast-fade 3s ease forwards; }
+@keyframes toast-fade { 0% { opacity: 0; transform: translateX(-50%) translateY(-10px); } 10% { opacity: 1; transform: translateX(-50%) translateY(0); } 80% { opacity: 1; } 100% { opacity: 0; } }
 `;
 
 // ==========================================
@@ -528,7 +533,9 @@ const LavroPortfolio = () => {
           // Copyright
           h('p', { className: 'font-mono text-xs text-gray-600' },
             'LAVRO.ORG \u00A9 ' + new Date().getFullYear() + ' // STAY ONLINE.'
-          )
+          ),
+          // Credits link
+          h('a', { href: '/credits', className: 'font-mono text-[10px] tracking-[0.3em] text-gray-500 hover:text-[#00ff66] transition-colors duration-300 mt-2' }, '[ CREDITS ]')
         )
       )
     ) // end main
@@ -540,3 +547,32 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(h(LavroPortfolio));
 document.getElementById('root').style.opacity = '1';
 document.getElementById('root').style.transition = 'opacity 0.3s ease';
+
+// 彩蛋: 点击标题三下触发彩虹模式
+requestAnimationFrame(function() {
+  var clickCount = 0;
+  var clickTimer = null;
+  var toast = document.createElement('div');
+  toast.className = 'konami-toast';
+  toast.textContent = '\u2605 RAINBOW MODE ACTIVATED \u2605';
+  document.body.appendChild(toast);
+
+  var titleEl = document.querySelector('[data-text="LAVRO"]');
+  if (!titleEl) return;
+  titleEl.style.cursor = 'pointer';
+  titleEl.style.userSelect = 'none';
+  titleEl.style.webkitUserSelect = 'none';
+  titleEl.addEventListener('mousedown', function(e) {
+    e.preventDefault();
+    clickCount++;
+    clearTimeout(clickTimer);
+    clickTimer = setTimeout(function() { clickCount = 0; }, 800);
+    if (clickCount >= 3) {
+      clickCount = 0;
+      document.documentElement.classList.toggle('rainbow-mode');
+      toast.style.animation = 'none';
+      void toast.offsetWidth;
+      toast.style.animation = '';
+    }
+  });
+});
