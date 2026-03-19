@@ -502,7 +502,7 @@ const LavroPortfolio = () => {
             h(MonumentalLink, { scrollY, title: 'GITHUB', subtitle: { label: 'Lavr0v0', desc: '\u4EE3\u7801\u7684\u9AA8\u67B6\u4E0E\u5F00\u6E90\u8BB0\u5F55\uFF0C\u5E95\u5C42\u903B\u8F91\u5B58\u653E\u5904' }, link: 'https://github.com/Lavr0v0', index: 5, align: 'right', iconName: 'github' }),
             h(MonumentalLink, { scrollY, title: 'DISCORD', subtitle: { label: 'lavro_', desc: '\u65E5\u5E38\u5439\u6C34\u3001\u7EC4\u6392\u4E0A\u5206\uFF0C\u6216\u8005\u8D5B\u535A\u7A7A\u95F4\u7684\u5FEB\u901F\u53EC\u5524' }, copyText: 'lavro_', index: 6, color: 'green', align: 'left', iconName: 'discord' }),
             h(MonumentalLink, { scrollY, title: 'QQ', subtitle: { label: '1041022220', desc: '\u56FD\u5185\u5E38\u7528\u5373\u65F6\u901A\u8BAF' }, copyText: '1041022220', index: 7, align: 'right', iconName: 'qq' }),
-            h(MonumentalLink, { scrollY, title: 'STEAM', subtitle: { label: 'Profile', desc: '\u6E38\u620F\u5E93\u4E0E\u8054\u673A\u72B6\u6001\uFF0C\u6765\u6253\u6D3E\u6D3E\u6216\u8005\u74E6\uFF01' }, link: 'https://steamcommunity.com/profiles/76561199125299095/', index: 8, color: 'green', align: 'left', iconName: 'steam' })
+            h(MonumentalLink, { scrollY, title: 'STEAM', subtitle: { label: 'Profile', desc: '\u6E38\u620F\u5E93\u4E0E\u8054\u673A\u72B6\u6001' }, link: 'https://steamcommunity.com/profiles/76561199125299095/', index: 8, color: 'green', align: 'left', iconName: 'steam' })
           )
         )
       ),
