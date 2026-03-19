@@ -1,0 +1,20 @@
+# Lavro
+
+> Personal portfolio website of Lavro, an international student focused on graphic design and creative development.
+
+## About
+
+Lavro is a student specializing in graphic design and creative web development. This site showcases interactive projects, character design pages, and contact information.
+
+## Projects
+
+- [Character Forge](https://lavro.org/CForge/): Character building and data core logic tool with multi-step creation and export.
+- [Life Simulator](https://lavro.org/LSimulator/): Branching event simulation game exploring different life choices.
+- [Alberina - D&D Character](https://lavro.org/DnD/Alberina/): Dungeons & Dragons character design showcase.
+- [Flavilar - D&D Character](https://lavro.org/DnD/Flavilar/): D&D character visual packaging practice.
+
+## Contact
+
+- Email: Lavro@lavro.org
+- GitHub: https://github.com/Lavr0v0
+- Steam: https://steamcommunity.com/profiles/76561199125299095/
