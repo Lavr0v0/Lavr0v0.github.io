@@ -54,6 +54,12 @@
 			height: 1px;
 			overflow: hidden;
 		}
+		#root {
+			opacity: 0;
+		}
+		#root.hydrated {
+			opacity: 1;
+		}
     </style>
 	<script type="application/ld+json">
 {
@@ -917,6 +923,7 @@
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<LavroPortfolio />);
+        document.getElementById('root').classList.add('hydrated');
     </script>
 </body>
 </html>
