@@ -1,6 +1,19 @@
 // Lavro Portfolio - Pre-compiled (no Babel needed)
 const { useEffect, useState, useRef, createElement: h, Fragment } = React;
 
+// SVG icon paths (replaces Font Awesome)
+const ICONS = {
+  code: 'M392.8 1.2c-17-4.9-34.7 5-39.6 22l-128 448c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l128-448c4.9-17-5-34.7-22-39.6zm80.6 120.1c-12.5 12.5-12.5 32.8 0 45.3L562.7 256l-89.4 89.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l112-112c12.5-12.5 12.5-32.8 0-45.3l-112-112c-12.5-12.5-32.8-12.5-45.3 0zm-306.7 0c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3l112 112c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l89.4-89.4c12.5-12.5 12.5-32.8 0-45.3z',
+  gamepad: 'M480 96H160A160 160 0 1 0 274.2 368h91.5A160 160 0 1 0 480 96zM248 268a12 12 0 0 1-12 12h-52v52a12 12 0 0 1-12 12h-24a12 12 0 0 1-12-12v-52H84a12 12 0 0 1-12-12v-24a12 12 0 0 1 12-12h52v-52a12 12 0 0 1 12-12h24a12 12 0 0 1 12 12v52h52a12 12 0 0 1 12 12zm216 76a40 40 0 1 1 40-40 40 40 0 0 1-40 40zm64-96a40 40 0 1 1 40-40 40 40 0 0 1-40 40z',
+  dragon: 'M278.6 3.8c-9.4-5.1-20.8-5.1-30.2 0L20.4 144.4C7.6 151.3 0 164.7 0 179.1V320c0 88.4 71.6 160 160 160h48v-40c0-13.3 10.7-24 24-24s24 10.7 24 24v40h48c88.4 0 160-71.6 160-160V179.1c0-14.4-7.6-27.8-20.4-34.7L278.6 3.8zM160 256a32 32 0 1 0 0-64 32 32 0 1 0 0 64zm192-32a32 32 0 1 0-64 0 32 32 0 1 0 64 0z',
+  envelope: 'M48 64C21.5 64 0 85.5 0 112c0 15.1 7.1 29.3 19.2 38.4L236.8 313.6c11.4 8.5 27 8.5 38.4 0L492.8 150.4c12.1-9.1 19.2-23.3 19.2-38.4c0-26.5-21.5-48-48-48H48zM0 176V384c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V176L294.4 339.2c-22.8 17.1-54 17.1-76.8 0L0 176z',
+  github: 'M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.8-14.1-112.8-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8z',
+  discord: 'M524.5 69.8a1.5 1.5 0 0 0-.8-.7A485.1 485.1 0 0 0 404.1 32a1.8 1.8 0 0 0-1.9.9 337.5 337.5 0 0 0-14.9 30.6 447.8 447.8 0 0 0-134.4 0 309.5 309.5 0 0 0-15.1-30.6 1.9 1.9 0 0 0-1.9-.9A483.7 483.7 0 0 0 116.1 69.1a1.7 1.7 0 0 0-.8.7C39.1 183.7 18.2 294.7 28.4 404.4a2 2 0 0 0 .8 1.4A487.7 487.7 0 0 0 176 479.9a1.9 1.9 0 0 0 2.1-.7A348.2 348.2 0 0 0 208.1 430.4a1.9 1.9 0 0 0-1-2.6 321.2 321.2 0 0 1-45.9-21.9 1.9 1.9 0 0 1-.2-3.1c3.1-2.3 6.2-4.7 9.1-7.1a1.8 1.8 0 0 1 1.9-.3c96.2 43.9 200.4 43.9 295.5 0a1.8 1.8 0 0 1 1.9.2c2.9 2.4 6 4.9 9.1 7.2a1.9 1.9 0 0 1-.1 3.1 301.4 301.4 0 0 1-45.9 21.8 1.9 1.9 0 0 0-1 2.6 391.1 391.1 0 0 0 30 48.8 1.9 1.9 0 0 0 2.1.7A486 486 0 0 0 610.7 405.7a1.9 1.9 0 0 0 .8-1.4C623.7 277.6 590.9 167.5 524.5 69.8zM222.5 337.6c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.6-23.4 59.2-52.8 59.2zm195.4 0c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.6-23.1 59.2-52.8 59.2z',
+  qq: 'M395.9 320.2c-4.2-17.4-14.5-33.8-14.5-33.8s5.6-8.5 10.2-24.8c5.5-19.3 4.7-42.4 4.7-42.4C396.3 98.5 329 0 248 0S99.7 98.5 99.7 219.2c0 0-.8 23.1 4.7 42.4 4.6 16.3 10.2 24.8 10.2 24.8s-10.3 16.4-14.5 33.8c-4.7 19.4-1.3 30.7-1.3 30.7 14.1-5.3 35.5-20.5 35.5-20.5 0 27.7 23.9 54.8 66.2 66.5-7.4 4.2-13.5 10.6-13.5 21.2 0 0 .4 16.1 17.2 16.1 0 0 15.5-3.8 29.8-15.7 14.3 11.9 29.8 15.7 29.8 15.7 16.8 0 17.2-16.1 17.2-16.1 0-10.6-6.1-17-13.5-21.2 42.3-11.7 66.2-38.8 66.2-66.5 0 0 21.4 15.2 35.5 20.5 0 0 3.4-11.3-1.3-30.7z',
+  steam: 'M496 256c0 137-111.2 248-248.4 248-113.3 0-209.2-75.5-240-178.9l95.2 39.3c6.4 32.1 34.9 56.4 68.9 56.4 39.2 0 71.1-32.4 70.8-72.1l84.1-61.2c44.6.5 81.2-36.1 81.2-80.6 0-44.8-36.4-81.1-81.2-81.1-44.6 0-80.8 36.3-81.2 80.6l-60.1 85.1c-13.2-.5-25.6 3.2-35.8 9.9L0 191.1C25.8 83.7 127.4 0 247.6 0 384.8 0 496 119 496 256z'
+};
+const ICON_VIEWBOX = { code: '0 0 640 512', gamepad: '0 0 560 512', dragon: '0 0 512 512', envelope: '0 0 512 512', github: '0 0 496 512', discord: '0 0 640 512', qq: '0 0 496 448', steam: '0 0 496 512' };
+
 // ==========================================
 // 自定义 Hook：滚动视口检测
 // ==========================================
@@ -83,16 +96,20 @@ const MonumentalLink = ({ title, subtitle, link, copyText, index, color = "white
   const setRefs = (el) => { ref.current = el; containerRef.current = el; };
 
   // Icon watermark
-  const iconEl = iconName && h('i', {
-    className: iconName + ' absolute top-1/2 text-white z-[-2] pointer-events-none',
+  const iconEl = iconName && ICONS[iconName] && h('svg', {
+    xmlns: 'http://www.w3.org/2000/svg',
+    viewBox: ICON_VIEWBOX[iconName] || '0 0 512 512',
+    fill: 'currentColor',
+    className: 'absolute top-1/2 text-white z-[-2] pointer-events-none',
     style: {
-      fontSize: 'min(40vw, 400px)',
+      width: 'min(40vw, 400px)',
+      height: 'min(40vw, 400px)',
       opacity: logoStyle.opacity,
       [align === 'right' ? 'right' : 'left']: align === 'center' ? '50%' : '5%',
       transform: 'translate(' + (align === 'center' ? '-50%' : '0') + ', -50%)',
       willChange: 'opacity'
     }
-  });
+  }, h('path', { d: ICONS[iconName] }));
 
   // Title element
   const titleStyle = {
@@ -295,7 +312,7 @@ const LavroPortfolio = () => {
     h('style', { dangerouslySetInnerHTML: { __html: globalCSS } }),
 
     // Fixed backgrounds
-    h('div', { className: 'fixed inset-0 z-0 bg-cover bg-center grayscale contrast-[1.3] brightness-[0.25] pointer-events-none', style: { backgroundImage: 'url("./HomePageAssets/bg.jpg")' } }),
+    h('div', { className: 'fixed inset-0 z-0 bg-cover bg-center grayscale contrast-[1.3] brightness-[0.25] pointer-events-none', style: { backgroundImage: 'url("./HomePageAssets/bg.webp")' } }),
     h('div', { className: 'fixed inset-0 z-[1] pointer-events-none opacity-[0.05] mix-blend-overlay', style: { backgroundImage: 'url("https://www.transparenttextures.com/patterns/stardust.png")' } }),
 
     // Main content
@@ -439,8 +456,8 @@ const LavroPortfolio = () => {
             h('h2', { ref: devTitleRef, className: 'text-[#00ff66] tracking-[0.4em] text-xs md:text-sm font-bold font-mono transition-all duration-[800ms] ease-out ' + (devTitleInView ? 'opacity-80 translate-x-0' : 'opacity-0 -translate-x-16') }, '/// 01. DEVELOPMENT WORKS')
           ),
           h('div', { className: 'flex flex-col gap-16 md:gap-32 w-full' },
-            h(MonumentalLink, { scrollY, title: 'C. FORGE', subtitle: { label: 'lavro.org/CForge', desc: 'CharacterForge - \u89D2\u8272\u6784\u5EFA\u4E0E\u6570\u636E\u6838\u5FC3\u903B\u8F91' }, link: 'https://lavro.org/CForge', index: 0, color: 'white', align: 'left', iconName: 'fa-solid fa-code' }),
-            h(MonumentalLink, { scrollY, title: 'LIFE SIM.', subtitle: { label: 'lavro.org/LSimulator', desc: 'Life Simulator - \u6E38\u620F\u673A\u5236\u8BBE\u8BA1\u4E0E\u6570\u503C\u6A21\u62DF\u7CFB\u7EDF' }, link: 'https://lavro.org/LSimulator', index: 1, color: 'green', align: 'right', iconName: 'fa-solid fa-gamepad' })
+            h(MonumentalLink, { scrollY, title: 'C. FORGE', subtitle: { label: 'lavro.org/CForge', desc: 'CharacterForge - \u89D2\u8272\u6784\u5EFA\u4E0E\u6570\u636E\u6838\u5FC3\u903B\u8F91' }, link: 'https://lavro.org/CForge', index: 0, color: 'white', align: 'left', iconName: 'code' }),
+            h(MonumentalLink, { scrollY, title: 'LIFE SIM.', subtitle: { label: 'lavro.org/LSimulator', desc: 'Life Simulator - \u6E38\u620F\u673A\u5236\u8BBE\u8BA1\u4E0E\u6570\u503C\u6A21\u62DF\u7CFB\u7EDF' }, link: 'https://lavro.org/LSimulator', index: 1, color: 'green', align: 'right', iconName: 'gamepad' })
           )
         )
       ),
@@ -453,7 +470,7 @@ const LavroPortfolio = () => {
             h('h2', { ref: designTitleRef, className: 'text-white tracking-[0.4em] text-xs md:text-sm font-bold font-mono transition-all duration-[800ms] ease-out ' + (designTitleInView ? 'opacity-80 translate-x-0' : 'opacity-0 -translate-x-16') }, '/// 02. DESIGN AESTHETICS')
           ),
           h('div', { className: 'flex flex-col gap-16 md:gap-32' },
-            h(MonumentalLink, { scrollY, title: 'D&D ARCHIVES', subtitle: { label: 'Dungeons & Dragons', desc: 'D&D\u89D2\u8272\u8BBE\u8BA1\u7F51\u9875\u5C55\u793A\u53CA\u89C6\u89C9\u5305\u88C5\u5B9E\u8DF5' }, link: null, index: 2, color: 'white', align: 'center', iconName: 'fa-solid fa-dragon',
+            h(MonumentalLink, { scrollY, title: 'D&D ARCHIVES', subtitle: { label: 'Dungeons & Dragons', desc: 'D&D\u89D2\u8272\u8BBE\u8BA1\u7F51\u9875\u5C55\u793A\u53CA\u89C6\u89C9\u5305\u88C5\u5B9E\u8DF5' }, link: null, index: 2, color: 'white', align: 'center', iconName: 'dragon',
               subLinks: [{ name: 'ALBERINA', url: 'https://lavro.org/DnD/Alberina' }, { name: 'FLAVILAR', url: 'https://lavro.org/DnD/Flavilar' }]
             })
           )
@@ -467,11 +484,11 @@ const LavroPortfolio = () => {
             h('h2', { ref: contactTitleRef, className: 'text-[#00ff66] tracking-[0.4em] text-xs md:text-sm font-bold font-mono transition-all duration-[800ms] ease-out ' + (contactTitleInView ? 'opacity-80 translate-x-0' : 'opacity-0 -translate-x-16') }, '/// 03. CONTACT NETWORK')
           ),
           h('div', { className: 'flex flex-col gap-12 md:gap-24 relative z-10' },
-            h(MonumentalLink, { scrollY, title: 'EMAIL', subtitle: { label: 'Lavro@lavro.org', desc: '\u4E3B\u7EBF\u8054\u7CFB\u65B9\u5F0F\uFF0C\u5904\u7406\u91CD\u8981\u4E8B\u52A1\u4E0E\u9879\u76EE' }, link: 'mailto:Lavro@lavro.org', index: 4, align: 'left', iconName: 'fa-solid fa-envelope' }),
-            h(MonumentalLink, { scrollY, title: 'GITHUB', subtitle: { label: 'Lavr0v0', desc: '\u4EE3\u7801\u7684\u9AA8\u67B6\u4E0E\u5F00\u6E90\u8BB0\u5F55\uFF0C\u5E95\u5C42\u903B\u8F91\u5B58\u653E\u5904' }, link: 'https://github.com/Lavr0v0', index: 5, align: 'right', iconName: 'fa-brands fa-github' }),
-            h(MonumentalLink, { scrollY, title: 'DISCORD', subtitle: { label: 'lavro_', desc: '\u65E5\u5E38\u5439\u6C34\u3001\u7EC4\u6392\u4E0A\u5206\uFF0C\u6216\u8005\u8D5B\u535A\u7A7A\u95F4\u7684\u5FEB\u901F\u53EC\u5524' }, copyText: 'lavro_', index: 6, color: 'green', align: 'left', iconName: 'fa-brands fa-discord' }),
-            h(MonumentalLink, { scrollY, title: 'QQ', subtitle: { label: '1041022220', desc: '\u56FD\u5185\u5E38\u7528\u5373\u65F6\u901A\u8BAF' }, copyText: '1041022220', index: 7, align: 'right', iconName: 'fa-brands fa-qq' }),
-            h(MonumentalLink, { scrollY, title: 'STEAM', subtitle: { label: 'Profile', desc: '\u6E38\u620F\u5E93\u4E0E\u8054\u673A\u72B6\u6001\uFF0C\u6765\u6253\u6D3E\u6D3E\u6216\u8005\u74E6\uFF01' }, link: 'https://steamcommunity.com/profiles/76561199125299095/', index: 8, color: 'green', align: 'left', iconName: 'fa-brands fa-steam' })
+            h(MonumentalLink, { scrollY, title: 'EMAIL', subtitle: { label: 'Lavro@lavro.org', desc: '\u4E3B\u7EBF\u8054\u7CFB\u65B9\u5F0F\uFF0C\u5904\u7406\u91CD\u8981\u4E8B\u52A1\u4E0E\u9879\u76EE' }, link: 'mailto:Lavro@lavro.org', index: 4, align: 'left', iconName: 'envelope' }),
+            h(MonumentalLink, { scrollY, title: 'GITHUB', subtitle: { label: 'Lavr0v0', desc: '\u4EE3\u7801\u7684\u9AA8\u67B6\u4E0E\u5F00\u6E90\u8BB0\u5F55\uFF0C\u5E95\u5C42\u903B\u8F91\u5B58\u653E\u5904' }, link: 'https://github.com/Lavr0v0', index: 5, align: 'right', iconName: 'github' }),
+            h(MonumentalLink, { scrollY, title: 'DISCORD', subtitle: { label: 'lavro_', desc: '\u65E5\u5E38\u5439\u6C34\u3001\u7EC4\u6392\u4E0A\u5206\uFF0C\u6216\u8005\u8D5B\u535A\u7A7A\u95F4\u7684\u5FEB\u901F\u53EC\u5524' }, copyText: 'lavro_', index: 6, color: 'green', align: 'left', iconName: 'discord' }),
+            h(MonumentalLink, { scrollY, title: 'QQ', subtitle: { label: '1041022220', desc: '\u56FD\u5185\u5E38\u7528\u5373\u65F6\u901A\u8BAF' }, copyText: '1041022220', index: 7, align: 'right', iconName: 'qq' }),
+            h(MonumentalLink, { scrollY, title: 'STEAM', subtitle: { label: 'Profile', desc: '\u6E38\u620F\u5E93\u4E0E\u8054\u673A\u72B6\u6001\uFF0C\u6765\u6253\u6D3E\u6D3E\u6216\u8005\u74E6\uFF01' }, link: 'https://steamcommunity.com/profiles/76561199125299095/', index: 8, color: 'green', align: 'left', iconName: 'steam' })
           )
         )
       ),
@@ -489,4 +506,5 @@ const LavroPortfolio = () => {
 // Mount
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(h(LavroPortfolio));
-document.getElementById('root').classList.add('hydrated');
+document.getElementById('root').style.opacity = '1';
+document.getElementById('root').style.transition = 'opacity 0.3s ease';
