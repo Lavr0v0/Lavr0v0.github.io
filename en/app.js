@@ -1,4 +1,4 @@
-// Lavro Portfolio - Pre-compiled (no Babel needed)
+// Lavro Portfolio - English Version (Pre-compiled, no Babel needed)
 const { useEffect, useState, useRef, createElement: h, Fragment } = React;
 
 // SVG icon paths (replaces Font Awesome)
@@ -15,7 +15,7 @@ const ICONS = {
 const ICON_VIEWBOX = { code: '0 0 640 512', gamepad: '0 0 640 512', dragon: '0 0 640 512', envelope: '0 0 512 512', github: '0 0 496 512', discord: '0 0 640 512', qq: '0 0 448 512', steam: '0 0 496 512' };
 
 // ==========================================
-// 自定义 Hook：滚动视口检测
+// Custom Hook: Scroll Viewport Detection
 // ==========================================
 const useInView = (options) => {
   const ref = useRef(null);
@@ -33,7 +33,7 @@ const useInView = (options) => {
 };
 
 // ==========================================
-// 乱码打字机特效组件
+// Scrambled Typewriter Effect Component
 // ==========================================
 const ScrambledText = ({ text, phase }) => {
   const [displayText, setDisplayText] = useState(phase === 'start' ? '' : text);
@@ -57,9 +57,9 @@ const ScrambledText = ({ text, phase }) => {
 };
 
 // ==========================================
-// 核心子组件：纪念碑式物理交互链接
+// Core Component: Monumental Physics Link
 // ==========================================
-const MonumentalLink = ({ title, subtitle, link, copyText, index, color = "white", align = "left", subLinks, iconName, scrollY }) => {
+const MonumentalLink = ({ title, subtitle, link, copyText, index, color = "white", align = "left", subLinks, iconName, scrollY, badge }) => {
   const [ref, inView] = useInView({ threshold: 0.2 });
   const containerRef = useRef(null);
   const [copied, setCopied] = useState(false);
@@ -67,7 +67,6 @@ const MonumentalLink = ({ title, subtitle, link, copyText, index, color = "white
 
   useEffect(() => {
     if (!containerRef.current || !iconName) return;
-    // 延迟到下一帧读取布局，避免强制重排
     const id = requestAnimationFrame(() => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
@@ -95,7 +94,6 @@ const MonumentalLink = ({ title, subtitle, link, copyText, index, color = "white
 
   const setRefs = (el) => { ref.current = el; containerRef.current = el; };
 
-  // Icon watermark
   const iconEl = iconName && ICONS[iconName] && h('svg', {
     xmlns: 'http://www.w3.org/2000/svg',
     viewBox: ICON_VIEWBOX[iconName] || '0 0 512 512',
@@ -110,7 +108,6 @@ const MonumentalLink = ({ title, subtitle, link, copyText, index, color = "white
     }
   }, h('path', { d: ICONS[iconName] }));
 
-  // Title element
   const titleStyle = {
     WebkitTextStroke: inView ? '0px transparent' : strokeColor,
     transform: inView ? 'translate3d(0, 0, 0)' : 'translate3d(' + initialTranslateX + 'px, ' + initialTranslateY + 'px, 0)',
@@ -146,10 +143,10 @@ const MonumentalLink = ({ title, subtitle, link, copyText, index, color = "white
     }, title);
   }
 
-  // Subtitle + sublinks
   const subtitleEl = h('div', { className: 'w-full max-w-3xl pt-2 flex flex-col relative z-20 ' + innerAlign },
     h('div', { className: 'transition-all duration-1000 ease-out delay-100 ' + (inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12') },
       h('span', { className: 'font-mono text-sm md:text-base mb-3 block font-bold ' + labelColor }, '> ', subtitle.label),
+      badge && h('span', { className: 'inline-block text-[10px] tracking-[0.15em] px-2 py-0.5 border border-[#00ff66]/40 text-[#00ff66]/70 font-mono ml-0 mt-2 mb-1' }, badge),
       h('p', { className: 'text-base md:text-xl text-gray-400 font-light leading-relaxed' }, subtitle.desc),
       subLinks && h('div', { className: 'flex flex-wrap items-center gap-6 mt-6 ' + subLinkJustify },
         subLinks.map((sl, idx) => h('a', {
@@ -166,13 +163,20 @@ const MonumentalLink = ({ title, subtitle, link, copyText, index, color = "white
 };
 
 // ==========================================
-// CSS 样式字符串
+// CSS Styles
 // ==========================================
 const globalCSS = `
 @font-face {
   font-family: 'Alibaba PuHuiTi';
-  src: url('./HomePageAssets/AlibabaPuHuiTi-Light-subset.woff2') format('woff2');
+  src: url('../HomePageAssets/AlibabaPuHuiTi-Light-subset.woff2') format('woff2');
   font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Smooch Sans';
+  src: url('../HomePageAssets/SmoochSans-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
@@ -180,7 +184,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  font-family: 'Alibaba PuHuiTi', system-ui, sans-serif;
+  font-family: 'Smooch Sans', system-ui, -apple-system, sans-serif;
 }
 .font-display { font-family: 'Anton', sans-serif; }
 ::-webkit-scrollbar { width: 8px; }
@@ -212,7 +216,7 @@ html.rainbow-mode .konami-toast { display: block; }
 `;
 
 // ==========================================
-// 主应用：Lavro Portfolio
+// Main App: Lavro Portfolio (English)
 // ==========================================
 const LavroPortfolio = () => {
   const [scrollY, setScrollY] = useState(0);
@@ -260,16 +264,16 @@ const LavroPortfolio = () => {
   const [contactTitleRef, contactTitleInView] = useInView({ threshold: 0.8 });
 
   const gameImages = [
-    './HomePageAssets/Games/games-1.webp','./HomePageAssets/Games/games-2.webp','./HomePageAssets/Games/games-3.webp','./HomePageAssets/Games/games-4.webp',
-    './HomePageAssets/Games/games-5.webp','./HomePageAssets/Games/games-6.webp','./HomePageAssets/Games/games-7.webp','./HomePageAssets/Games/games-8.webp',
-    './HomePageAssets/Games/games-9.webp','./HomePageAssets/Games/games-10.webp','./HomePageAssets/Games/games-11.webp','./HomePageAssets/Games/games-12.webp',
-    './HomePageAssets/Games/games-13.webp','./HomePageAssets/Games/games-14.webp','./HomePageAssets/Games/games-15.webp','./HomePageAssets/Games/games-16.webp',
-    './HomePageAssets/Games/games-17.webp'
+    '../HomePageAssets/Games/games-1.webp','../HomePageAssets/Games/games-2.webp','../HomePageAssets/Games/games-3.webp','../HomePageAssets/Games/games-4.webp',
+    '../HomePageAssets/Games/games-5.webp','../HomePageAssets/Games/games-6.webp','../HomePageAssets/Games/games-7.webp','../HomePageAssets/Games/games-8.webp',
+    '../HomePageAssets/Games/games-9.webp','../HomePageAssets/Games/games-10.webp','../HomePageAssets/Games/games-11.webp','../HomePageAssets/Games/games-12.webp',
+    '../HomePageAssets/Games/games-13.webp','../HomePageAssets/Games/games-14.webp','../HomePageAssets/Games/games-15.webp','../HomePageAssets/Games/games-16.webp',
+    '../HomePageAssets/Games/games-17.webp'
   ];
   const animeImages = [
-    './HomePageAssets/Anime/anime-1.webp','./HomePageAssets/Anime/anime-2.webp','./HomePageAssets/Anime/anime-3.webp','./HomePageAssets/Anime/anime-4.webp',
-    './HomePageAssets/Anime/anime-5.webp','./HomePageAssets/Anime/anime-6.webp','./HomePageAssets/Anime/anime-7.webp','./HomePageAssets/Anime/anime-8.webp',
-    './HomePageAssets/Anime/anime-9.webp','./HomePageAssets/Anime/anime-10.webp'
+    '../HomePageAssets/Anime/anime-1.webp','../HomePageAssets/Anime/anime-2.webp','../HomePageAssets/Anime/anime-3.webp','../HomePageAssets/Anime/anime-4.webp',
+    '../HomePageAssets/Anime/anime-5.webp','../HomePageAssets/Anime/anime-6.webp','../HomePageAssets/Anime/anime-7.webp','../HomePageAssets/Anime/anime-8.webp',
+    '../HomePageAssets/Anime/anime-9.webp','../HomePageAssets/Anime/anime-10.webp'
   ];
 
   useEffect(() => { window.history.scrollRestoration = 'manual'; window.scrollTo(0, 0); }, []);
@@ -299,7 +303,6 @@ const LavroPortfolio = () => {
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, []);
 
-  // Helper: create marquee image row (offset = start index for stagger)
   const marqueeRow = (images, cls, offset) => {
     const staggered = [...images.slice(offset % images.length), ...images.slice(0, offset % images.length)];
     return h('div', { className: cls + ' gap-3' },
@@ -316,40 +319,34 @@ const LavroPortfolio = () => {
   // ==========================================
   // RENDER
   // ==========================================
-  return h('div', { className: 'min-h-screen bg-[#050505] text-[#f0f0f0] overflow-hidden selection:bg-[#00ff66] selection:text-black font-sans' },
+  return h('div', { className: 'min-h-screen bg-[#050505] text-[#f0f0f0] overflow-hidden selection:bg-[#00ff66] selection:text-black', style: { fontFamily: "'Smooch Sans', system-ui, sans-serif" } },
 
-    // Global CSS
     h('style', { dangerouslySetInnerHTML: { __html: globalCSS } }),
 
-    // Fixed backgrounds
-    h('div', { className: 'fixed inset-0 z-0 bg-cover bg-center grayscale contrast-[1.3] brightness-[0.25] pointer-events-none', style: { backgroundImage: 'url("./HomePageAssets/bg.webp")' } }),
+    h('div', { className: 'fixed inset-0 z-0 bg-cover bg-center grayscale contrast-[1.3] brightness-[0.25] pointer-events-none', style: { backgroundImage: 'url("../HomePageAssets/bg.webp")' } }),
     h('div', { className: 'fixed inset-0 z-[1] pointer-events-none opacity-[0.05] mix-blend-overlay', style: { backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")' } }),
 
-    // Main content
     h('main', { className: 'relative z-10 w-full' },
 
       // Language switch (top-right)
-      h('a', { href: '/en/', className: 'fixed top-6 right-6 z-50 text-xs tracking-[0.2em] text-[#00ff66] border border-[#00ff66] px-4 py-2 hover:bg-[#00ff66] hover:text-[#050505] transition-all duration-300 font-mono' }, 'EN'),
+      h('a', { href: '/', className: 'fixed top-6 right-6 z-50 text-xs tracking-[0.2em] text-[#00ff66] border border-[#00ff66] px-4 py-2 hover:bg-[#00ff66] hover:text-[#050505] transition-all duration-300', style: { fontFamily: "'Smooch Sans', system-ui, sans-serif" } }, '\u4E2D\u6587'),
 
       // === 01. HERO ===
       h('header', { className: 'relative w-full h-screen flex items-center justify-center' },
         h('div', { ref: heroContentRef, className: 'absolute inset-0 z-20 w-full max-w-[100rem] mx-auto px-6 flex flex-col items-start justify-center', style: { willChange: 'transform' } },
-          // Portfolio label
           h('div', { ref: heroFadeRef1, style: { willChange: 'opacity' } },
             h('div', { style: introTransition(0.1) },
               h('h2', { className: 'text-[#00ff66] tracking-[0.3em] uppercase text-xs md:text-sm mb-8 font-bold opacity-80 font-mono' }, 'LAVRO.ORG // PORTFOLIO')
             )
           ),
-          // LAVRO title
           h('h1', {
             ref: heroTitleRef, 'data-text': 'LAVRO',
             className: 'text-[6rem] sm:text-[10rem] md:text-[14rem] lg:text-[18rem] tracking-tighter uppercase leading-[0.8] text-white font-display transform-gpu relative ' + (introPhase !== 'done' ? 'animate-brutal-glitch' : ''),
             style: { transformOrigin: 'left center', willChange: 'transform' }
           }, h(ScrambledText, { text: 'LAVRO', phase: introPhase })),
-          // Subtitle area
           h('div', { ref: heroFadeRef2, className: 'w-full', style: { willChange: 'opacity' } },
             h('div', { style: introTransition(0.3) },
-              h('h2', { className: 'text-base md:text-2xl tracking-[0.5em] md:tracking-[1em] text-gray-200 mt-6 md:mt-8 ml-2 font-light relative z-20' }, '\u56FD\u9645\u5B66\u751F / \u5E73\u9762\u8BBE\u8BA1 / \u521B\u610F\u5F00\u53D1')
+              h('h2', { className: 'text-base md:text-2xl tracking-[0.3em] md:tracking-[0.5em] text-gray-200 mt-6 md:mt-8 ml-2 font-light relative z-20 leading-relaxed' }, 'INTERNATIONAL STUDENT', h('br'), 'CREATIVE DEVELOPMENT', h('br'), 'GRAPHIC DESIGN')
             ),
             h('div', { className: 'w-full max-w-4xl', style: introTransition(0.5) },
               h('div', { className: 'flex flex-wrap gap-x-12 gap-y-6 mt-12 md:mt-16 text-xs md:text-sm tracking-[0.1em] md:tracking-[0.2em] font-mono font-bold text-white relative z-20' },
@@ -370,14 +367,12 @@ const LavroPortfolio = () => {
           )
         ),
 
-        // Scroll hint arrow
         h('div', { className: 'absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1 md:gap-2 transition-opacity duration-500 ' + (scrollY > 50 ? 'opacity-0 pointer-events-none' : 'opacity-70'), style: { transition: 'opacity 0.5s ease' } },
           h('span', { className: 'text-[10px] font-mono tracking-[0.3em] text-gray-400 uppercase hidden md:block' }, 'SCROLL'),
           h('svg', { className: 'w-4 h-4 md:w-5 md:h-5 text-[#00ff66] animate-bounce-down', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: '2' },
             h('path', { d: 'M7 13l5 5 5-5M7 6l5 5 5-5' })
           )
         ),
-        // Invert clip layer
         h('div', { className: 'absolute inset-0 z-30 pointer-events-none ' + (linePhase === 'start' ? 'translate-x-[100vw]' : 'transition-transform duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] translate-x-0') },
           h('div', { ref: clipBackdropRef, className: 'absolute inset-0', style: { backdropFilter: 'invert(100%) hue-rotate(180deg)', WebkitBackdropFilter: 'invert(100%) hue-rotate(180deg)', clipPath: 'polygon(55% 0, 100% 0, 100% 100%, 35% 100%)' } }),
           h('svg', { className: 'absolute inset-0 w-full h-full drop-shadow-[0_0_15px_rgba(0,255,102,0.3)]' },
@@ -402,8 +397,8 @@ const LavroPortfolio = () => {
               h('div', { className: 'mt-8 w-16 h-1 bg-[#00ff66] transition-all duration-1000 delay-300 ' + (aboutTitleInView ? 'opacity-100' : 'opacity-0') })
             ),
             h('div', { ref: aboutParallaxRef, className: 'w-full lg:w-7/12 flex flex-col justify-end pb-4 space-y-8', style: { willChange: 'transform' } },
-              h('p', { className: 'text-base md:text-xl text-gray-300 leading-loose tracking-wide font-light max-w-2xl' },
-                '\u6211\u662F\u4E00\u540D\u5B66\u751F\uFF0C\u4E3B\u653B\u5E73\u9762\u8BBE\u8BA1\u4E0E\u521B\u610F\u5F00\u53D1\u3002\u5728\u8FD9\u91CC\uFF0C\u6CA1\u6709\u592A\u591A\u5B8F\u5927\u7684\u5546\u4E1A\u5BA3\u8A00\u3002\u5DE5\u4F5C\u4E4B\u5916\uFF0C\u6211\u662F\u4E00\u540D\u7EDD\u5BF9\u7684 OTAKU\uFF0C\u6C89\u6D78\u4E8E\u5404\u7C7B\u6E38\u620F\u4E16\u754C\u4E4B\u4E2D\u3002\u751F\u6D3B\u4E0E\u8BBE\u8BA1\u7684\u7075\u611F\uFF0C\u5F80\u5F80\u5C31\u5728\u8FD9\u4E9B\u7EAF\u7CB9\u7684\u5A31\u4E50\u4E0E\u521B\u4F5C\u8FB9\u754C\u4EA4\u7EC7\u5904\u53D1\u751F\u3002'
+              h('p', { className: 'text-lg md:text-2xl text-gray-300 leading-loose tracking-wide font-light max-w-2xl' },
+                "I'm a student majoring in graphic design and creative development. No grand corporate manifestos here. Beyond work, I'm a total OTAKU, immersed in all kinds of gaming worlds. Inspiration for life and design often sparks at the intersection of pure entertainment and creation."
               ),
               h('div', { className: 'flex flex-col md:flex-row gap-8 max-w-2xl my-4 py-6 border-t border-[#333]/40' },
                 h('div', { className: 'flex flex-col gap-2' },
@@ -416,18 +411,17 @@ const LavroPortfolio = () => {
                 )
               ),
               h('div', { className: 'pt-2' },
-                h('p', { className: 'text-sm md:text-base text-gray-400 leading-relaxed tracking-wide font-light max-w-2xl' },
-                  '\u5982\u679C\u4F60\u60F3\u627E\u6211\u804A\u804A\u9879\u76EE\u3001\u63A2\u8BA8\u8BBE\u8BA1\uFF0C\u6216\u8005\u5355\u7EAF\u60F3\u62C9\u4E0A\u6211\u8054\u673A\u6253\u6E38\u620F\uFF0C\u53EA\u8981\u6CA1\u5728\u7761\u89C9\u6216\u4E0A\u8BFE\uFF0C\u6211\u901A\u5E38\u90FD\u5728\u8D5B\u535A\u7A7A\u95F4\u3002')
+                h('p', { className: 'text-base md:text-lg text-gray-400 leading-relaxed tracking-wide font-light max-w-2xl' },
+                  "If you want to chat about projects, discuss design, or simply squad up for some games — as long as I'm not sleeping or in class, I'm usually around in cyberspace."
+                )
               )
             )
           )
         )
       ),
 
-
       // === 03. FAVORITES & INTERESTS ===
       h('section', { className: 'relative w-full min-h-screen py-24 md:py-40 z-10 overflow-hidden flex items-center border-t border-[#111]' },
-        // Marquee poster wall
         h('div', { ref: hobbyParallaxRef, className: 'absolute inset-0 z-0 pointer-events-none mix-blend-screen opacity-[0.35] overflow-hidden transform-gpu', style: { willChange: 'transform' } },
           h('div', { className: 'absolute top-1/2 left-1/2 w-[140vw] h-[140vh] -translate-x-1/2 -translate-y-1/2 -rotate-[15deg] scale-110 flex flex-col gap-3 justify-center grayscale-[40%]' },
             marqueeRow(gameImages, 'animate-marquee', 0),
@@ -445,22 +439,22 @@ const LavroPortfolio = () => {
               )
             ),
             h('div', { className: 'w-full md:w-8/12 border-l-[3px] border-[#00ff66] pl-6 md:pl-12 transition-all duration-1000 delay-300 ' + (hobbyTitleInView ? 'translate-x-0 opacity-100' : 'translate-x-12 opacity-0') },
-              h('p', { className: 'text-base md:text-xl text-gray-200 leading-loose tracking-wide font-light' },
-                '\u5E73\u65F6\u5927\u90E8\u5206\u65F6\u95F4\u90FD\u6D3B\u8DC3\u5728\u5404\u7C7B\u6E38\u620F\u4E0E\u756A\u5267\u7684\u5E73\u884C\u4E16\u754C\u4E2D\u3002\u5BF9\u6211\u800C\u8A00\uFF0C\u8FD9\u4E9B\u4E0D\u4EC5\u662F\u7B80\u5355\u7684\u6D88\u9063\uFF0C\u66F4\u662F\u7EF4\u6301\u521B\u9020\u529B\u3001\u5BA1\u7F8E\u76F4\u89C9\u4EE5\u53CA\u4FDD\u6301\u70ED\u7231\u7684\u6700\u4F73\u65B9\u5F0F\u3002'
+              h('p', { className: 'text-lg md:text-2xl text-gray-200 leading-loose tracking-wide font-light' },
+                "Most of my free time is spent in the parallel worlds of games and anime. For me, these aren't just simple pastimes — they're the best way to maintain creativity, aesthetic intuition, and keep the passion alive."
               ),
               h('div', { className: 'grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12 mt-10 pt-8 border-t border-[#333]/50' },
                 h('div', null,
-                  h('h4', { className: 'text-[#00ff66] text-xs font-mono mb-4 tracking-widest opacity-80' }, '>> CURRENTLY PLAYING / \u6E38\u620F'),
+                  h('h4', { className: 'text-[#00ff66] text-xs font-mono mb-4 tracking-widest opacity-80' }, '>> CURRENTLY PLAYING'),
                   h('ul', { className: 'space-y-3 font-mono text-sm tracking-wider text-white' },
-                    ['APEX\u82F1\u96C4','\u74E6\u6D1B\u5170\u7279','\u6211\u7684\u4E16\u754C','\u5B88\u671B\u5148\u950B','\u660E\u65E5\u65B9\u821F'].map((g,i) =>
+                    ['APEX LEGENDS','VALORANT','MINECRAFT','OVERWATCH','ARKNIGHTS'].map((g,i) =>
                       h('li', { key: i, className: 'flex items-center gap-3' }, h('span', { className: 'text-[#333]' }, '-'), ' ', g)
                     )
                   )
                 ),
                 h('div', null,
-                  h('h4', { className: 'text-[#00ff66] text-xs font-mono mb-4 tracking-widest opacity-80' }, '>> MANGA & ANIME / \u756A\u5267\u4E0E\u6F2B\u753B'),
+                  h('h4', { className: 'text-[#00ff66] text-xs font-mono mb-4 tracking-widest opacity-80' }, '>> MANGA & ANIME'),
                   h('ul', { className: 'space-y-3 font-mono text-sm tracking-wider text-white' },
-                    ['\u5951\u7EA6\u4E4B\u543B','\u65E0\u804C\u8F6C\u751F','\u9882\u4E50\u4EBA\u5076','\u91D1\u724C\u5F97\u4E3B','\u5800\u4E0E\u5BAB\u6751'].map((a,i) =>
+                    ['ENGAGE KISS','MUSHOKU TENSEI','AVE MUJICA','MEDALIST','HORIMIYA'].map((a,i) =>
                       h('li', { key: i, className: 'flex items-center gap-3' }, h('span', { className: 'text-[#333]' }, '-'), ' ', a)
                     )
                   )
@@ -478,8 +472,8 @@ const LavroPortfolio = () => {
             h('h2', { ref: devTitleRef, className: 'text-[#00ff66] tracking-[0.4em] text-xs md:text-sm font-bold font-mono transition-all duration-[800ms] ease-out ' + (devTitleInView ? 'opacity-80 translate-x-0' : 'opacity-0 -translate-x-16') }, '/// 01. DEVELOPMENT WORKS')
           ),
           h('div', { className: 'flex flex-col gap-16 md:gap-32 w-full' },
-            h(MonumentalLink, { scrollY, title: 'C. FORGE', subtitle: { label: 'lavro.org/CForge', desc: 'CharacterForge - \u89D2\u8272\u6784\u5EFA\u4E0E\u6570\u636E\u6838\u5FC3\u903B\u8F91' }, link: 'https://lavro.org/CForge/', index: 0, color: 'white', align: 'left', iconName: 'code' }),
-            h(MonumentalLink, { scrollY, title: 'LIFE SIM.', subtitle: { label: 'lavro.org/LSimulator', desc: 'Life Simulator - \u6E38\u620F\u673A\u5236\u8BBE\u8BA1\u4E0E\u6570\u503C\u6A21\u62DF\u7CFB\u7EDF' }, link: 'https://lavro.org/LSimulator/', index: 1, color: 'green', align: 'right', iconName: 'gamepad' })
+            h(MonumentalLink, { scrollY, title: 'C. FORGE', subtitle: { label: 'lavro.org/CForge', desc: 'CharacterForge — Character building and data core logic' }, link: 'https://lavro.org/CForge/', index: 0, color: 'white', align: 'left', iconName: 'code', badge: 'ZH ONLY' }),
+            h(MonumentalLink, { scrollY, title: 'LIFE SIM.', subtitle: { label: 'lavro.org/LSimulator', desc: 'Life Simulator — Game mechanics design and numerical simulation' }, link: 'https://lavro.org/LSimulator/', index: 1, color: 'green', align: 'right', iconName: 'gamepad' })
           )
         )
       ),
@@ -492,7 +486,7 @@ const LavroPortfolio = () => {
             h('h2', { ref: designTitleRef, className: 'text-white tracking-[0.4em] text-xs md:text-sm font-bold font-mono transition-all duration-[800ms] ease-out ' + (designTitleInView ? 'opacity-80 translate-x-0' : 'opacity-0 -translate-x-16') }, '/// 02. DESIGN AESTHETICS')
           ),
           h('div', { className: 'flex flex-col gap-16 md:gap-32' },
-            h(MonumentalLink, { scrollY, title: 'D&D ARCHIVES', subtitle: { label: 'Dungeons & Dragons', desc: 'D&D\u89D2\u8272\u8BBE\u8BA1\u7F51\u9875\u5C55\u793A\u53CA\u89C6\u89C9\u5305\u88C5\u5B9E\u8DF5' }, link: null, index: 2, color: 'white', align: 'center', iconName: 'dragon',
+            h(MonumentalLink, { scrollY, title: 'D&D ARCHIVES', subtitle: { label: 'Dungeons & Dragons', desc: 'Fan-made OC character showcase pages and visual design practice' }, link: null, index: 2, color: 'white', align: 'center', iconName: 'dragon', badge: 'ZH ONLY',
               subLinks: [{ name: 'ALBERINA', url: 'https://lavro.org/DnD/Alberina/' }, { name: 'FLAVILAR', url: 'https://lavro.org/DnD/Flavilar/' }]
             })
           )
@@ -506,11 +500,11 @@ const LavroPortfolio = () => {
             h('h2', { ref: contactTitleRef, className: 'text-[#00ff66] tracking-[0.4em] text-xs md:text-sm font-bold font-mono transition-all duration-[800ms] ease-out ' + (contactTitleInView ? 'opacity-80 translate-x-0' : 'opacity-0 -translate-x-16') }, '/// 03. CONTACT NETWORK')
           ),
           h('div', { className: 'flex flex-col gap-12 md:gap-24 relative z-10' },
-            h(MonumentalLink, { scrollY, title: 'EMAIL', subtitle: { label: 'Lavro@lavro.org', desc: '\u4E3B\u7EBF\u8054\u7CFB\u65B9\u5F0F\uFF0C\u5904\u7406\u91CD\u8981\u4E8B\u52A1\u4E0E\u9879\u76EE' }, link: 'mailto:Lavro@lavro.org', index: 4, align: 'left', iconName: 'envelope' }),
-            h(MonumentalLink, { scrollY, title: 'GITHUB', subtitle: { label: 'Lavr0v0', desc: '\u4EE3\u7801\u7684\u9AA8\u67B6\u4E0E\u5F00\u6E90\u8BB0\u5F55\uFF0C\u5E95\u5C42\u903B\u8F91\u5B58\u653E\u5904' }, link: 'https://github.com/Lavr0v0', index: 5, align: 'right', iconName: 'github' }),
-            h(MonumentalLink, { scrollY, title: 'DISCORD', subtitle: { label: 'lavro_', desc: '\u65E5\u5E38\u5439\u6C34\u3001\u7EC4\u6392\u4E0A\u5206\uFF0C\u6216\u8005\u8D5B\u535A\u7A7A\u95F4\u7684\u5FEB\u901F\u53EC\u5524' }, copyText: 'lavro_', index: 6, color: 'green', align: 'left', iconName: 'discord' }),
-            h(MonumentalLink, { scrollY, title: 'QQ', subtitle: { label: '1041022220', desc: '\u56FD\u5185\u5E38\u7528\u5373\u65F6\u901A\u8BAF' }, copyText: '1041022220', index: 7, align: 'right', iconName: 'qq' }),
-            h(MonumentalLink, { scrollY, title: 'STEAM', subtitle: { label: 'Profile', desc: '\u6E38\u620F\u5E93\u4E0E\u8054\u673A\u72B6\u6001' }, link: 'https://steamcommunity.com/profiles/76561199125299095/', index: 8, color: 'green', align: 'left', iconName: 'steam' })
+            h(MonumentalLink, { scrollY, title: 'EMAIL', subtitle: { label: 'Lavro@lavro.org', desc: 'Primary contact for important matters and projects' }, link: 'mailto:Lavro@lavro.org', index: 4, align: 'left', iconName: 'envelope' }),
+            h(MonumentalLink, { scrollY, title: 'GITHUB', subtitle: { label: 'Lavr0v0', desc: 'The skeleton of code and open-source records' }, link: 'https://github.com/Lavr0v0', index: 5, align: 'right', iconName: 'github' }),
+            h(MonumentalLink, { scrollY, title: 'DISCORD', subtitle: { label: 'lavro_', desc: 'Casual chat, squad up, or a quick summon in cyberspace' }, copyText: 'lavro_', index: 6, color: 'green', align: 'left', iconName: 'discord' }),
+            h(MonumentalLink, { scrollY, title: 'QQ', subtitle: { label: '1041022220', desc: 'Instant messaging for CN region' }, copyText: '1041022220', index: 7, align: 'right', iconName: 'qq' }),
+            h(MonumentalLink, { scrollY, title: 'STEAM', subtitle: { label: 'Profile', desc: 'Game library and online status' }, link: 'https://steamcommunity.com/profiles/76561199125299095/', index: 8, color: 'green', align: 'left', iconName: 'steam' })
           )
         )
       ),
@@ -518,7 +512,6 @@ const LavroPortfolio = () => {
       // === FOOTER ===
       h('section', { className: 'relative w-full bg-black z-20 pb-24 pt-12 border-t border-[#111]' },
         h('footer', { className: 'pt-8 flex flex-col items-center gap-8' },
-          // Back to top
           h('button', {
             onClick: () => { if (lenisRef.current) lenisRef.current.scrollTo(0, { duration: 2 }); else window.scrollTo({ top: 0, behavior: 'smooth' }); },
             className: 'group flex flex-col items-center gap-2 cursor-pointer transition-all duration-300 hover:text-[#00ff66] text-gray-600'
@@ -528,25 +521,20 @@ const LavroPortfolio = () => {
             ),
             h('span', { className: 'text-[10px] font-mono tracking-[0.4em] uppercase' }, 'BACK TO TOP')
           ),
-          // Decorative line
           h('div', { className: 'w-24 h-px bg-gradient-to-r from-transparent via-[#00ff66]/30 to-transparent' }),
-          // ASCII decoration
-          // Copyright
           h('p', { className: 'font-mono text-xs text-gray-600' },
             'LAVRO.ORG \u00A9 ' + new Date().getFullYear() + ' // STAY ONLINE.'
           ),
-          // Credits link
           h('a', { href: '/credits/', className: 'font-mono text-[10px] tracking-[0.3em] text-gray-500 hover:text-[#00ff66] transition-colors duration-300 mt-2' }, '[ CREDITS ]')
         )
       )
-    ) // end main
-  ); // end root div
+    )
+  );
 };
 
 // Mount
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(h(LavroPortfolio));
-// React 18 render 是异步的，等下一帧确保 DOM 已更新再显示
 requestAnimationFrame(function() {
   requestAnimationFrame(function() {
     document.getElementById('root').style.transition = 'opacity 0.3s ease';
@@ -554,7 +542,7 @@ requestAnimationFrame(function() {
   });
 });
 
-// 彩蛋: 点击标题三下触发彩虹模式
+// Easter egg: Triple-click title for rainbow mode
 requestAnimationFrame(function() {
   var clickCount = 0;
   var clickTimer = null;
