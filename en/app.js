@@ -131,7 +131,7 @@ const MonumentalLink = ({ title, subtitle, link, copyText, index, color = "white
   } else if (link) {
     titleEl = h('a', {
       href: link,
-      target: (link.startsWith('http') || link.startsWith('mailto')) ? '_blank' : '_self',
+      target: ((link.startsWith('http') || link.startsWith('mailto')) && !link.includes('lavro.org')) ? '_blank' : '_self',
       rel: 'noreferrer',
       className: titleClass + ' cursor-pointer hover:opacity-70 ' + (inView ? activeColor : 'text-transparent'),
       style: titleStyle
