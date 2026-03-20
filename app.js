@@ -475,8 +475,8 @@ const LavroPortfolio = () => {
             h('h2', { ref: devTitleRef, className: 'text-[#00ff66] tracking-[0.4em] text-xs md:text-sm font-bold font-mono transition-all duration-[800ms] ease-out ' + (devTitleInView ? 'opacity-80 translate-x-0' : 'opacity-0 -translate-x-16') }, '/// 01. DEVELOPMENT WORKS')
           ),
           h('div', { className: 'flex flex-col gap-16 md:gap-32 w-full' },
-            h(MonumentalLink, { scrollY, title: 'C. FORGE', subtitle: { label: 'lavro.org/CForge', desc: 'CharacterForge - \u89D2\u8272\u6784\u5EFA\u4E0E\u6570\u636E\u6838\u5FC3\u903B\u8F91' }, link: 'https://lavro.org/CForge', index: 0, color: 'white', align: 'left', iconName: 'code' }),
-            h(MonumentalLink, { scrollY, title: 'LIFE SIM.', subtitle: { label: 'lavro.org/LSimulator', desc: 'Life Simulator - \u6E38\u620F\u673A\u5236\u8BBE\u8BA1\u4E0E\u6570\u503C\u6A21\u62DF\u7CFB\u7EDF' }, link: 'https://lavro.org/LSimulator', index: 1, color: 'green', align: 'right', iconName: 'gamepad' })
+            h(MonumentalLink, { scrollY, title: 'C. FORGE', subtitle: { label: 'lavro.org/CForge', desc: 'CharacterForge - \u89D2\u8272\u6784\u5EFA\u4E0E\u6570\u636E\u6838\u5FC3\u903B\u8F91' }, link: 'https://lavro.org/CForge/', index: 0, color: 'white', align: 'left', iconName: 'code' }),
+            h(MonumentalLink, { scrollY, title: 'LIFE SIM.', subtitle: { label: 'lavro.org/LSimulator', desc: 'Life Simulator - \u6E38\u620F\u673A\u5236\u8BBE\u8BA1\u4E0E\u6570\u503C\u6A21\u62DF\u7CFB\u7EDF' }, link: 'https://lavro.org/LSimulator/', index: 1, color: 'green', align: 'right', iconName: 'gamepad' })
           )
         )
       ),
@@ -490,7 +490,7 @@ const LavroPortfolio = () => {
           ),
           h('div', { className: 'flex flex-col gap-16 md:gap-32' },
             h(MonumentalLink, { scrollY, title: 'D&D ARCHIVES', subtitle: { label: 'Dungeons & Dragons', desc: 'D&D\u89D2\u8272\u8BBE\u8BA1\u7F51\u9875\u5C55\u793A\u53CA\u89C6\u89C9\u5305\u88C5\u5B9E\u8DF5' }, link: null, index: 2, color: 'white', align: 'center', iconName: 'dragon',
-              subLinks: [{ name: 'ALBERINA', url: 'https://lavro.org/DnD/Alberina' }, { name: 'FLAVILAR', url: 'https://lavro.org/DnD/Flavilar' }]
+              subLinks: [{ name: 'ALBERINA', url: 'https://lavro.org/DnD/Alberina/' }, { name: 'FLAVILAR', url: 'https://lavro.org/DnD/Flavilar/' }]
             })
           )
         )
@@ -535,7 +535,7 @@ const LavroPortfolio = () => {
             'LAVRO.ORG \u00A9 ' + new Date().getFullYear() + ' // STAY ONLINE.'
           ),
           // Credits link
-          h('a', { href: '/credits', className: 'font-mono text-[10px] tracking-[0.3em] text-gray-500 hover:text-[#00ff66] transition-colors duration-300 mt-2' }, '[ CREDITS ]')
+          h('a', { href: '/credits/', className: 'font-mono text-[10px] tracking-[0.3em] text-gray-500 hover:text-[#00ff66] transition-colors duration-300 mt-2' }, '[ CREDITS ]')
         )
       )
     ) // end main

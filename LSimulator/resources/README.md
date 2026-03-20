@@ -48,7 +48,7 @@ resources/
 
 ## 版权信息
 
-所有资源的详细来源和许可信息请查看项目根目录的 [CREDITS.md](../CREDITS.md) 文件。
+所有资源的详细来源和许可信息请查看 [借物表](https://lavro.org/credits/) 页面。
 
 ### 图标来源
 - 设计师: Anggra, Freepik, Fathema Khanom
@@ -76,7 +76,7 @@ resources/
 
 1. 将文件放入对应的文件夹（FONT/ 或 ICON/）
 2. 在 `pages/assets/app.css` 或 `pages/index.html` 中引用
-3. 在 `CREDITS.md` 中添加来源信息
+3. 在 [借物表](https://lavro.org/credits/) 中添加来源信息
 4. 更新本 README 文件
 
 ---
