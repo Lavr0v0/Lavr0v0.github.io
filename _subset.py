@@ -1,13 +1,30 @@
 """Subset Alibaba PuHuiTi: include ASCII + all non-ASCII chars from site files."""
-import re, os, subprocess
+import re, os, subprocess, glob
 
 chars = set()
 # Always include printable ASCII (0x20-0x7E)
 for c in range(0x20, 0x7F):
     chars.add(c)
 
+# Scan all HTML and JS files (excluding irrelevant dirs and react bundles)
+exclude_dirs = {'_archive', 'node_modules', '.git', 'Projects/CForge', 'Projects/LSimulator'}
+scan_files = []
+for pattern in ['**/*.html', '**/*.js']:
+    for f in glob.glob(pattern, recursive=True):
+        f_norm = f.replace('\\', '/')
+        if any(f_norm.startswith(ex + '/') or f_norm.startswith(ex.replace('/', '\\') + '\\') for ex in exclude_dirs):
+            continue
+        basename = os.path.basename(f)
+        if basename in ('react-dom.production.min.js', 'react.production.min.js'):
+            continue
+        scan_files.append(f)
+
+print(f"Scanning {len(scan_files)} files...")
+for f in sorted(scan_files):
+    print(f"  {f}")
+
 # Collect all non-ASCII chars from source files
-for f in ['app.js', 'index.html', 'credits/index.html']:
+for f in scan_files:
     with open(f, 'r', encoding='utf-8') as fh:
         text = fh.read()
         for m in re.findall(r'\\u([0-9a-fA-F]{4})', text):
@@ -19,16 +36,19 @@ for f in ['app.js', 'index.html', 'credits/index.html']:
                 chars.add(ord(c))
 
 unicodes_str = ','.join(f'U+{c:04X}' for c in sorted(chars))
-print(f"Total codepoints: {len(chars)}")
+print(f"\nTotal codepoints: {len(chars)}")
 
-src = '_tmp_puhuiti.ttf'
+# Save unicode list for reference
+with open('_subset_unicodes.txt', 'w', encoding='utf-8') as fh:
+    for c in sorted(chars):
+        if c > 127:
+            fh.write(f'U+{c:04X}  {chr(c)}\n')
+
+# Subset directly from woff2 source
+src = '_archive/AlibabaPuHuiTi-Light.woff2'
 if not os.path.exists(src):
-    print("Need _tmp_puhuiti.ttf - converting from woff2 first...")
-    from fontTools.ttLib import TTFont
-    font = TTFont('_archive/AlibabaPuHuiTi-Light.woff2')
-    font.flavor = None
-    font.save(src)
-    font.close()
+    print(f"ERROR: Source font not found: {src}")
+    exit(1)
 
 cmd = [
     'python', '-m', 'fontTools.subset', src,
@@ -38,9 +58,10 @@ cmd = [
     '--no-hinting', '--desubroutinize',
 ]
 print("Subsetting...")
-result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
 if result.stderr:
     print("STDERR:", result.stderr)
 print(f"Exit: {result.returncode}")
 if result.returncode == 0:
-    print(f"Output: {os.path.getsize('HomePageAssets/AlibabaPuHuiTi-Light-subset.woff2')/1024:.1f} KB")
+    size = os.path.getsize('HomePageAssets/AlibabaPuHuiTi-Light-subset.woff2')
+    print(f"Output: {size/1024:.1f} KB ({size} bytes)")

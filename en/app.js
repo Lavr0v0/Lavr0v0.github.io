@@ -168,7 +168,7 @@ const MonumentalLink = ({ title, subtitle, link, copyText, index, color = "white
 const globalCSS = `
 @font-face {
   font-family: 'Alibaba PuHuiTi';
-  src: url('../HomePageAssets/AlibabaPuHuiTi-Light-subset.woff2') format('woff2');
+  src: url('../HomePageAssets/AlibabaPuHuiTi-Light.woff2') format('woff2');
   font-weight: 300;
   font-style: normal;
   font-display: swap;
@@ -260,7 +260,6 @@ const LavroPortfolio = () => {
   const [aboutTitleRef, aboutTitleInView] = useInView({ threshold: 0.2 });
   const [hobbyTitleRef, hobbyTitleInView] = useInView({ threshold: 0.2 });
   const [devTitleRef, devTitleInView] = useInView({ threshold: 0.8 });
-  const [designTitleRef, designTitleInView] = useInView({ threshold: 0.8 });
   const [contactTitleRef, contactTitleInView] = useInView({ threshold: 0.8 });
 
   const gameImages = [
@@ -381,6 +380,17 @@ const LavroPortfolio = () => {
         )
       ),
 
+      // === EN VERSION NOTICE ===
+      h('div', { className: 'relative z-20 w-full py-6 md:py-8' },
+        h('div', { className: 'max-w-3xl mx-auto px-6' },
+          h('div', { className: 'border border-[#00ff66]/30 bg-[#0a0a0a]/80 px-6 py-4 md:px-8 md:py-5' },
+            h('p', { className: 'text-center text-xs md:text-sm font-mono tracking-[0.15em] text-gray-400 leading-relaxed' },
+              '// ', h('span', { className: 'text-[#00ff66]/70' }, 'NOTE'), ' — The English version may lag behind in updates and does not cover all content. For the latest, visit the ', h('a', { href: '/', className: 'text-[#00ff66] hover:underline' }, 'Chinese version'), '.'
+            )
+          )
+        )
+      ),
+
       // === 02. ABOUT / TIMEZONE ===
       h('section', { className: 'relative w-full min-h-screen flex flex-col justify-center py-24 md:py-40 z-10 overflow-hidden' },
         h('div', { className: 'absolute inset-0 bg-[#050505]/80 z-0 border-t border-[#111]' }),
@@ -465,30 +475,14 @@ const LavroPortfolio = () => {
         )
       ),
 
-      // === 04. PROJECTS: DEVELOPMENT ===
+      // === 04. WORKS ===
       h('section', { className: 'relative w-full min-h-screen py-24 md:py-40 z-20 bg-[#020202]' },
         h('div', { className: 'max-w-[100rem] mx-auto px-6 w-full' },
           h('div', { className: 'overflow-hidden mb-24 md:mb-32 pb-8 border-b border-[#111]' },
-            h('h2', { ref: devTitleRef, className: 'text-[#00ff66] tracking-[0.4em] text-xs md:text-sm font-bold font-mono transition-all duration-[800ms] ease-out ' + (devTitleInView ? 'opacity-80 translate-x-0' : 'opacity-0 -translate-x-16') }, '/// 01. DEVELOPMENT WORKS')
+            h('h2', { ref: devTitleRef, className: 'text-[#00ff66] tracking-[0.4em] text-xs md:text-sm font-bold font-mono transition-all duration-[800ms] ease-out ' + (devTitleInView ? 'opacity-80 translate-x-0' : 'opacity-0 -translate-x-16') }, '/// 01. WORKS')
           ),
           h('div', { className: 'flex flex-col gap-16 md:gap-32 w-full' },
-            h(MonumentalLink, { scrollY, title: 'C. FORGE', subtitle: { label: 'lavro.org/Projects/CForge', desc: 'CharacterForge — Character building and data core logic' }, link: 'https://lavro.org/Projects/CForge/', index: 0, color: 'white', align: 'left', iconName: 'code', badge: 'ZH ONLY' }),
-            h(MonumentalLink, { scrollY, title: 'LIFE SIM.', subtitle: { label: 'lavro.org/Projects/LSimulator', desc: 'Life Simulator — Game mechanics design and numerical simulation' }, link: 'https://lavro.org/Projects/LSimulator/', index: 1, color: 'green', align: 'right', iconName: 'gamepad' })
-          )
-        )
-      ),
-
-      // === PROJECTS: DESIGN ===
-      h('section', { className: 'relative w-full min-h-screen py-24 md:py-40 z-20 border-t border-[#111]' },
-        h('div', { className: 'absolute inset-0 bg-[#050505]/95 z-0' }),
-        h('div', { className: 'relative z-10 max-w-[100rem] mx-auto px-6 w-full' },
-          h('div', { className: 'overflow-hidden mb-24 md:mb-32 pb-8 border-b border-[#222]' },
-            h('h2', { ref: designTitleRef, className: 'text-white tracking-[0.4em] text-xs md:text-sm font-bold font-mono transition-all duration-[800ms] ease-out ' + (designTitleInView ? 'opacity-80 translate-x-0' : 'opacity-0 -translate-x-16') }, '/// 02. DESIGN AESTHETICS')
-          ),
-          h('div', { className: 'flex flex-col gap-16 md:gap-32' },
-            h(MonumentalLink, { scrollY, title: 'D&D ARCHIVES', subtitle: { label: 'Dungeons & Dragons', desc: 'Fan-made OC character showcase pages and visual design practice' }, link: null, index: 2, color: 'white', align: 'center', iconName: 'dragon', badge: 'ZH ONLY',
-              subLinks: [{ name: 'ALBERINA', url: 'https://lavro.org/DnD/Alberina/' }, { name: 'FLAVILAR', url: 'https://lavro.org/DnD/Flavilar/' }]
-            })
+            h(MonumentalLink, { scrollY, title: 'PROJECTS', subtitle: { label: 'Mature Projects', desc: 'Completed project entries' }, link: 'https://lavro.org/en/Projects/', index: 0, color: 'white', align: 'left', iconName: 'code' })
           )
         )
       ),
@@ -497,13 +491,12 @@ const LavroPortfolio = () => {
       h('section', { id: 'contact-section', className: 'relative w-full py-24 md:py-40 z-10 bg-[#000]' },
         h('div', { className: 'relative z-10 max-w-[100rem] mx-auto px-6 w-full' },
           h('div', { className: 'overflow-hidden mb-20 md:mb-32 pb-6 md:pb-8 border-b border-[#111]' },
-            h('h2', { ref: contactTitleRef, className: 'text-[#00ff66] tracking-[0.4em] text-xs md:text-sm font-bold font-mono transition-all duration-[800ms] ease-out ' + (contactTitleInView ? 'opacity-80 translate-x-0' : 'opacity-0 -translate-x-16') }, '/// 03. CONTACT NETWORK')
+            h('h2', { ref: contactTitleRef, className: 'text-[#00ff66] tracking-[0.4em] text-xs md:text-sm font-bold font-mono transition-all duration-[800ms] ease-out ' + (contactTitleInView ? 'opacity-80 translate-x-0' : 'opacity-0 -translate-x-16') }, '/// 02. CONTACT NETWORK')
           ),
           h('div', { className: 'flex flex-col gap-12 md:gap-24 relative z-10' },
-            h(MonumentalLink, { scrollY, title: 'EMAIL', subtitle: { label: 'Lavro@lavro.org', desc: 'Primary contact for important matters and projects' }, link: 'mailto:Lavro@lavro.org', index: 4, align: 'left', iconName: 'envelope' }),
-            h(MonumentalLink, { scrollY, title: 'GITHUB', subtitle: { label: 'Lavr0v0', desc: 'The skeleton of code and open-source records' }, link: 'https://github.com/Lavr0v0', index: 5, align: 'right', iconName: 'github' }),
-            h(MonumentalLink, { scrollY, title: 'DISCORD', subtitle: { label: 'lavro_', desc: 'Casual chat, squad up, or a quick summon in cyberspace' }, copyText: 'lavro_', index: 6, color: 'green', align: 'left', iconName: 'discord' }),
-            h(MonumentalLink, { scrollY, title: 'QQ', subtitle: { label: '1041022220', desc: 'Instant messaging for CN region' }, copyText: '1041022220', index: 7, align: 'right', iconName: 'qq' }),
+            h(MonumentalLink, { scrollY, title: 'EMAIL', subtitle: { label: 'Lavro@lavro.org', desc: 'Primary contact for important matters and projects' }, link: 'mailto:Lavro@lavro.org', index: 4, align: 'right', iconName: 'envelope' }),
+            h(MonumentalLink, { scrollY, title: 'GITHUB', subtitle: { label: 'Lavr0v0', desc: 'The skeleton of code and open-source records' }, link: 'https://github.com/Lavr0v0', index: 5, align: 'left', iconName: 'github' }),
+            h(MonumentalLink, { scrollY, title: 'DISCORD', subtitle: { label: 'lavro_', desc: 'Casual chat, squad up, or a quick summon in cyberspace' }, copyText: 'lavro_', index: 6, color: 'green', align: 'right', iconName: 'discord' }),
             h(MonumentalLink, { scrollY, title: 'STEAM', subtitle: { label: 'Profile', desc: 'Game library and online status' }, link: 'https://steamcommunity.com/profiles/76561199125299095/', index: 8, color: 'green', align: 'left', iconName: 'steam' })
           )
         )
@@ -525,7 +518,7 @@ const LavroPortfolio = () => {
           h('p', { className: 'font-mono text-xs text-gray-600' },
             'LAVRO.ORG \u00A9 ' + new Date().getFullYear() + ' // STAY ONLINE.'
           ),
-          h('a', { href: '/credits/', className: 'font-mono text-[10px] tracking-[0.3em] text-gray-500 hover:text-[#00ff66] transition-colors duration-300 mt-2' }, '[ CREDITS ]')
+          h('a', { href: '/en/credits/', className: 'font-mono text-[10px] tracking-[0.3em] text-gray-500 hover:text-[#00ff66] transition-colors duration-300 mt-2' }, '[ CREDITS ]')
         )
       )
     )

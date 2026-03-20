@@ -11,8 +11,9 @@ const ICONS = {
   discord: 'M524.531,69.836a1.5,1.5,0,0,0-.764-.7A485.065,485.065,0,0,0,404.081,32.03a1.816,1.816,0,0,0-1.923.91,337.461,337.461,0,0,0-14.9,30.6,447.848,447.848,0,0,0-134.426,0,309.541,309.541,0,0,0-15.135-30.6,1.89,1.89,0,0,0-1.924-.91A483.689,483.689,0,0,0,116.085,69.137a1.712,1.712,0,0,0-.788.676C39.068,183.651,18.186,294.69,28.43,404.354a2.016,2.016,0,0,0,.765,1.375A487.666,487.666,0,0,0,176.02,479.918a1.9,1.9,0,0,0,2.063-.676A348.2,348.2,0,0,0,208.12,430.4a1.86,1.86,0,0,0-1.019-2.588,321.173,321.173,0,0,1-45.868-21.853,1.885,1.885,0,0,1-.185-3.126c3.082-2.309,6.166-4.711,9.109-7.137a1.819,1.819,0,0,1,1.9-.256c96.229,43.917,200.41,43.917,295.5,0a1.812,1.812,0,0,1,1.924.233c2.944,2.426,6.027,4.851,9.132,7.16a1.884,1.884,0,0,1-.162,3.126,301.407,301.407,0,0,1-45.89,21.83,1.875,1.875,0,0,0-1,2.611,391.055,391.055,0,0,0,30.014,48.815,1.864,1.864,0,0,0,2.063.7A486.048,486.048,0,0,0,610.7,405.729a1.882,1.882,0,0,0,.765-1.352C623.729,277.594,590.933,167.465,524.531,69.836ZM222.491,337.58c-28.972,0-52.844-26.587-52.844-59.239S193.056,219.1,222.491,219.1c29.665,0,53.306,26.82,52.843,59.239C275.334,310.993,251.924,337.58,222.491,337.58Zm195.38,0c-28.971,0-52.843-26.587-52.843-59.239S388.437,219.1,417.871,219.1c29.667,0,53.307,26.82,52.844,59.239C470.715,310.993,447.538,337.58,417.871,337.58Z',
   qq: 'M433.754 420.445c-11.526 1.393-44.86-52.741-44.86-52.741 0 31.345-16.136 72.247-51.051 101.786 16.842 5.192 54.843 19.167 45.803 34.421-7.316 12.343-125.51 7.881-159.632 4.037-34.122 3.844-152.316 8.306-159.632-4.037-9.045-15.25 28.918-29.214 45.783-34.415-34.92-29.539-51.059-70.445-51.059-101.792 0 0-33.334 54.134-44.859 52.741-5.37-.65-12.424-29.644 9.347-99.704 10.261-33.024 21.995-60.478 40.144-105.779C60.683 98.063 108.982.006 224 0c113.737.006 163.156 96.133 160.264 214.963 18.118 45.223 29.912 72.85 40.144 105.778 21.768 70.06 14.716 99.053 9.346 99.704z',
   steam: 'M496 256c0 137-111.2 248-248.4 248-113.8 0-209.6-76.3-239-180.4l95.2 39.3c6.4 32.1 34.9 56.4 68.9 56.4 39.2 0 71.9-32.4 70.2-73.5l84.5-60.2c52.1 1.3 95.8-40.9 95.8-93.5 0-51.6-42-93.5-93.7-93.5s-93.7 42-93.7 93.5v1.2L176.6 279c-15.5-.9-30.7 3.4-43.5 12.1L0 236.1C10.2 108.4 117.1 8 247.6 8 384.8 8 496 119 496 256zM155.7 384.3l-30.5-12.6a52.79 52.79 0 0 0 27.2 25.8c26.9 11.2 57.8-1.6 69-28.4 5.4-13 5.5-27.3.1-40.3-5.4-13-15.5-23.2-28.5-28.6-12.9-5.4-26.7-5.2-38.9-.6l31.5 13c19.8 8.2 29.2 30.9 20.9 50.7-8.3 19.9-31 29.2-50.8 21zm173.8-129.9c-34.4 0-62.4-28-62.4-62.3s28-62.3 62.4-62.3 62.4 28 62.4 62.3-27.9 62.3-62.4 62.3zm.1-15.6c25.9 0 46.9-21 46.9-46.8 0-25.9-21-46.8-46.9-46.8s-46.9 21-46.9 46.8c.1 25.8 21.1 46.8 46.9 46.8z',
+  flask: 'M256 398.8c-11.8 5.1-23.4 9.7-34.9 13.5c16.7 21.2 31.7 37.1 34.9 40.5c3.2-3.4 18.2-19.3 34.9-40.5c-11.5-3.9-23.1-8.4-34.9-13.5zM446 256c33 45.2 44.3 90.9 23.6 128c-20.2 36.3-62.5 49.3-115.2 43.2c-22 28.8-40.6 48.8-53.2 61.8c-8.6 8.9-22.6 8.9-31.2 0c-12.6-13-31.2-33.1-53.2-61.8c-52.7 6.1-95-6.8-115.2-43.2C80.7 346.9 92 301.2 125 256c-33-45.2-44.3-90.9-23.6-128c20.2-36.3 62.5-49.3 115.2-43.2c22-28.8 40.6-48.8 53.2-61.8c8.6-8.9 22.6-8.9 31.2 0c12.6 13 31.2 33.1 53.2 61.8c52.7-6.1 95 6.8 115.2 43.2C490.3 165.1 479 210.8 446 256zM384 256c0-70.7-57.3-128-128-128s-128 57.3-128 128s57.3 128 128 128s128-57.3 128-128zm-96 0a32 32 0 1 0-64 0a32 32 0 1 0 64 0z',
 };
-const ICON_VIEWBOX = { code: '0 0 640 512', gamepad: '0 0 640 512', dragon: '0 0 640 512', envelope: '0 0 512 512', github: '0 0 496 512', discord: '0 0 640 512', qq: '0 0 448 512', steam: '0 0 496 512' };
+const ICON_VIEWBOX = { code: '0 0 640 512', gamepad: '0 0 640 512', dragon: '0 0 640 512', envelope: '0 0 512 512', github: '0 0 496 512', discord: '0 0 640 512', qq: '0 0 448 512', steam: '0 0 496 512', flask: '0 0 512 512' };
 
 // ==========================================
 // 自定义 Hook：滚动视口检测
@@ -256,7 +257,6 @@ const LavroPortfolio = () => {
   const [aboutTitleRef, aboutTitleInView] = useInView({ threshold: 0.2 });
   const [hobbyTitleRef, hobbyTitleInView] = useInView({ threshold: 0.2 });
   const [devTitleRef, devTitleInView] = useInView({ threshold: 0.8 });
-  const [designTitleRef, designTitleInView] = useInView({ threshold: 0.8 });
   const [contactTitleRef, contactTitleInView] = useInView({ threshold: 0.8 });
 
   const gameImages = [
@@ -471,30 +471,16 @@ const LavroPortfolio = () => {
         )
       ),
 
-      // === 04. PROJECTS: DEVELOPMENT ===
+      // === 04. WORKS ===
       h('section', { className: 'relative w-full min-h-screen py-24 md:py-40 z-20 bg-[#020202]' },
         h('div', { className: 'max-w-[100rem] mx-auto px-6 w-full' },
           h('div', { className: 'overflow-hidden mb-24 md:mb-32 pb-8 border-b border-[#111]' },
-            h('h2', { ref: devTitleRef, className: 'text-[#00ff66] tracking-[0.4em] text-xs md:text-sm font-bold font-mono transition-all duration-[800ms] ease-out ' + (devTitleInView ? 'opacity-80 translate-x-0' : 'opacity-0 -translate-x-16') }, '/// 01. DEVELOPMENT WORKS')
+            h('h2', { ref: devTitleRef, className: 'text-[#00ff66] tracking-[0.4em] text-xs md:text-sm font-bold font-mono transition-all duration-[800ms] ease-out ' + (devTitleInView ? 'opacity-80 translate-x-0' : 'opacity-0 -translate-x-16') }, '/// 01. WORKS')
           ),
           h('div', { className: 'flex flex-col gap-16 md:gap-32 w-full' },
-            h(MonumentalLink, { scrollY, title: 'C. FORGE', subtitle: { label: 'lavro.org/Projects/CForge', desc: 'CharacterForge - \u89D2\u8272\u6784\u5EFA\u4E0E\u6570\u636E\u6838\u5FC3\u903B\u8F91' }, link: 'https://lavro.org/Projects/CForge/', index: 0, color: 'white', align: 'left', iconName: 'code' }),
-            h(MonumentalLink, { scrollY, title: 'LIFE SIM.', subtitle: { label: 'lavro.org/Projects/LSimulator', desc: 'Life Simulator - \u6E38\u620F\u673A\u5236\u8BBE\u8BA1\u4E0E\u6570\u503C\u6A21\u62DF\u7CFB\u7EDF' }, link: 'https://lavro.org/Projects/LSimulator/', index: 1, color: 'green', align: 'right', iconName: 'gamepad' })
-          )
-        )
-      ),
-
-      // === PROJECTS: DESIGN ===
-      h('section', { className: 'relative w-full min-h-screen py-24 md:py-40 z-20 border-t border-[#111]' },
-        h('div', { className: 'absolute inset-0 bg-[#050505]/95 z-0' }),
-        h('div', { className: 'relative z-10 max-w-[100rem] mx-auto px-6 w-full' },
-          h('div', { className: 'overflow-hidden mb-24 md:mb-32 pb-8 border-b border-[#222]' },
-            h('h2', { ref: designTitleRef, className: 'text-white tracking-[0.4em] text-xs md:text-sm font-bold font-mono transition-all duration-[800ms] ease-out ' + (designTitleInView ? 'opacity-80 translate-x-0' : 'opacity-0 -translate-x-16') }, '/// 02. DESIGN AESTHETICS')
-          ),
-          h('div', { className: 'flex flex-col gap-16 md:gap-32' },
-            h(MonumentalLink, { scrollY, title: 'D&D ARCHIVES', subtitle: { label: 'Dungeons & Dragons', desc: 'D&D\u89D2\u8272\u8BBE\u8BA1\u7F51\u9875\u5C55\u793A\u53CA\u89C6\u89C9\u5305\u88C5\u5B9E\u8DF5' }, link: null, index: 2, color: 'white', align: 'center', iconName: 'dragon',
-              subLinks: [{ name: 'ALBERINA', url: 'https://lavro.org/DnD/Alberina/' }, { name: 'FLAVILAR', url: 'https://lavro.org/DnD/Flavilar/' }]
-            })
+            h(MonumentalLink, { scrollY, title: 'PROJECTS', subtitle: { label: '\u6210\u719F\u9879\u76EE', desc: '\u5DF2\u5B8C\u6210\u7684\u6B63\u5F0F\u9879\u76EE\u5165\u53E3' }, link: 'https://lavro.org/Projects/', index: 0, color: 'white', align: 'left', iconName: 'code' }),
+            h(MonumentalLink, { scrollY, title: 'LABS', subtitle: { label: '\u8BD5\u9A8C\u573A', desc: '\u521B\u610F\u5B9E\u9A8C\u4E0E\u8BBE\u8BA1\u63A2\u7D22' }, link: 'https://lavro.org/Labs/', index: 1, color: 'green', align: 'right', iconName: 'flask' }),
+            h(MonumentalLink, { scrollY, title: 'D&D ARCHIVES', subtitle: { label: '\u540C\u4EBA\u81EA\u8BBE\u89D2\u8272\u6863\u6848', desc: '\u81EA\u8BBE\u7F51\u9875\u8BBE\u8BA1\u5B9E\u8DF5' }, link: 'https://lavro.org/DnD/', index: 2, color: 'white', align: 'left', iconName: 'dragon' })
           )
         )
       ),
@@ -503,7 +489,7 @@ const LavroPortfolio = () => {
       h('section', { id: 'contact-section', className: 'relative w-full py-24 md:py-40 z-10 bg-[#000]' },
         h('div', { className: 'relative z-10 max-w-[100rem] mx-auto px-6 w-full' },
           h('div', { className: 'overflow-hidden mb-20 md:mb-32 pb-6 md:pb-8 border-b border-[#111]' },
-            h('h2', { ref: contactTitleRef, className: 'text-[#00ff66] tracking-[0.4em] text-xs md:text-sm font-bold font-mono transition-all duration-[800ms] ease-out ' + (contactTitleInView ? 'opacity-80 translate-x-0' : 'opacity-0 -translate-x-16') }, '/// 03. CONTACT NETWORK')
+            h('h2', { ref: contactTitleRef, className: 'text-[#00ff66] tracking-[0.4em] text-xs md:text-sm font-bold font-mono transition-all duration-[800ms] ease-out ' + (contactTitleInView ? 'opacity-80 translate-x-0' : 'opacity-0 -translate-x-16') }, '/// 02. CONTACT NETWORK')
           ),
           h('div', { className: 'flex flex-col gap-12 md:gap-24 relative z-10' },
             h(MonumentalLink, { scrollY, title: 'EMAIL', subtitle: { label: 'Lavro@lavro.org', desc: '\u4E3B\u7EBF\u8054\u7CFB\u65B9\u5F0F\uFF0C\u5904\u7406\u91CD\u8981\u4E8B\u52A1\u4E0E\u9879\u76EE' }, link: 'mailto:Lavro@lavro.org', index: 4, align: 'left', iconName: 'envelope' }),
