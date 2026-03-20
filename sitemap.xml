@@ -8,13 +8,13 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://lavro.org/CForge/</loc>
+    <loc>https://lavro.org/Projects/CForge/</loc>
     <lastmod>2026-03-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://lavro.org/LSimulator/</loc>
+    <loc>https://lavro.org/Projects/LSimulator/</loc>
     <lastmod>2026-03-19</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

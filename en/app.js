@@ -472,8 +472,8 @@ const LavroPortfolio = () => {
             h('h2', { ref: devTitleRef, className: 'text-[#00ff66] tracking-[0.4em] text-xs md:text-sm font-bold font-mono transition-all duration-[800ms] ease-out ' + (devTitleInView ? 'opacity-80 translate-x-0' : 'opacity-0 -translate-x-16') }, '/// 01. DEVELOPMENT WORKS')
           ),
           h('div', { className: 'flex flex-col gap-16 md:gap-32 w-full' },
-            h(MonumentalLink, { scrollY, title: 'C. FORGE', subtitle: { label: 'lavro.org/CForge', desc: 'CharacterForge — Character building and data core logic' }, link: 'https://lavro.org/CForge/', index: 0, color: 'white', align: 'left', iconName: 'code', badge: 'ZH ONLY' }),
-            h(MonumentalLink, { scrollY, title: 'LIFE SIM.', subtitle: { label: 'lavro.org/LSimulator', desc: 'Life Simulator — Game mechanics design and numerical simulation' }, link: 'https://lavro.org/LSimulator/', index: 1, color: 'green', align: 'right', iconName: 'gamepad' })
+            h(MonumentalLink, { scrollY, title: 'C. FORGE', subtitle: { label: 'lavro.org/Projects/CForge', desc: 'CharacterForge — Character building and data core logic' }, link: 'https://lavro.org/Projects/CForge/', index: 0, color: 'white', align: 'left', iconName: 'code', badge: 'ZH ONLY' }),
+            h(MonumentalLink, { scrollY, title: 'LIFE SIM.', subtitle: { label: 'lavro.org/Projects/LSimulator', desc: 'Life Simulator — Game mechanics design and numerical simulation' }, link: 'https://lavro.org/Projects/LSimulator/', index: 1, color: 'green', align: 'right', iconName: 'gamepad' })
           )
         )
       ),
