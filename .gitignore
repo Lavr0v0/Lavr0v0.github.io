@@ -1,5 +1,6 @@
 _src
 _archive
+*.lnk
 
 node_modules
 src/input.css
