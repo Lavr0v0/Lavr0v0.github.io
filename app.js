@@ -545,8 +545,13 @@ const LavroPortfolio = () => {
 // Mount
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(h(LavroPortfolio));
-document.getElementById('root').style.opacity = '1';
-document.getElementById('root').style.transition = 'opacity 0.3s ease';
+// React 18 render 是异步的，等下一帧确保 DOM 已更新再显示
+requestAnimationFrame(function() {
+  requestAnimationFrame(function() {
+    document.getElementById('root').style.transition = 'opacity 0.3s ease';
+    document.getElementById('root').style.opacity = '1';
+  });
+});
 
 // 彩蛋: 点击标题三下触发彩虹模式
 requestAnimationFrame(function() {
