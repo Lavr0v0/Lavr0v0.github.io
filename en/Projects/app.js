@@ -4,8 +4,9 @@ const { useEffect, useState, useRef, createElement: h, Fragment } = React;
 const ICONS = {
   code: 'M392.8 1.2c-17-4.9-34.7 5-39.6 22l-128 448c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l128-448c4.9-17-5-34.7-22-39.6zm80.6 120.1c-12.5 12.5-12.5 32.8 0 45.3L562.7 256l-89.4 89.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l112-112c12.5-12.5 12.5-32.8 0-45.3l-112-112c-12.5-12.5-32.8-12.5-45.3 0zm-306.7 0c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3l112 112c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l89.4-89.4c12.5-12.5 12.5-32.8 0-45.3z',
   gamepad: 'M192 64C86 64 0 150 0 256S86 448 192 448l256 0c106 0 192-86 192-192s-86-192-192-192L192 64zM496 168a40 40 0 1 1 0 80 40 40 0 1 1 0-80zM392 304a40 40 0 1 1 80 0 40 40 0 1 1 -80 0zM168 200c0-13.3 10.7-24 24-24s24 10.7 24 24l0 32 32 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-32 0 0 32c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-32-32 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l32 0 0-32z',
+  cube: 'M234.5 5.7c13.9-5 29.1-5 43.1 0l192 68.3C495 83.4 512 107.5 512 134.6V377.4c0 27-17 51.2-42.5 60.3l-192 68.3c-13.9 5-29.1 5-43.1 0l-192-68.3C17 428.6 0 404.5 0 377.4V134.6c0-27 17-51.2 42.5-60.3l192-68.3zM256 66L96 123.2v245.6l160 56.8 160-56.8V123.2L256 66z',
 };
-const ICON_VIEWBOX = { code: '0 0 640 512', gamepad: '0 0 640 512' };
+const ICON_VIEWBOX = { code: '0 0 640 512', gamepad: '0 0 640 512', cube: '0 0 512 512' };
 
 const useInView = (options) => {
   const ref = useRef(null);
@@ -36,7 +37,7 @@ const ScrambledText = ({ text, phase }) => {
   return h(Fragment, null, displayText);
 };
 
-const MonumentalLink = ({ title, subtitle, link, index, color = "white", align = "left", iconName, scrollY, badge }) => {
+const MonumentalLink = ({ title, subtitle, link, index, color = "white", align = "left", iconName, scrollY, badge, subLinks }) => {
   const [ref, inView] = useInView({ threshold: 0.2 });
   const containerRef = useRef(null);
   const [logoStyle, setLogoStyle] = useState({ opacity: 0 });
@@ -63,7 +64,10 @@ const MonumentalLink = ({ title, subtitle, link, index, color = "white", align =
     h('div', { className: 'transition-all duration-1000 ease-out delay-100 ' + (inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12') },
       h('span', { className: 'font-mono text-sm md:text-base mb-3 block font-bold text-[#00ff66]' }, '> ', subtitle.label),
       badge && h('span', { className: 'inline-block text-[10px] tracking-[0.15em] px-2 py-0.5 border border-[#00ff66]/40 text-[#00ff66]/70 font-mono mt-2 mb-1' }, badge),
-      h('p', { className: 'text-base md:text-xl text-gray-400 font-light leading-relaxed' }, subtitle.desc)
+      h('p', { className: 'text-base md:text-xl text-gray-400 font-light leading-relaxed' }, subtitle.desc),
+      subLinks && h('div', { className: 'flex flex-wrap items-center gap-6 mt-6' },
+        subLinks.map((sl, idx) => h('a', { key: idx, href: sl.url, target: '_blank', rel: 'noreferrer', className: 'text-xs md:text-sm font-mono tracking-widest transition-colors border-b border-transparent pb-1 uppercase text-white hover:border-[#00ff66] hover:text-[#00ff66]' }, '[ ', sl.name, ' ]'))
+      )
     )
   );
   return h('div', { ref: setRefs, className: 'flex flex-col ' + flexAlign + ' gap-4 md:gap-6 py-12 px-4 relative z-10 w-full' }, iconEl, titleEl, subtitleEl);
@@ -129,7 +133,8 @@ const ProjectsPage = () => {
           ),
           h('div', { className: 'flex flex-col gap-16 md:gap-32 w-full' },
             h(MonumentalLink, { scrollY, title: 'C. FORGE', subtitle: { label: 'lavro.org/Projects/CForge', desc: 'CharacterForge — Character building and data core logic' }, link: 'https://lavro.org/Projects/CForge/', index: 0, color: 'white', align: 'left', iconName: 'code', badge: 'ZH ONLY' }),
-            h(MonumentalLink, { scrollY, title: 'LIFE SIM.', subtitle: { label: 'lavro.org/Projects/LSimulator', desc: 'Life Simulator — Game mechanics design and numerical simulation' }, link: 'https://lavro.org/Projects/LSimulator/', index: 1, color: 'green', align: 'right', iconName: 'gamepad' })
+            h(MonumentalLink, { scrollY, title: 'LIFE SIM.', subtitle: { label: 'lavro.org/Projects/LSimulator', desc: 'Life Simulator — Game mechanics design and numerical simulation' }, link: 'https://lavro.org/Projects/LSimulator/', index: 1, color: 'green', align: 'right', iconName: 'gamepad' }),
+            h(MonumentalLink, { scrollY, title: 'CARPET LIR', subtitle: { label: 'modrinth.com/mod/carpet-lir-addition', desc: "Lavro's Item Renewability Carpet Addition — A Minecraft Carpet extension mod" }, link: 'https://modrinth.com/mod/carpet-lir-addition', index: 2, color: 'white', align: 'left', iconName: 'cube', badge: 'MINECRAFT MOD', subLinks: [{ name: 'Modrinth', url: 'https://modrinth.com/mod/carpet-lir-addition' }, { name: 'GitHub', url: 'https://github.com/Lavr0v0/carpet-lir-addition' }] })
           )
         )
       ),

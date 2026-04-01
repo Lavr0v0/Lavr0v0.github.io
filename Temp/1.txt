@@ -1,0 +1,195 @@
+import React, { useEffect, useState, useRef } from 'react';
+import { Moon, Wind, Sparkles, ArrowRight } from 'lucide-react';
+
+// --- 自定义 Hook：探测元素是否进入视口 (用于渐现) ---
+const useIntersectionObserver = () => {
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('opacity-100', 'translate-y-0', 'scale-100');
+            entry.target.classList.remove('opacity-0', 'translate-y-12', 'scale-95');
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    const elements = document.querySelectorAll('.cinematic-reveal');
+    elements.forEach((el) => observer.observe(el));
+
+    return () => elements.forEach((el) => observer.unobserve(el));
+  }, []);
+};
+
+export default function App() {
+  const [mousePos, setMousePos] = useState({ x: -1000, y: -1000 });
+  useIntersectionObserver();
+
+  // 监听鼠标移动，用于控制背景的“神光”跟随
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  return (
+    // 使用纯粹的极黑背景，文字采用柔和的星光白
+    <div className="relative min-h-screen bg-[#030303] text-[#EAEAEA] overflow-x-hidden selection:bg-[#EAEAEA] selection:text-[#030303] cursor-crosshair">
+      
+      {/* --- 全局样式与动画注入 --- */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Noto+Serif+SC:wght@200;300;400&display=swap');
+        
+        .font-divine { font-family: 'Cinzel', serif; }
+        .font-cn { font-family: 'Noto Serif SC', serif; }
+
+        /* 电影级缓慢浮现 */
+        .cinematic-reveal {
+          transition: all 2.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        /* 神圣光晕呼吸动画 */
+        @keyframes divine-breath {
+          0%, 100% { transform: scale(1) translate(0, 0); opacity: 0.4; }
+          50% { transform: scale(1.1) translate(2%, 2%); opacity: 0.7; }
+        }
+        .animate-divine {
+          animation: divine-breath 20s ease-in-out infinite alternate;
+        }
+
+        /* 星尘闪烁动画 */
+        @keyframes twinkle {
+          0%, 100% { opacity: 0.2; }
+          50% { opacity: 0.8; }
+        }
+      `}} />
+
+      {/* --- 底层：电影级胶片噪点 (提升质感) --- */}
+      <div className="fixed inset-0 pointer-events-none z-50 opacity-[0.15] mix-blend-screen">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+          <filter id="darkNoise">
+            <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch" />
+          </filter>
+          <rect width="100%" height="100%" filter="url(#darkNoise)" />
+        </svg>
+      </div>
+
+      {/* --- 底层：动态神光环境 (Ambient Divine Light) --- */}
+      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+        {/* 固定在中央的巨大主光源 (类似月光或神圣之眼) */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#D4C5B0] rounded-full blur-[180px] opacity-10 animate-divine mix-blend-screen"></div>
+        {/* 偏冷的深蓝副光源 */}
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#1A2530] rounded-full blur-[150px] opacity-30 animate-divine" style={{ animationDelay: '-10s' }}></div>
+      </div>
+
+      {/* --- 交互层：手电筒/探照光 (随鼠标移动) --- */}
+      <div 
+        className="fixed inset-0 z-[1] pointer-events-none transition-transform duration-700 ease-out mix-blend-screen"
+        style={{
+          background: `radial-gradient(600px circle at ${mousePos.x}px ${mousePos.y}px, rgba(212, 197, 176, 0.08), transparent 50%)`
+        }}
+      />
+
+      {/* --- 导航栏 --- */}
+      <nav className="fixed w-full top-0 z-40 px-12 py-8 flex justify-between items-center mix-blend-difference">
+        <div className="font-divine text-2xl tracking-[0.4em] text-white/90">AETHER</div>
+        <div className="flex gap-12 font-cn text-xs tracking-[0.3em] text-white/50">
+          <span className="hover:text-white transition-colors duration-500 cursor-pointer">序言</span>
+          <span className="hover:text-white transition-colors duration-500 cursor-pointer">神启</span>
+        </div>
+      </nav>
+
+      {/* --- 第一屏：Hero Section --- */}
+      <section className="relative h-screen flex flex-col items-center justify-center z-10 px-4">
+        {/* 核心视觉：日食/黑洞的隐喻 */}
+        <div className="relative flex items-center justify-center mb-12 cinematic-reveal opacity-0 scale-95">
+          <div className="absolute w-64 h-64 bg-black rounded-full shadow-[0_0_100px_rgba(212,197,176,0.3)] border border-white/5 z-10"></div>
+          <div className="absolute w-72 h-72 bg-gradient-to-tr from-[#D4C5B0]/20 to-transparent rounded-full animate-spin" style={{ animationDuration: '30s' }}></div>
+          {/* 悬浮粒子 */}
+          <Sparkles className="absolute text-[#D4C5B0] opacity-40 z-20" size={24} style={{ top: '-10%', left: '80%', animation: 'twinkle 4s infinite' }} />
+          <Moon className="absolute text-[#D4C5B0] opacity-30 z-20" size={16} style={{ bottom: '-5%', left: '10%', animation: 'twinkle 6s infinite 1s' }} />
+        </div>
+
+        <div className="text-center z-20 cinematic-reveal opacity-0 translate-y-12" style={{ transitionDelay: '0.3s' }}>
+          <h1 className="font-cn text-5xl md:text-7xl font-light tracking-[0.3em] text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.3)] mb-8">
+            寂 灭 与 降 生
+          </h1>
+          <p className="font-divine text-sm md:text-base tracking-[0.5em] text-[#D4C5B0]/70 uppercase">
+            Out of the absolute void, light speaks.
+          </p>
+        </div>
+
+        {/* 极简向下指示器 */}
+        <div className="absolute bottom-12 w-[1px] h-24 bg-gradient-to-b from-white/30 to-transparent"></div>
+      </section>
+
+      {/* --- 第二屏：诗意哲思 (Philosophical Depth) --- */}
+      <section className="relative min-h-screen flex items-center justify-center py-32 z-10">
+        <div className="max-w-4xl mx-auto px-8 text-center">
+          <Wind className="mx-auto text-[#D4C5B0]/30 mb-12 cinematic-reveal opacity-0" size={32} strokeWidth={1} />
+          
+          <h2 className="font-cn text-2xl md:text-4xl leading-[2.5] tracking-[0.2em] font-light text-white/90 cinematic-reveal opacity-0 translate-y-12">
+            “当世界褪去所有色彩，<br/>
+            <span className="text-[#D4C5B0]">神圣</span>，才得以显现它的轮廓。”
+          </h2>
+          
+          <div className="mt-16 text-[#A0A0A0] font-cn text-sm leading-[3] tracking-widest text-justify md:text-center cinematic-reveal opacity-0 translate-y-12" style={{ transitionDelay: '0.2s' }}>
+            在这里，我们不制造喧哗。<br/>
+            我们利用阴影、静默与微弱的星芒，雕刻出空间的厚度。<br/>
+            剥离掉感官的冗余，去聆听自然在深渊中最初的呼吸。<br/>
+            光芒穿透黑暗的瞬间，即是永恒。
+          </div>
+        </div>
+      </section>
+
+      {/* --- 第三屏：黑暗中的琉璃碑 (Glass Monoliths) --- */}
+      <section className="relative py-32 z-10 px-8">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            { en: "SILENCE", cn: "寂 静", desc: "隔绝外界的轰鸣，向内凝视。" },
+            { en: "PURITY", cn: "纯 粹", desc: "如黑曜石般不染尘埃的本质。" },
+            { en: "ETERNITY", cn: "永 恒", desc: "超越时间的流转，凝固的一瞬。" }
+          ].map((item, index) => (
+            <div 
+              key={index}
+              className="group relative h-[500px] border border-white/5 bg-gradient-to-b from-white/[0.03] to-transparent p-10 flex flex-col justify-end overflow-hidden cinematic-reveal opacity-0 translate-y-12 hover:border-white/20 transition-all duration-700"
+              style={{ transitionDelay: `${index * 0.2}s` }}
+            >
+              {/* 卡片内部的悬浮微光 */}
+              <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-[#D4C5B0] rounded-full blur-[80px] opacity-0 group-hover:opacity-20 transition-opacity duration-700 z-0"></div>
+              
+              <div className="relative z-10">
+                <div className="font-divine text-[#D4C5B0]/50 tracking-[0.3em] text-sm mb-4">{item.en}</div>
+                <h3 className="font-cn text-3xl text-white tracking-[0.2em] font-light mb-6">{item.cn}</h3>
+                <p className="font-cn text-xs text-[#A0A0A0] tracking-widest leading-relaxed">
+                  {item.desc}
+                </p>
+                {/* 装饰线条 */}
+                <div className="w-0 h-[1px] bg-[#D4C5B0]/50 mt-8 group-hover:w-full transition-all duration-1000 ease-out"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* --- 底部：消散于黑暗 --- */}
+      <footer className="relative h-[50vh] flex flex-col items-center justify-center z-10 border-t border-white/5 bg-gradient-to-b from-transparent to-black">
+        <div className="cinematic-reveal opacity-0 translate-y-12 text-center">
+          <div className="font-divine text-3xl tracking-[0.5em] text-white/80 mb-8">AETHER</div>
+          <button className="text-xs font-cn tracking-[0.3em] text-[#D4C5B0]/60 hover:text-white flex items-center justify-center gap-4 group transition-colors duration-500">
+            <span>步入幽境</span>
+            <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform duration-500" />
+          </button>
+        </div>
+        
+        <div className="absolute bottom-8 font-divine text-[10px] tracking-[0.4em] text-white/20 uppercase">
+          Into the void. Designed in darkness.
+        </div>
+      </footer>
+    </div>
+  );
+}

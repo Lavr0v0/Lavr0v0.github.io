@@ -1,0 +1,293 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { Leaf, Droplets, Sun, ChevronDown } from 'lucide-react';
+
+// --- 自定义 Hook：滚动渐现 ---
+const useScrollFade = () => {
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('opacity-100', 'translate-y-0');
+            entry.target.classList.remove('opacity-0', 'translate-y-16');
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const elements = document.querySelectorAll('.fade-up');
+    elements.forEach((el) => observer.observe(el));
+
+    return () => elements.forEach((el) => observer.unobserve(el));
+  }, []);
+};
+
+// --- 组件：森林萤火/光灵 (Canvas 粒子) ---
+const ForestSpirits = () => {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+    let particles = [];
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    window.addEventListener('resize', resize);
+    resize();
+
+    class Spirit {
+      constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 0.5;
+        this.speedY = Math.random() * -0.3 - 0.1; // 极缓上升
+        this.speedX = (Math.random() - 0.5) * 0.4; // 左右漂浮
+        this.baseOpacity = Math.random() * 0.5 + 0.1;
+        this.opacity = this.baseOpacity;
+        this.pulseSpeed = Math.random() * 0.02 + 0.005;
+        this.time = Math.random() * 100;
+        // 萤火虫般的黄绿色光芒
+        this.color = Math.random() > 0.5 ? 'rgba(167, 243, 208, ' : 'rgba(253, 230, 138, '; 
+      }
+      update() {
+        this.y += this.speedY;
+        this.x += Math.sin(this.time) * this.speedX;
+        this.time += 0.05;
+
+        // 呼吸闪烁
+        this.opacity = this.baseOpacity + Math.sin(this.time * 2) * 0.3;
+        if (this.opacity < 0) this.opacity = 0;
+
+        if (this.y < -10) {
+          this.y = canvas.height + 10;
+          this.x = Math.random() * canvas.width;
+        }
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = `${this.color}${this.opacity})`;
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = `${this.color}0.8)`;
+        ctx.fill();
+      }
+    }
+
+    const init = () => {
+      particles = [];
+      for (let i = 0; i < 60; i++) {
+        particles.push(new Spirit());
+      }
+    };
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach((p) => {
+        p.update();
+        p.draw();
+      });
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    init();
+    animate();
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-[1]" />;
+};
+
+// --- 组件：体积光/神圣光柱 (丁达尔效应) ---
+const GodRays = () => (
+  <div className="fixed inset-0 pointer-events-none z-[0] overflow-hidden mix-blend-screen opacity-60">
+    <div className="absolute top-[-10%] left-[20%] w-[300px] h-[150vh] bg-gradient-to-b from-[#A7F3D0]/20 via-[#A7F3D0]/5 to-transparent rotate-[-25deg] origin-top blur-2xl animate-ray"></div>
+    <div className="absolute top-[-10%] left-[50%] w-[400px] h-[150vh] bg-gradient-to-b from-[#FDE68A]/10 via-[#A7F3D0]/5 to-transparent rotate-[-15deg] origin-top blur-3xl animate-ray" style={{ animationDelay: '-3s' }}></div>
+    <div className="absolute top-[-10%] right-[10%] w-[200px] h-[150vh] bg-gradient-to-b from-[#A7F3D0]/10 via-transparent to-transparent rotate-[10deg] origin-top blur-2xl animate-ray" style={{ animationDelay: '-7s' }}></div>
+  </div>
+);
+
+export default function App() {
+  useScrollFade();
+  const [scrollPos, setScrollPos] = useState(0);
+
+  // 视差效果监听
+  useEffect(() => {
+    const handleScroll = () => setScrollPos(window.scrollY);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return (
+    // 深邃的墨绿底色，代表幽深的古老森林
+    <div className="relative min-h-screen bg-[#040C08] text-[#E0EBE5] overflow-x-hidden selection:bg-[#A7F3D0] selection:text-[#040C08]">
+      
+      {/* 全局样式 */}
+      <style dangerouslySetInnerHTML={{__html: `
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500&family=Noto+Serif+SC:wght@200;300;400&display=swap');
+        
+        .font-divine { font-family: 'Cinzel', serif; }
+        .font-cn { font-family: 'Noto Serif SC', serif; }
+
+        .fade-up {
+          transition: opacity 2s cubic-bezier(0.2, 0.8, 0.2, 1), transform 2s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes rayBreath {
+          0%, 100% { opacity: 0.5; transform: rotate(var(--tw-rotate)) scaleX(1); }
+          50% { opacity: 0.8; transform: rotate(var(--tw-rotate)) scaleX(1.1); }
+        }
+        .animate-ray {
+          animation: rayBreath 12s ease-in-out infinite alternate;
+        }
+
+        /* 水波纹边框效果 */
+        .ripple-border {
+          position: relative;
+        }
+        .ripple-border::before {
+          content: '';
+          position: absolute;
+          inset: -1px;
+          background: linear-gradient(180deg, rgba(167,243,208,0.4), transparent);
+          border-radius: inherit;
+          z-index: -1;
+          opacity: 0;
+          transition: opacity 1s ease;
+        }
+        .ripple-border:hover::before {
+          opacity: 1;
+        }
+      `}} />
+
+      {/* 背景特效层 */}
+      <GodRays />
+      <ForestSpirits />
+      
+      {/* 底部浓雾/水汽渐变 */}
+      <div className="fixed bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-[#040C08] to-transparent pointer-events-none z-[2]"></div>
+
+      {/* --- 顶部导航 --- */}
+      <nav className="fixed w-full top-0 z-50 px-10 py-8 flex justify-between items-center bg-gradient-to-b from-[#040C08] to-transparent">
+        <div className="flex items-center gap-3 text-[#A7F3D0]/80">
+          <Leaf size={18} strokeWidth={1.5} />
+          <span className="font-divine text-lg tracking-[0.4em]">VERDANT</span>
+        </div>
+        <div className="flex gap-10 font-cn text-xs tracking-widest text-white/50">
+          <a href="#sanctuary" className="hover:text-[#A7F3D0] transition-colors duration-500">神殿</a>
+          <a href="#origin" className="hover:text-[#A7F3D0] transition-colors duration-500">万物</a>
+        </div>
+      </nav>
+
+      {/* --- 第一屏：巨木之门 (The Gateway) --- */}
+      <section className="relative h-screen flex flex-col items-center justify-center z-10">
+        
+        {/* 背景里的隐约巨树轮廓 / 拱门 */}
+        <div 
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[500px] md:w-[400px] md:h-[600px] border border-[#A7F3D0]/10 rounded-t-full flex items-center justify-center overflow-hidden"
+          style={{ transform: `translate(-50%, -50%) translateY(${scrollPos * 0.2}px)` }}
+        >
+          {/* 拱门内的圣光 */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#A7F3D0]/10 to-transparent opacity-50"></div>
+          <div className="w-[1px] h-full bg-gradient-to-b from-transparent via-[#A7F3D0]/30 to-transparent"></div>
+        </div>
+
+        <div className="text-center fade-up opacity-0 translate-y-16 mt-20">
+          <h1 className="font-cn text-5xl md:text-[5rem] font-light tracking-[0.3em] text-white drop-shadow-[0_0_30px_rgba(167,243,208,0.3)] mb-8">
+            苍 翠 神 殿
+          </h1>
+          <div className="flex items-center justify-center gap-6 mb-8">
+            <div className="w-12 h-[1px] bg-[#A7F3D0]/30"></div>
+            <p className="font-divine text-sm md:text-base tracking-[0.6em] text-[#A7F3D0]/70">
+              BREATH OF THE ANCIENTS
+            </p>
+            <div className="w-12 h-[1px] bg-[#A7F3D0]/30"></div>
+          </div>
+        </div>
+
+        {/* 滚动提示 */}
+        <div className="absolute bottom-12 flex flex-col items-center gap-3 text-[#A7F3D0]/40 animate-pulse">
+          <span className="font-cn text-xs tracking-[0.3em]">深入密林</span>
+          <ChevronDown size={16} strokeWidth={1} />
+        </div>
+      </section>
+
+      {/* --- 第二屏：森之礼赞 (The Tribute) --- */}
+      <section id="sanctuary" className="relative min-h-screen py-32 z-10 flex items-center">
+        <div className="max-w-6xl mx-auto px-8 w-full flex flex-col md:flex-row gap-20 items-center">
+          
+          {/* 左侧文字 */}
+          <div className="flex-1 fade-up opacity-0 translate-y-16 space-y-12">
+            <h2 className="font-cn text-3xl md:text-4xl leading-relaxed tracking-[0.2em] font-light text-white/90">
+              在这里，<br/>
+              巨树即是<span className="text-[#A7F3D0] drop-shadow-[0_0_10px_rgba(167,243,208,0.5)]">立柱</span>，<br/>
+              晨雾即是<span className="text-[#A7F3D0] drop-shadow-[0_0_10px_rgba(167,243,208,0.5)]">穹顶</span>。
+            </h2>
+            <p className="font-cn text-sm leading-[2.5] tracking-widest text-white/50 text-justify max-w-md">
+              真正的圣洁并非人造的殿堂，而是历经千万年岁月生长的寂静。
+              当第一缕阳光穿透茂密的树冠，化作有形的光柱倾泻而下，
+              空气中悬浮的微尘，便是大自然最神圣的启示录。
+            </p>
+          </div>
+
+          {/* 右侧意境卡片组 */}
+          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-6 relative">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[#A7F3D0]/5 rounded-full blur-[100px] z-0 pointer-events-none"></div>
+            
+            {[
+              { icon: Sun, title: "初 芒", en: "ILLUMINATION" },
+              { icon: Droplets, title: "甘 露", en: "PURIFICATION" },
+              { icon: Leaf, title: "生 息", en: "VITALITY" }
+            ].map((item, idx) => (
+              <div 
+                key={idx} 
+                className={`ripple-border bg-[#071710]/80 backdrop-blur-md border border-[#A7F3D0]/10 p-8 rounded-xl fade-up opacity-0 translate-y-16 flex flex-col items-center text-center group cursor-pointer ${idx === 2 ? 'sm:col-span-2' : ''}`}
+                style={{ transitionDelay: `${idx * 0.2}s` }}
+              >
+                <item.icon className="text-[#A7F3D0]/50 mb-6 group-hover:text-[#A7F3D0] transition-colors duration-500" size={28} strokeWidth={1} />
+                <h3 className="font-cn text-xl tracking-[0.3em] text-white/90 mb-2">{item.title}</h3>
+                <div className="font-divine text-[10px] tracking-widest text-white/30 group-hover:text-white/60 transition-colors">{item.en}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* --- 第三屏：水面倒影 (The Reflection) --- */}
+      <section id="origin" className="relative h-[80vh] flex flex-col justify-center items-center z-10 bg-gradient-to-t from-[#020604] to-transparent">
+        {/* 倒影效果分割线 */}
+        <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#A7F3D0]/20 to-transparent mb-20 relative">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#A7F3D0]/50 blur-sm"></div>
+        </div>
+
+        <div className="text-center fade-up opacity-0 translate-y-16">
+          <h2 className="font-divine text-2xl md:text-4xl tracking-[0.4em] text-[#A7F3D0]/80 mb-6">
+            RETURN TO THE SOURCE
+          </h2>
+          <p className="font-cn text-lg tracking-[0.5em] text-white/60 font-light">
+            临水照影，万物归一
+          </p>
+        </div>
+      </section>
+
+      {/* --- 极简底部 --- */}
+      <footer className="relative py-12 text-center z-10 bg-[#020604] border-t border-[#A7F3D0]/5">
+        <div className="font-divine text-xl tracking-[0.4em] text-white/50 mb-4 hover:text-[#A7F3D0] transition-colors cursor-pointer">
+          VERDANT
+        </div>
+        <div className="font-cn text-[10px] tracking-[0.2em] text-white/30 uppercase">
+          © {new Date().getFullYear()} Nurtured by Nature.
+        </div>
+      </footer>
+
+    </div>
+  );
+}
