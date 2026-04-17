@@ -155,7 +155,7 @@
     .hero-inner {
       position: relative; z-index: 3;
       max-width: 1340px; margin: 0 auto;
-      padding: 0 56px; width: 100%;
+      padding: 0 56px 0 6px; width: 100%;
     }
 
     /* Each hero layer has its own will-change for smooth GPU parallax */
@@ -232,17 +232,6 @@
     }
     .btn-text:hover { color: var(--or); border-color: var(--or); }
 
-    .h-hint {
-      position: absolute; bottom: 36px; left: 56px; z-index: 3;
-      display: flex; align-items: center; gap: 10px;
-      font-size: 9px; letter-spacing: 0.22em; color: var(--t3);
-      text-transform: uppercase;
-    }
-    .h-hint::before {
-      content: ''; display: block;
-      width: 1px; height: 30px;
-      background: linear-gradient(to bottom, var(--or), transparent);
-    }
 
     /* ── SECTIONS ─────────────────────────────────── */
     .sec { position: relative; z-index: 1; padding: 144px 0; }
@@ -543,7 +532,6 @@
     </div>
   </div>
 
-  <div class="h-hint">Scroll</div>
 </section>
 
 
