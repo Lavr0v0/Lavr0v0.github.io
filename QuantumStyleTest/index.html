@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quantum Robotics</title>
+
+  <!-- Anurati (title) local + Chakra Petch (body) CDN — two fonts only -->
+  <style>
+    @font-face {
+      font-family: 'Anurati';
+      src: url('assets/Anurati-Regular.woff') format('woff');
+      font-weight: 400 700;
+      font-style: normal;
+      font-display: swap;
+    }
+  </style>
+  <style>
+    @font-face {
+      font-family: 'Chakra Petch';
+      src: url('assets/ChakraPetch-Regular.ttf') format('truetype');
+      font-weight: 400; font-style: normal; font-display: swap;
+    }
+    @font-face {
+      font-family: 'Chakra Petch';
+      src: url('assets/ChakraPetch-Medium.ttf') format('truetype');
+      font-weight: 500; font-style: normal; font-display: swap;
+    }
+    @font-face {
+      font-family: 'Chakra Petch';
+      src: url('assets/ChakraPetch-SemiBold.ttf') format('truetype');
+      font-weight: 600; font-style: normal; font-display: swap;
+    }
+  </style>
+
+  <!-- Lenis required CSS -->
+  <style>
+    html { scrollbar-gutter: stable; }
+    html.lenis, html.lenis body { height: auto; }
+    .lenis.lenis-smooth { scroll-behavior: auto !important; }
+    .lenis.lenis-stopped { overflow: hidden; }
+  </style>
+
+  <style>
+    /* ── TOKENS ───────────────────────────────────── */
+    :root {
+      --bg:    #07090D;
+      --bg2:   #0B0E16;
+      --panel: #0E1219;
+      --or:    #FF6B3B;
+      --or2:   rgba(255,107,59,0.16);
+      --or3:   rgba(255,107,59,0.07);
+      --t1:    #F2F7FC;
+      --t2:    #A8BEC8;
+      --t3:    #2E4252;
+      --bd:    rgba(255,107,59,0.12);
+      --bd2:   rgba(255,107,59,0.28);
+      --fA: 'Anurati', sans-serif;
+      --fB: 'Chakra Petch', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--t1);
+      font-family: var(--fB);
+      font-size: 15px;
+      line-height: 1.75;
+      overflow-x: hidden;
+    }
+
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,107,59,0.014) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,107,59,0.014) 1px, transparent 1px);
+      background-size: 64px 64px;
+      pointer-events: none; z-index: 0;
+    }
+
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--bd2); }
+    ::selection { background: rgba(255,107,59,0.2); }
+
+    /* ── NAV ──────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+      height: 58px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 44px;
+      background: rgba(5,7,11,0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--bd);
+    }
+
+    .nav-brand {
+      display: flex; align-items: center; gap: 14px;
+      text-decoration: none;
+    }
+    .nav-logo { width: 36px; height: 36px; flex-shrink: 0; }
+
+    .brand-words { display: flex; flex-direction: column; gap: 2px; }
+    .brand-name  { font-family: var(--fA); font-weight: 700; font-size: 13px; letter-spacing: 0.14em; color: var(--t1); }
+    .brand-code  { font-family: var(--fB); font-size: 9px; letter-spacing: 0.22em; color: var(--or); opacity: 0.7; }
+
+    .nav-links { display: flex; list-style: none; }
+    .nav-links a {
+      font-family: var(--fB);
+      font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+      text-decoration: none; color: var(--t2); padding: 6px 13px;
+      position: relative; transition: color 0.2s;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute;
+      bottom: 0; left: 13px; right: 13px;
+      height: 1px; background: var(--or);
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.24s ease;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--t1); }
+    .nav-links a:hover::after, .nav-links a.active::after { transform: scaleX(1); }
+    .nav-est { font-size: 9px; letter-spacing: 0.2em; color: var(--t3); }
+
+    /* ── HERO ─────────────────────────────────────── */
+    #hero {
+      position: relative; height: 100vh; min-height: 640px;
+      display: flex; align-items: center;
+      padding-top: 58px; overflow: hidden;
+    }
+
+    /* Deep atmospheric bg — parallax layer 1 */
+    .h-bg {
+      position: absolute; inset: -20%; z-index: 0;
+      background:
+        radial-gradient(ellipse 55% 55% at 50% 50%, rgba(140,45,10,0.22) 0%, transparent 65%),
+        radial-gradient(ellipse 28% 28% at 88% 18%, rgba(180,60,10,0.10) 0%, transparent 55%),
+        linear-gradient(160deg, #0A0C14 0%, #07090D 100%);
+      will-change: transform;
+    }
+
+    /* Corner reticles */
+    .rc {
+      position: absolute; z-index: 2;
+      width: 16px; height: 16px;
+      border-style: solid; border-color: var(--bd2);
+    }
+    .rc.tl { top: 72px;  left: 32px;  border-width: 1px 0 0 1px; }
+    .rc.tr { top: 72px;  right: 32px; border-width: 1px 1px 0 0; }
+    .rc.bl { bottom: 32px; left: 32px; border-width: 0 0 1px 1px; }
+    .rc.br { bottom: 32px; right: 32px; border-width: 0 1px 1px 0; }
+
+    .hero-inner {
+      position: relative; z-index: 3;
+      max-width: 1340px; margin: 0 auto;
+      padding: 0 56px; width: 100%;
+    }
+
+    /* Each hero layer has its own will-change for smooth GPU parallax */
+    .h-eyebrow {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 10px; letter-spacing: 0.26em;
+      color: var(--or); text-transform: uppercase;
+      margin-bottom: 28px; opacity: 0.8;
+      will-change: transform, opacity;
+    }
+    .h-eyebrow::before {
+      content: ''; display: block;
+      width: 0; height: 1px; background: var(--or);
+      transition: width 0.9s cubic-bezier(.16,1,.3,1) 0.5s;
+    }
+    .h-eyebrow.in::before { width: 28px; }
+
+    /* Title group — Lenis controls this wrapper's transform+opacity */
+    .hero-title-group {
+      font-family: var(--fA);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      line-height: 0.90;
+      color: var(--t1);
+      will-change: transform, opacity;
+    }
+    .h-line { display: block; }
+    .hl-s   { font-size: clamp(30px, 4.4vw, 64px); }   /* WELCOME TO · ROBOTICS */
+    .hl-b   { font-size: clamp(72px, 10.8vw, 152px); } /* QUANTUM — dominant */
+    .h-line.hi {
+      color: var(--or);
+      filter: drop-shadow(0 0 36px rgba(255,107,59,0.60))
+              drop-shadow(0 0 80px rgba(255,107,59,0.22));
+    }
+
+    /* Entry direction overrides for hero title lines */
+    .h-entry.hl-from-left  { transform: translateX(-72px); }
+    .h-entry.hl-from-right { transform: translateX(72px); }
+    .h-entry.hl-b          { transform: translateY(18px) scale(0.97); }
+
+    .hero-sub {
+      margin: 46px 0 54px; max-width: 500px;
+      will-change: transform, opacity;
+    }
+    .hs-label {
+      font-size: 9px; color: var(--or);
+      letter-spacing: 0.28em; text-transform: uppercase;
+      margin-bottom: 12px; opacity: 0.6;
+    }
+    .hs-text { font-size: 15px; line-height: 1.95; color: var(--t2); font-weight: 600; }
+
+    .hero-cta {
+      display: flex; align-items: center; gap: 28px;
+      will-change: transform, opacity;
+    }
+    .btn-fill {
+      font-family: var(--fB); font-weight: 500;
+      font-size: 10px; letter-spacing: 0.18em;
+      text-transform: uppercase; text-decoration: none;
+      color: var(--bg); background: var(--or);
+      padding: 13px 30px; display: inline-block;
+      clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .btn-fill:hover {
+      background: #FF8055;
+      box-shadow: 0 0 30px rgba(255,107,59,0.50);
+    }
+    .btn-text {
+      font-size: 10px; letter-spacing: 0.16em;
+      text-transform: uppercase; text-decoration: none;
+      color: var(--t2); border-bottom: 1px solid var(--bd);
+      padding-bottom: 2px; transition: color 0.2s, border-color 0.2s;
+    }
+    .btn-text:hover { color: var(--or); border-color: var(--or); }
+
+    .h-hint {
+      position: absolute; bottom: 36px; left: 56px; z-index: 3;
+      display: flex; align-items: center; gap: 10px;
+      font-size: 9px; letter-spacing: 0.22em; color: var(--t3);
+      text-transform: uppercase;
+    }
+    .h-hint::before {
+      content: ''; display: block;
+      width: 1px; height: 30px;
+      background: linear-gradient(to bottom, var(--or), transparent);
+    }
+
+    /* ── SECTIONS ─────────────────────────────────── */
+    .sec { position: relative; z-index: 1; padding: 144px 0; }
+    .sec-dark { background: var(--bg2); }
+
+    .wrap { max-width: 1340px; margin: 0 auto; padding: 0 56px; }
+
+    .sec-head { margin-bottom: 84px; }
+    .sec-eye {
+      font-size: 9px; color: var(--or);
+      letter-spacing: 0.3em; text-transform: uppercase;
+      margin-bottom: 14px; opacity: 0.6;
+    }
+    .sec-h2 {
+      font-family: var(--fA);
+      font-weight: 700;
+      font-size: clamp(44px, 6.2vw, 80px);
+      letter-spacing: 0.08em; line-height: 0.9; color: var(--t1);
+    }
+    .sec-rule { width: 48px; height: 2px; background: var(--or); margin-top: 20px;
+      transform-origin: left; transform: scaleX(0);
+      transition: transform 0.9s cubic-bezier(.16,1,.3,1) 0.3s; }
+    .revealed .sec-rule { transform: scaleX(1); }
+
+    /* ── CARDS ────────────────────────────────────── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; }
+
+    .card {
+      background: var(--panel); border: 1px solid var(--bd);
+      padding: 40px 32px 32px; position: relative;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      transform-style: preserve-3d;
+    }
+    .card:hover { border-color: var(--bd2);
+      box-shadow: 0 8px 40px rgba(255,107,59,0.08); }
+    .card::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 2px; background: var(--or); opacity: 0.25; transition: opacity 0.3s;
+    }
+    .card:hover::before { opacity: 1; }
+    .ck { position: absolute; width: 8px; height: 8px; border-style: solid; border-color: var(--t3); transition: border-color 0.3s; }
+    .card:hover .ck { border-color: var(--or); }
+    .ck.tl { top: 9px;  left: 9px;  border-width: 1px 0 0 1px; }
+    .ck.br { bottom: 9px; right: 9px; border-width: 0 1px 1px 0; }
+
+    .c-code  { font-size: 9px; color: var(--or); letter-spacing: 0.24em; text-transform: uppercase; margin-bottom: 18px; opacity: 0.65; }
+    .c-title { font-family: var(--fA); font-weight: 700; font-size: 20px; letter-spacing: 0.09em; color: var(--t1); margin-bottom: 16px; }
+    .c-body  { font-size: 14px; line-height: 1.9; color: var(--t2); font-weight: 600; }
+    .c-body p + p { margin-top: 12px; }
+    .c-body ul    { list-style: none; padding: 0; margin-top: 10px; }
+    .c-body ul li { position: relative; padding-left: 16px; margin-bottom: 8px; }
+    .c-body ul li::before { content: '›'; position: absolute; left: 0; color: var(--or); font-size: 16px; line-height: 1.3; }
+    .c-tag { display: inline-block; margin-top: 24px; font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--t3); border: 1px solid var(--bd); padding: 3px 10px; }
+
+    /* ── SCHEDULE ─────────────────────────────────── */
+    .s-card {
+      background: var(--panel); border: 1px solid var(--bd);
+      padding: 44px 32px; position: relative;
+      transition: border-color 0.3s, box-shadow 0.3s;
+      transform-style: preserve-3d;
+    }
+    .s-card:hover { border-color: var(--bd2);
+      box-shadow: 0 8px 40px rgba(255,107,59,0.08); }
+    .s-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--or); opacity: 0.22; transition: opacity 0.3s; }
+    .s-card:hover::before { opacity: 1; }
+    .s-num   { font-family: var(--fA); font-weight: 700; font-size: 58px; letter-spacing: 0.04em; line-height: 1; color: rgba(255,107,59,0.09); margin-bottom: 24px; user-select: none; will-change: transform; }
+    .s-phase { font-size: 9px; color: var(--or); letter-spacing: 0.26em; text-transform: uppercase; margin-bottom: 10px; opacity: 0.75; }
+    .s-title { font-family: var(--fA); font-weight: 700; font-size: 18px; letter-spacing: 0.09em; color: var(--t1); margin-bottom: 8px; }
+    .s-dates { font-size: 12px; color: var(--or); letter-spacing: 0.1em; margin-bottom: 18px; opacity: 0.8; }
+
+    /* ── SUPPORT ──────────────────────────────────── */
+    .sup-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+    .sup-h { font-family: var(--fA); font-weight: 700; font-size: clamp(40px, 5.2vw, 66px); letter-spacing: 0.07em; line-height: 0.94; color: var(--t1); margin-bottom: 28px; text-transform: uppercase; }
+    .sup-h .hi { color: var(--or); }
+    .sup-desc { font-size: 15px; line-height: 1.95; color: var(--t2); font-weight: 600; }
+    .s-body   { font-size: 13.5px; line-height: 1.85; color: var(--t2); font-weight: 600; }
+    .sup-items { display: flex; flex-direction: column; gap: 2px; }
+    .sup-item { background: var(--panel); border: 1px solid var(--bd); padding: 24px 28px; display: grid; grid-template-columns: 32px 1fr; gap: 16px; transition: border-color 0.3s; }
+    .sup-item:hover { border-color: var(--bd2); }
+    .sup-n { font-family: var(--fA); font-weight: 700; font-size: 18px; letter-spacing: 0.06em; color: var(--or); padding-top: 3px; }
+    .sup-t { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--t1); margin-bottom: 5px; }
+    .sup-b { font-size: 11px; color: var(--t2); line-height: 1.75; }
+
+    /* ── FOOTER ───────────────────────────────────── */
+    footer { position: relative; z-index: 1; border-top: 1px solid var(--bd); background: #050710; }
+    footer::before { content: ''; position: absolute; top: -1px; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--or), transparent); opacity: 0.3; }
+    .ft-top { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 48px; padding: 68px 56px 52px; max-width: 1340px; margin: 0 auto; }
+    .ft-lbl { font-size: 9px; color: var(--or); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 14px; opacity: 0.6; }
+    .ft-txt { font-size: 12px; color: var(--t2); line-height: 1.85; }
+    .ft-txt a { color: var(--t2); text-decoration: none; transition: color 0.2s; }
+    .ft-txt a:hover { color: var(--or); }
+    .ft-brand { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .ft-logo { width: 40px; height: 40px; }
+    .ft-name { font-family: var(--fA); font-weight: 700; font-size: 17px; letter-spacing: 0.18em; color: var(--t1); }
+    .ft-est  { font-size: 9px; color: var(--t3); letter-spacing: 0.26em; }
+    .ft-bottom { max-width: 1340px; margin: 0 auto; padding: 20px 56px 36px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--bd); }
+    .ft-copy  { font-size: 9px; color: var(--t3); letter-spacing: 0.1em; }
+    .ft-coord { font-size: 9px; color: var(--t3); letter-spacing: 0.1em; }
+
+    /* ── SCROLL REVEAL — driven by Lenis, no .in toggle ── */
+    /* Initial invisible state; JS overrides every scroll tick */
+    [data-reveal] { opacity: 0; will-change: transform, opacity; }
+
+    /* ── HERO WATERMARK LOGO ─────────────────────── */
+    .hero-wm {
+      position: absolute;
+      right: calc(-1 * clamp(178px, 23vw, 328px));
+      top: -4%;           /* starts above hero centre so it drifts through */
+      translate: none;    /* no centering, Lenis drives vertical travel */
+      z-index: 1; pointer-events: none;
+      will-change: transform;
+      opacity: 0;
+      transition: opacity 1.6s cubic-bezier(.16,1,.3,1);
+    }
+    .hero-wm.in { opacity: 1; }
+
+    /* Orange light "cast" from QUANTUM — masked to logo silhouette only */
+    .hero-wm::after {
+      content: '';
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(
+        ellipse 85% 65% at -12% 38%,
+        rgba(255,107,59,0.95) 0%,
+        rgba(255,107,59,0.45) 32%,
+        rgba(255,107,59,0.10) 55%,
+        transparent 68%
+      );
+      /* Clip gradient to logo shape only */
+      -webkit-mask-image: url('assets/logo.png');
+              mask-image: url('assets/logo.png');
+      -webkit-mask-size: 100% 100%;
+              mask-size: 100% 100%;
+      -webkit-mask-repeat: no-repeat;
+              mask-repeat: no-repeat;
+      opacity: 0.55;
+      pointer-events: none;
+    }
+
+    .hero-wm img {
+      width: clamp(559px, 71.5vw, 1030px);
+      height: auto;
+      opacity: 0.14;
+      filter: brightness(1.5);
+      display: block;
+    }
+
+    /* ── SPLASH SCREEN ───────────────────────────── */
+    #splash {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg);
+      transition: transform 0.9s cubic-bezier(.76,0,.24,1);
+      will-change: transform;
+    }
+    #splash.exit { transform: translateY(-100%); }
+
+    /* Subtle radial warmth behind logo */
+    #splash::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 40% 40% at 50% 50%,
+        rgba(140,45,10,0.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .sp-wrap {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 28px;
+      position: relative; z-index: 1;
+    }
+
+    .sp-logo {
+      width: 90px; height: 90px;
+      object-fit: contain;
+      opacity: 0;
+      transform: scale(0.7);
+      transition: opacity 0.9s cubic-bezier(.16,1,.3,1),
+                  transform 0.9s cubic-bezier(.16,1,.3,1);
+    }
+    .sp-logo.show { opacity: 1; transform: scale(1); }
+
+    .sp-name {
+      font-family: var(--fA);
+      font-size: clamp(22px, 3vw, 34px);
+      letter-spacing: 0.16em;
+      color: var(--t1);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .sp-name.show { opacity: 1; transform: none; }
+
+    .sp-tag {
+      font-family: var(--fB);
+      font-size: 10px; letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--or); opacity: 0;
+      transition: opacity 0.6s ease 0.15s;
+    }
+    .sp-tag.show { opacity: 0.7; }
+
+    /* ── HERO ENTRY (runs after splash exits) ───── */
+    .h-entry {
+      opacity: 0; transform: translateY(28px);
+      transition: opacity 0.8s cubic-bezier(.16,1,.3,1),
+                  transform 0.8s cubic-bezier(.16,1,.3,1);
+    }
+    .h-entry.in { opacity: 1; transform: none; }
+
+    /* ── RESPONSIVE ───────────────────────────────── */
+    @media (max-width: 1080px) {
+      .grid-2, .sup-layout { grid-template-columns: 1fr; }
+      .grid-3 { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 700px) {
+      .grid-3, .ft-top { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .hero-h1 { font-size: 72px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════ SPLASH ════ -->
+<div id="splash">
+  <div class="sp-wrap">
+    <img class="sp-logo" id="spLogo"
+         src="assets/logo.png"
+         alt="Quantum Robotics Logo">
+    <div class="sp-name" id="spName">Quantum Robotics</div>
+    <div class="sp-tag"  id="spTag">QR-917 · Ignite Division</div>
+  </div>
+</div>
+
+<!-- ════ NAV ════ -->
+<nav>
+  <a class="nav-brand" href="#">
+    <!--
+      Logo SVG — 1:1 square (80×80 viewBox)
+      Three-element geometric emblem:
+        Left: chevron < with orange accent bar + downward spike
+        Center: thin vertical spine
+        Right: chevron > + downward spike (mirror)
+    -->
+    <img class="nav-logo"
+         src="assets/logo.png"
+         alt="QR Logo">
+
+    <div class="brand-words">
+      <div class="brand-name">Quantum Robotics</div>
+      <div class="brand-code">// QR-917 · IGNITE</div>
+    </div>
+  </a>
+
+  <ul class="nav-links">
+    <li><a href="#" class="active">Home</a></li>
+    <li><a href="#">Student Board</a></li>
+    <li><a href="#">Resources</a></li>
+    <li><a href="#">Awards</a></li>
+    <li><a href="#">Programs</a></li>
+    <li><a href="#">Contact Us</a></li>
+  </ul>
+
+  <div class="nav-est">Est. 2013</div>
+</nav>
+
+
+<!-- ════ HERO ════ -->
+<section id="hero">
+  <div class="h-bg" id="hBg"></div>
+  <!-- Faded watermark logo — Lenis parallax layer -->
+  <div class="hero-wm" id="hWm">
+    <img src="assets/logo.png" alt="">
+  </div>
+  <div class="rc tl"></div><div class="rc tr"></div>
+  <div class="rc bl"></div><div class="rc br"></div>
+
+  <div class="hero-inner">
+    <div class="h-eyebrow h-entry" id="hEye">QR-917 &nbsp;·&nbsp; Division Overview &nbsp;·&nbsp; 2025–26</div>
+    <div class="hero-title-group" id="hTitle">
+      <span class="h-line hl-s h-entry hl-from-left" style="transition-delay:.08s">WELCOME TO</span>
+      <span class="h-line hl-b hi h-entry"            style="transition-delay:.20s">QUANTUM</span>
+      <span class="h-line hl-s h-entry hl-from-right" style="transition-delay:.34s">ROBOTICS</span>
+    </div>
+    <div class="hero-sub h-entry" id="hSub" style="transition-delay:.22s">
+      <div class="hs-label">// Mission Brief</div>
+      <p class="hs-text">
+        Quantum Robotics Division welcomes high school students under&nbsp;19,
+        particularly those new to the VEX Robotics Competition.
+        A nurturing environment built to develop foundational robotics skills.
+      </p>
+    </div>
+    <div class="hero-cta h-entry" id="hCta" style="transition-delay:.36s">
+      <a href="#about" class="btn-fill">Explore Division</a>
+      <a href="#"      class="btn-text">View Programs</a>
+    </div>
+  </div>
+
+  <div class="h-hint">Scroll</div>
+</section>
+
+
+<!-- ════ ABOUT ════ -->
+<section id="about" class="sec">
+  <div class="wrap">
+    <div class="sec-head" data-reveal="left">
+      <div class="sec-eye">// 01 · Mission Briefing</div>
+      <h2 class="sec-h2" data-py="-28">About Us</h2>
+      <div class="sec-rule"></div>
+    </div>
+    <div class="grid-2">
+      <div class="card" data-reveal="up">
+        <div class="ck tl"></div><div class="ck br"></div>
+        <div class="c-code">C-1 · Key Features</div>
+        <div class="c-title">Features</div>
+        <div class="c-body">
+          <p>This division provides a comprehensive introduction to robotics, with an emphasis on mentor-led training and development.</p>
+          <p>Students are introduced to essential robotics technologies and team collaboration practices — building both technical ability and interpersonal skills.</p>
+        </div>
+        <div class="c-tag">Core Module</div>
+      </div>
+      <div class="card" data-reveal="up" data-delay="0.12">
+        <div class="ck tl"></div><div class="ck br"></div>
+        <div class="c-code">C-2 · Educational Outcomes</div>
+        <div class="c-title">Skills Gained</div>
+        <div class="c-body">
+          <p>Participants will gain:</p>
+          <ul>
+            <li>Mechanical &amp; electronic engineering, programming, sensor technology, and CAD</li>
+            <li>Engineering design process and effective documentation practices</li>
+            <li>Teamwork, communication, and problem-solving</li>
+          </ul>
+        </div>
+        <div class="c-tag">Training</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════ SCHEDULE ════ -->
+<section class="sec sec-dark">
+  <div class="wrap">
+    <div class="sec-head" data-reveal="right">
+      <div class="sec-eye">// 02 · Operations Timeline</div>
+      <h2 class="sec-h2" data-py="-28">Schedule</h2>
+      <div class="sec-rule"></div>
+    </div>
+    <div class="grid-3">
+      <div class="s-card" data-reveal="up">
+        <div class="s-num" data-py="-55">01</div>
+        <div class="s-phase">Phase One</div>
+        <div class="s-title">Early Season</div>
+        <div class="s-dates">June – August</div>
+        <div class="s-body">Pre-season preparation, initial design sprints, and team formation. Students establish engineering foundations.</div>
+      </div>
+      <div class="s-card" data-reveal="up" data-delay="0.12">
+        <div class="s-num" data-py="-55">02</div>
+        <div class="s-phase">Phase Two</div>
+        <div class="s-title">Regular Season</div>
+        <div class="s-dates">September – March</div>
+        <div class="s-body">Full competition season. Teams meet twice weekly — design, build, programming, and engineering notebook maintenance.</div>
+      </div>
+      <div class="s-card" data-reveal="up" data-delay="0.24">
+        <div class="s-num" data-py="-55">03</div>
+        <div class="s-phase">Phase Three</div>
+        <div class="s-title">Post Season</div>
+        <div class="s-dates">March – May</div>
+        <div class="s-body">Reflection, documentation, and preparation for the next cycle. Knowledge transfer to incoming members.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════ SUPPORT ════ -->
+<section class="sec">
+  <div class="wrap">
+    <div class="sup-layout">
+      <div data-reveal="left">
+        <div class="sec-eye" style="margin-bottom:14px">// 03 · Mentorship</div>
+        <div class="sup-h" data-py="-22">Support &amp;<br><span class="hi">Resources</span></div>
+        <p class="sup-desc">
+          Every team is paired with dedicated adult mentors who provide guidance throughout
+          the season. Students gain access to structured seminars, hands-on clinics,
+          and a supportive network designed to accelerate learning at every level.
+        </p>
+      </div>
+      <div class="sup-items" data-reveal="right">
+        <div class="sup-item">
+          <div class="sup-n">01</div>
+          <div>
+            <div class="sup-t">Dedicated Mentors</div>
+            <div class="sup-b">Each team is assigned adult mentors with engineering and robotics expertise throughout the entire season.</div>
+          </div>
+        </div>
+        <div class="sup-item">
+          <div class="sup-n">02</div>
+          <div>
+            <div class="sup-t">Structured Seminars</div>
+            <div class="sup-b">Regular sessions covering design methodology, programming fundamentals, and competition strategy.</div>
+          </div>
+        </div>
+        <div class="sup-item">
+          <div class="sup-n">03</div>
+          <div>
+            <div class="sup-t">Hands-On Clinics</div>
+            <div class="sup-b">Focused build and programming clinics to reinforce skills and tackle specific technical challenges.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════ FOOTER ════ -->
+<footer>
+  <div class="ft-top">
+    <div data-reveal="up">
+      <div class="ft-lbl">// Location</div>
+      <div class="ft-txt">2741 152nd Ave NE, Unit 5B<br>Redmond, WA 98052</div>
+    </div>
+    <div class="ft-brand" data-reveal="scale">
+      <img class="ft-logo"
+           src="assets/logo.png"
+           alt="QR Logo"
+           style="opacity:0.55">
+      <div class="ft-name">Quantum Robotics</div>
+      <div class="ft-est">// Established 2013 · VEX Division //</div>
+    </div>
+    <div style="text-align:right" data-reveal="up" data-delay="0.1">
+      <div class="ft-lbl">// Contact</div>
+      <div class="ft-txt"><a href="mailto:quantum@igniterobotics.org">quantum@igniterobotics.org</a></div>
+    </div>
+  </div>
+  <div class="ft-bottom">
+    <div class="ft-copy">© 2025 Quantum Robotics · All Rights Reserved</div>
+    <div class="ft-coord">47.6587° N · 122.1215° W</div>
+  </div>
+</footer>
+
+
+<!-- Lenis -->
+<script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+  /* Always start at top on refresh */
+  history.scrollRestoration = 'manual';
+  window.scrollTo(0, 0);
+
+  /* ── Init Lenis ─────────────────────────────────── */
+  const lenis = new Lenis({
+    duration: 1.3,
+    easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    smoothWheel: true,
+  });
+  (function raf(t) { lenis.raf(t); requestAnimationFrame(raf); })(0);
+
+  /* ── Splash screen ─────────────────────────────── */
+  (function initSplash() {
+    const splash  = document.getElementById('splash');
+    const spLogo  = document.getElementById('spLogo');
+    const spName  = document.getElementById('spName');
+    const spTag   = document.getElementById('spTag');
+
+    lenis.stop(); // lock scroll during splash
+
+    // Logo scales + fades in on first frame
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      spLogo.classList.add('show');
+    }));
+
+    // Name + tag appear after logo settles
+    setTimeout(() => {
+      spName.classList.add('show');
+      spTag.classList.add('show');
+    }, 800);
+
+    // Slide splash up and reveal hero
+    setTimeout(() => {
+      splash.classList.add('exit');
+      setTimeout(() => {
+        splash.style.display = 'none';
+        lenis.start();
+        document.querySelectorAll('.h-entry').forEach(el => el.classList.add('in'));
+        // Watermark fades in separately (opacity-only, no transform conflict)
+        setTimeout(() => hWm.classList.add('in'), 300);
+        // After entry animations finish, strip transitions from Lenis-controlled
+        // elements so scroll-back is instant, not laggy
+        setTimeout(() => {
+          [hEye, hSub, hCta].forEach(el => el.style.transition = 'none');
+        }, 1100);
+      }, 900);
+    }, 2000);
+  })();
+
+  /* ── Hero parallax layers ───────────────────────── */
+  const hBg    = document.getElementById('hBg');
+  const hWm    = document.getElementById('hWm');   // watermark logo
+  const hEye   = document.getElementById('hEye');
+  const hTitle = document.getElementById('hTitle');
+  const hSub   = document.getElementById('hSub');
+  const hCta   = document.getElementById('hCta');
+  const heroEl = document.getElementById('hero');
+
+  lenis.on('scroll', ({ scroll }) => {
+    const H = heroEl.offsetHeight;
+    if (scroll > H * 1.25) return;
+
+    // Six-layer depth stack — bg races, watermark drifts mid, text barely moves
+    hBg.style.transform    = `translateY(${scroll * 0.72}px) translate(${mouseX}px,${mouseY}px)`;
+
+    // Watermark drifts top→bottom over hero scroll — no CSS centering, pure translateY
+    hWm.style.transform    = `translateY(${scroll * 0.72}px)`;
+
+    hEye.style.transform   = `translateY(${scroll * 0.48}px)`;
+    hEye.style.opacity     = Math.max(0, 1 - scroll / (H * 0.42));
+
+    hTitle.style.transform = `translateY(${scroll * 0.28}px)`;
+    hTitle.style.opacity   = Math.max(0, 1 - scroll / (H * 0.58));
+
+    hSub.style.transform   = `translateY(${scroll * 0.14}px)`;
+    hSub.style.opacity     = Math.max(0, 1 - scroll / (H * 0.70));
+
+    hCta.style.transform   = `translateY(${scroll * 0.06}px)`;
+    hCta.style.opacity     = Math.max(0, 1 - scroll / (H * 0.82));
+  });
+
+  /* ── Continuous Lenis parallax for data-py elements ─ */
+  const pyEls = document.querySelectorAll('[data-py]');
+
+  lenis.on('scroll', ({ scroll: s }) => {
+    const H = heroEl.offsetHeight;
+    if (s < H * 1.25) return; // hero handles its own parallax above
+
+    const vh = window.innerHeight;
+    pyEls.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      // progress: 0 when element centre is at viewport bottom, 1 at top
+      const progress = (vh / 2 - (rect.top + rect.height / 2)) / vh;
+      const range    = parseFloat(el.dataset.py || 0);
+      el.style.transform = `translateY(${progress * range}px)`;
+    });
+  });
+
+  /* ── Mouse offset for hero bg parallax ─────────────── */
+  let mouseX = 0, mouseY = 0;
+  document.addEventListener('mousemove', e => {
+    mouseX = (e.clientX / window.innerWidth  - 0.5) * 24;
+    mouseY = (e.clientY / window.innerHeight - 0.5) * 14;
+  });
+
+  /* ── Number count-up (fires once when card enters view) ── */
+  function countUp(el) {
+    const target = parseInt(el.textContent, 10);
+    if (isNaN(target)) return;
+    let n = 0;
+    const id = setInterval(() => {
+      n++;
+      el.textContent = String(n).padStart(2, '0');
+      if (n >= target) clearInterval(id);
+    }, 38);
+  }
+
+  /* ── Card 3D tilt ───────────────────────────────────── */
+  document.querySelectorAll('.card, .s-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width  - 0.5;
+      const y = (e.clientY - r.top)  / r.height - 0.5;
+      card.style.transition = 'border-color 0.3s, box-shadow 0.3s';
+      card.style.transform  = `perspective(700px) rotateY(${x*7}deg) rotateX(${-y*7}deg) translateZ(6px)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transition = 'border-color 0.3s, box-shadow 0.3s, transform 0.55s cubic-bezier(.16,1,.3,1)';
+      card.style.transform  = '';
+    });
+  });
+
+  /* ── Magnetic buttons ───────────────────────────────── */
+  document.querySelectorAll('.btn-fill').forEach(btn => {
+    btn.addEventListener('mousemove', e => {
+      const r = btn.getBoundingClientRect();
+      const x = (e.clientX - r.left - r.width  / 2) * 0.28;
+      const y = (e.clientY - r.top  - r.height / 2) * 0.28;
+      btn.style.transition = 'background 0.2s, box-shadow 0.2s';
+      btn.style.transform  = `translate(${x}px,${y}px)`;
+    });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.transition = 'background 0.2s, box-shadow 0.2s, transform 0.5s cubic-bezier(.16,1,.3,1)';
+      btn.style.transform  = '';
+    });
+  });
+
+  /* ── Lenis scroll-driven reveal ────────────────────────
+     Progress formula (0 = below viewport, 1 = fully revealed):
+       p = (vh*0.88 - rect.top - delayOffset) / (vh*0.22)
+     Bidirectional: scrolling back up shrinks p back to 0.
+  ─────────────────────────────────────────────────────── */
+  const revealEls = [...document.querySelectorAll('[data-reveal]')];
+
+  function updateReveal() {
+    const vh = window.innerHeight;
+    revealEls.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      const dir  = el.dataset.reveal;
+      // data-delay shifts the trigger point for stagger
+      const delayOffset = parseFloat(el.dataset.delay || 0) * 320;
+
+      const raw = (vh * 0.88 - rect.top - delayOffset) / (vh * 0.22);
+      const p   = Math.max(0, Math.min(1, raw));
+
+      // Eased progress — springy feel without GSAP
+      const e = p < 0.5 ? 2*p*p : 1 - Math.pow(-2*p+2, 2)/2;
+
+      let tx = 0, ty = 0, sc = 1;
+      if (dir === 'up')    { ty  =  (1 - e) * 56; }
+      if (dir === 'left')  { tx  = -(1 - e) * 64; ty = (1 - e) * 16; }
+      if (dir === 'right') { tx  =  (1 - e) * 64; ty = (1 - e) * 16; }
+      if (dir === 'scale') { ty  =  (1 - e) * 38; sc = 1 - (1 - e) * 0.04; }
+
+      el.style.opacity   = e;
+      el.style.transform = `translate(${tx}px,${ty}px) scale(${sc})`;
+
+      // Trigger sec-rule line draw when parent is well in view
+      el.classList.toggle('revealed', p > 0.65);
+
+      // Count-up: fire once when fully entering, reset when fully leaving
+      if (!el._counted && p > 0.6) {
+        el._counted = true;
+        el.querySelectorAll('.s-num').forEach(countUp);
+      }
+      if (el._counted && p === 0) { el._counted = false; }
+    });
+  }
+
+  // Initial state before first scroll
+  requestAnimationFrame(updateReveal);
+  lenis.on('scroll', updateReveal);
+</script>
+
+</body>
+</html>
