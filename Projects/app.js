@@ -6,8 +6,9 @@ const ICONS = {
   code: 'M392.8 1.2c-17-4.9-34.7 5-39.6 22l-128 448c-4.9 17 5 34.7 22 39.6s34.7-5 39.6-22l128-448c4.9-17-5-34.7-22-39.6zm80.6 120.1c-12.5 12.5-12.5 32.8 0 45.3L562.7 256l-89.4 89.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l112-112c12.5-12.5 12.5-32.8 0-45.3l-112-112c-12.5-12.5-32.8-12.5-45.3 0zm-306.7 0c-12.5-12.5-32.8-12.5-45.3 0l-112 112c-12.5 12.5-12.5 32.8 0 45.3l112 112c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L77.3 256l89.4-89.4c12.5-12.5 12.5-32.8 0-45.3z',
   gamepad: 'M192 64C86 64 0 150 0 256S86 448 192 448l256 0c106 0 192-86 192-192s-86-192-192-192L192 64zM496 168a40 40 0 1 1 0 80 40 40 0 1 1 0-80zM392 304a40 40 0 1 1 80 0 40 40 0 1 1 -80 0zM168 200c0-13.3 10.7-24 24-24s24 10.7 24 24l0 32 32 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-32 0 0 32c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-32-32 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l32 0 0-32z',
   cube: 'M234.5 5.7c13.9-5 29.1-5 43.1 0l192 68.3C495 83.4 512 107.5 512 134.6V377.4c0 27-17 51.2-42.5 60.3l-192 68.3c-13.9 5-29.1 5-43.1 0l-192-68.3C17 428.6 0 404.5 0 377.4V134.6c0-27 17-51.2 42.5-60.3l192-68.3zM256 66L96 123.2v245.6l160 56.8 160-56.8V123.2L256 66z',
+  bubble: 'M256 41a215 215 0 1 1 0 430a215 215 0 1 1 0-430zM182.5 205a95 95 0 1 0 0 190a95 95 0 1 0 0-190zM317.5 99.5a74 74 0 1 0 0 148a74 74 0 1 0 0-148zM363 269.5a57.5 57.5 0 1 0 0 115a57.5 57.5 0 1 0 0-115z',
 };
-const ICON_VIEWBOX = { code: '0 0 640 512', gamepad: '0 0 640 512', cube: '0 0 512 512' };
+const ICON_VIEWBOX = { code: '0 0 640 512', gamepad: '0 0 640 512', cube: '0 0 512 512', bubble: '0 0 512 512' };
 
 const useInView = (options) => {
   const ref = useRef(null);
@@ -92,7 +93,7 @@ const MonumentalLink = ({ title, subtitle, link, index, color = "white", align =
       transform: 'translate(' + (align === 'center' ? '-50%' : '0') + ', -50%)',
       willChange: 'opacity'
     }
-  }, h('path', { d: ICONS[iconName] }));
+  }, h('path', { d: ICONS[iconName], fillRule: 'evenodd' }));
 
   const titleStyle = {
     WebkitTextStroke: inView ? '0px transparent' : strokeColor,
@@ -230,7 +231,8 @@ const ProjectsPage = () => {
           h('div', { className: 'flex flex-col gap-16 md:gap-32 w-full' },
             h(MonumentalLink, { scrollY, title: 'C. FORGE', subtitle: { label: 'lavro.org/Projects/CForge', desc: 'CharacterForge - \u89D2\u8272\u6784\u5EFA\u4E0E\u6570\u636E\u6838\u5FC3\u903B\u8F91' }, link: 'https://lavro.org/Projects/CForge/', index: 0, color: 'white', align: 'left', iconName: 'code' }),
             h(MonumentalLink, { scrollY, title: 'LIFE SIM.', subtitle: { label: 'lavro.org/Projects/LSimulator', desc: 'Life Simulator - \u6E38\u620F\u673A\u5236\u8BBE\u8BA1\u4E0E\u6570\u503C\u6A21\u62DF\u7CFB\u7EDF' }, link: 'https://lavro.org/Projects/LSimulator/', index: 1, color: 'green', align: 'right', iconName: 'gamepad' }),
-            h(MonumentalLink, { scrollY, title: 'CARPET LIR', subtitle: { label: 'modrinth.com/mod/carpet-lir-addition', desc: "Lavro's Item Renewability Carpet Addition - Minecraft Carpet \u9644\u5C5E\u6A21\u7EC4" }, link: 'https://modrinth.com/mod/carpet-lir-addition', index: 2, color: 'white', align: 'left', iconName: 'cube', subLinks: [{ name: 'Modrinth', url: 'https://modrinth.com/mod/carpet-lir-addition' }, { name: 'GitHub', url: 'https://github.com/Lavr0v0/carpet-lir-addition' }] })
+            h(MonumentalLink, { scrollY, title: 'POCHAN', subtitle: { label: 'github.com/Lavr0v0/Pochan', desc: 'Pochan - 本地优先的追番气泡工具，观看习惯以浮动气泡可视化' }, link: 'https://github.com/Lavr0v0/Pochan', index: 2, color: 'green', align: 'left', iconName: 'bubble', subLinks: [{ name: 'GitHub', url: 'https://github.com/Lavr0v0/Pochan' }, { name: 'Releases', url: 'https://github.com/Lavr0v0/Pochan/releases' }] }),
+            h(MonumentalLink, { scrollY, title: 'CARPET LIR', subtitle: { label: 'modrinth.com/mod/carpet-lir-addition', desc: "Lavro's Item Renewability Carpet Addition - Minecraft Carpet \u9644\u5C5E\u6A21\u7EC4" }, link: 'https://modrinth.com/mod/carpet-lir-addition', index: 3, color: 'white', align: 'right', iconName: 'cube', subLinks: [{ name: 'Modrinth', url: 'https://modrinth.com/mod/carpet-lir-addition' }, { name: 'GitHub', url: 'https://github.com/Lavr0v0/carpet-lir-addition' }] })
           )
         )
       ),
