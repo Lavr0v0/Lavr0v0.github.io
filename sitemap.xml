@@ -3,81 +3,81 @@
 
   <url>
     <loc>https://lavro.org/</loc>
-    <lastmod>2026-03-19</lastmod>
+    <lastmod>2026-06-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://lavro.org/Projects/</loc>
-    <lastmod>2026-03-20</lastmod>
+    <lastmod>2026-06-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://lavro.org/Projects/CForge/</loc>
-    <lastmod>2026-03-19</lastmod>
+    <lastmod>2026-06-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://lavro.org/Projects/LSimulator/</loc>
-    <lastmod>2026-03-19</lastmod>
+    <lastmod>2026-06-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://lavro.org/DnD/Alberina/</loc>
-    <lastmod>2026-03-19</lastmod>
+    <lastmod>2026-06-11</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://lavro.org/DnD/Flavilar/</loc>
-    <lastmod>2026-03-19</lastmod>
+    <lastmod>2026-06-11</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://lavro.org/llms.txt</loc>
-    <lastmod>2026-03-19</lastmod>
+    <lastmod>2026-06-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
 
   <url>
     <loc>https://lavro.org/credits/</loc>
-    <lastmod>2026-03-19</lastmod>
+    <lastmod>2026-06-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.2</priority>
   </url>
 
   <url>
     <loc>https://lavro.org/en/</loc>
-    <lastmod>2026-03-20</lastmod>
+    <lastmod>2026-06-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://lavro.org/en/Projects/</loc>
-    <lastmod>2026-03-20</lastmod>
+    <lastmod>2026-06-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://lavro.org/en/credits/</loc>
-    <lastmod>2026-03-20</lastmod>
+    <lastmod>2026-06-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.2</priority>
   </url>
   <url>
     <loc>https://lavro.org/Labs/</loc>
-    <lastmod>2026-03-20</lastmod>
+    <lastmod>2026-06-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://lavro.org/DnD/</loc>
-    <lastmod>2026-03-20</lastmod>
+    <lastmod>2026-06-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>

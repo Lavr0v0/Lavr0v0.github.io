@@ -4,3 +4,5 @@ _archive
 
 node_modules
 src/input.css
+_tmp_*
+Temp/

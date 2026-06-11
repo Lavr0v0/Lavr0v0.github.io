@@ -6,7 +6,7 @@ on:
     paths:
       - "projects.json"
   schedule:
-    - cron: "*/10 * * * *"
+    - cron: "0 4 * * *"
 
 
 jobs:
@@ -17,9 +17,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           persist-credentials: false
-
-      - name: Install tools
-        run: sudo apt-get update && sudo apt-get install -y jq rsync
 
       - name: Sync projects listed in projects.json
         env:
@@ -52,6 +49,11 @@ jobs:
               --exclude ".github" \
               --exclude ".DS_Store" \
               --exclude "node_modules" \
+              --exclude "*.md" \
+              --exclude "docs" \
+              --exclude "tests" \
+              --exclude ".vscode" \
+              --exclude "package-lock.json" \
               "$work/${source}/" "${target}/"
           done
 
@@ -72,4 +74,3 @@ jobs:
 
           # 直接用 PAT 推送（绕过 origin）
           git push "https://x-access-token:${GH_TOKEN}@github.com/Lavr0v0/Lavr0v0.github.io.git" HEAD:main
-
