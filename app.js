@@ -359,8 +359,21 @@ const LavroPortfolio = () => {
 
   const marqueeRow = (images, cls, offset) => {
     const staggered = [...images.slice(offset % images.length), ...images.slice(0, offset % images.length)];
-    return h('div', { className: cls + ' gap-3' },
-      [...staggered, ...staggered].map((img, i) => h('div', { key: i, className: 'w-[36vw] md:w-[13.5vw] aspect-[3/4] flex-shrink-0 bg-cover bg-center rounded-sm bg-[#111]', style: { backgroundImage: 'url(' + img + ')' } }))
+    return h('div', {
+      className: cls + ' gap-3',
+      ref: (el) => {
+        if (!el || el._lazyObs) return;
+        el._lazyObs = true;
+        const obs = new IntersectionObserver(([entry]) => {
+          if (entry.isIntersecting) {
+            el.querySelectorAll('[data-bg]').forEach(d => { d.style.backgroundImage = 'url(' + d.dataset.bg + ')'; });
+            obs.disconnect();
+          }
+        }, { rootMargin: '50% 0px' });
+        obs.observe(el);
+      }
+    },
+      [...staggered, ...staggered].map((img, i) => h('div', { key: i, className: 'w-[36vw] md:w-[13.5vw] aspect-[3/4] flex-shrink-0 bg-cover bg-center rounded-sm bg-[#111]', 'data-bg': img }))
     );
   };
 
