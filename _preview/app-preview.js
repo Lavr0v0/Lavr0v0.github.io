@@ -126,34 +126,17 @@ const i18n = {
 
 
 // D1: Real-time status panel (preview only)
-const StatusPanel = () => {
+const UtcWatermark = () => {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => { const id = setInterval(() => setNow(new Date()), 1000); return () => clearInterval(id); }, []);
-  const utcH = now.getUTCHours();
-  const online = utcH >= 1 && utcH < 8;
   const pad = n => String(n).padStart(2, '0');
   const hh = pad(now.getUTCHours()); const mm = pad(now.getUTCMinutes()); const ss = pad(now.getUTCSeconds());
-  return h('div', { className: 'my-4 py-6 border-t border-[#333]/40' },
-    h('div', { className: 'grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl' },
-      h('div', { className: 'flex flex-col gap-2' },
-        h('span', { className: 'text-[#00ff66] text-[10px] md:text-xs font-mono tracking-widest opacity-80' }, 'UTC NOW'),
-        h('span', { className: 'text-white text-lg md:text-xl font-bold font-mono tracking-wider tabular-nums' },
-          hh, h('span', { className: 'animate-colon' }, ':'), mm, h('span', { className: 'animate-colon' }, ':'), ss)
-      ),
-      h('div', { className: 'flex flex-col gap-2' },
-        h('span', { className: 'text-[#00ff66] text-[10px] md:text-xs font-mono tracking-widest opacity-80' }, 'STATUS'),
-        h('span', { className: 'flex items-center gap-2 text-white text-lg md:text-xl font-bold font-mono tracking-wider' },
-          h('span', { className: 'inline-block w-2 h-2 rounded-full flex-shrink-0 ' + (online ? 'bg-[#00ff66] animate-status-pulse' : 'bg-gray-600') }),
-          online ? 'ONLINE' : 'OFFLINE')
-      ),
-      h('div', { className: 'flex flex-col gap-2' },
-        h('span', { className: 'text-[#00ff66] text-[10px] md:text-xs font-mono tracking-widest opacity-80' }, 'UTC-8 ACTIVE'),
-        h('span', { className: 'text-white text-lg md:text-xl font-bold font-mono tracking-wider' }, '17:00 - 00:00')
-      ),
-      h('div', { className: 'flex flex-col gap-2' },
-        h('span', { className: 'text-[#00ff66] text-[10px] md:text-xs font-mono tracking-widest opacity-80' }, 'UTC+8 ACTIVE'),
-        h('span', { className: 'text-white text-lg md:text-xl font-bold font-mono tracking-wider' }, '09:00 - 16:00')
-      )
+  return h('div', {
+    className: 'absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none select-none hidden lg:block',
+    style: { opacity: 0.045, zIndex: 0 }
+  },
+    h('span', { className: 'font-mono text-white tabular-nums', style: { fontSize: 'clamp(2.5rem, 5vw, 7rem)', letterSpacing: '0.05em', lineHeight: 1 } },
+      hh, h('span', { className: 'animate-colon' }, ':'), mm, h('span', { className: 'animate-colon' }, ':'), ss
     )
   );
 };
@@ -365,40 +348,42 @@ function runPreviewRaf() {
 // PV4: Section index sidebar rail
 const SectionRail = () => {
   const SECTIONS = [
-    { id: 'hero', label: '01 / HERO' },
-    { id: 'sync', label: '02 / SYNC' },
-    { id: 'hobby', label: '03 / HOBBY' },
-    { id: 'works', label: '04 / WORKS' },
-    { id: 'contact', label: '05 / CONTACT' },
+    { id: 'hero',    label: '01' },
+    { id: 'sync',    label: '02' },
+    { id: 'hobby',   label: '03' },
+    { id: 'works',   label: '04' },
+    { id: 'contact', label: '05' },
   ];
-  const [active, setActive] = useState('01 / HERO');
-  const lineRef = useRef(null);
+  const [activeId, setActiveId] = useState('hero');
 
   useEffect(() => {
     const obs = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          const s = SECTIONS.find(s => s.id === e.target.id);
-          if (s) setActive(s.label);
-        }
-      });
+      entries.forEach(e => { if (e.isIntersecting) setActiveId(e.target.id); });
     }, { threshold: 0.4 });
     SECTIONS.forEach(s => { const el = document.getElementById(s.id); if (el) obs.observe(el); });
-    const updateLine = (scroll) => {
-      if (!lineRef.current) return;
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = max > 0 ? Math.min(1, scroll / max) : 0;
-      lineRef.current.style.height = (progress * 100) + '%';
-    };
-    parallaxSubscribers.add(updateLine);
-    return () => { obs.disconnect(); parallaxSubscribers.delete(updateLine); };
+    return () => obs.disconnect();
   }, []);
 
-  return h('div', { className: 'fixed right-5 top-1/2 -translate-y-1/2 z-40 hidden md:flex flex-col items-center gap-4 pointer-events-none' },
-    h('span', { className: 'font-mono text-[10px] tracking-[0.25em] text-[#00ff66] opacity-80', style: { writingMode: 'vertical-rl', transition: 'opacity 0.3s' } }, active),
-    h('div', { className: 'relative w-px h-32 bg-[#222]' },
-      h('div', { ref: lineRef, className: 'absolute top-0 left-0 w-px bg-[#00ff66]', style: { height: '0%', transition: 'height 0.1s linear' } })
-    )
+  return h('div', { className: 'fixed right-5 top-1/2 -translate-y-1/2 z-40 hidden md:flex flex-col items-end pointer-events-none', style: { gap: 0 } },
+    SECTIONS.map((s) => {
+      const isActive = s.id === activeId;
+      return h('div', { key: s.id, className: 'flex items-center', style: { gap: '10px', padding: '10px 0' } },
+        h('span', {
+          className: 'font-mono text-[9px] tracking-[0.3em]',
+          style: { color: '#00ff66', opacity: isActive ? 0.7 : 0, transition: 'opacity 0.3s' }
+        }, s.label),
+        h('div', {
+          className: 'rounded-full transition-all duration-300',
+          style: {
+            width: isActive ? '10px' : '4px',
+            height: isActive ? '10px' : '4px',
+            background: isActive ? '#00ff66' : '#333',
+            outline: isActive ? '2px solid #00ff66' : 'none',
+            outlineOffset: '3px',
+          }
+        })
+      );
+    })
   );
 };
 
@@ -441,9 +426,9 @@ const LavroPortfolio = () => {
     if (aboutParallaxRef.current) aboutParallaxRef.current.style.transform = 'translate3d(0, ' + contentParallax1 + 'px, 0)';
     if (FLAGS.velocity) {
       const v = velocityRef.current;
-      const wallSkew = Math.max(-4, Math.min(4, v * 0.06));
+      const wallSkew = Math.max(-15, Math.min(15, v * 0.25));
       if (hobbyParallaxRef.current) hobbyParallaxRef.current.style.transform = 'translate3d(0, ' + hobbyParallax + 'px, 0) skewY(' + wallSkew + 'deg)';
-      const rate = 1 + Math.min(Math.abs(v) * 0.05, 2.5);
+      const rate = Math.max(0.2, Math.min(8, 1 + v * 0.3));
       marqueeRowsRef.current.forEach((el) => {
         if (!el) return;
         if (!el._marqueeAnim) { const a = el.getAnimations()[0]; if (a) el._marqueeAnim = a; }
@@ -617,37 +602,37 @@ const LavroPortfolio = () => {
           h('h2', { ref: bgTextRef, className: 'text-[40vw] md:text-[30vw] leading-none whitespace-nowrap text-white font-display tracking-tighter ease-out transform-gpu' },
             'SYNCING   SYNCING   SYNCING   SYNCING   SYNCING')
         ),
+        FLAGS.status && h(UtcWatermark),
         h('div', { className: 'relative z-10 max-w-[100rem] mx-auto px-6 w-full' },
           h('div', { className: 'flex flex-col lg:flex-row gap-12 lg:gap-32' },
             h('div', { className: 'w-full lg:w-5/12 py-4', ref: aboutTitleRef },
               FLAGS.diagonal
-                ? h('h3', {
-                    className: 'text-[4rem] md:text-[6rem] lg:text-[8rem] uppercase text-white leading-[0.9] tracking-tighter font-display',
-                    style: {
-                      clipPath: aboutTitleInView ? 'polygon(-5% 0, 115% 0, 100% 100%, -20% 100%)' : 'polygon(-5% 0, -5% 0, -20% 100%, -20% 100%)',
-                      opacity: aboutTitleInView ? 1 : 0,
-                      transform: aboutTitleInView ? 'translateX(0)' : 'translateX(-2rem)',
-                      transition: 'clip-path 1.2s cubic-bezier(0.16,1,0.3,1), transform 1.2s cubic-bezier(0.16,1,0.3,1), opacity 0.5s ease'
-                    }
-                  }, 'ONLINE ', h('br'), h('span', { className: 'text-transparent', style: { WebkitTextStroke: '2px #00ff66' } }, 'ROUTINE.'), h('br'), 'UTC SYNC.')
+                ? h('div', { className: 'overflow-hidden pb-1' },
+                    h('h3', {
+                      className: 'text-[4rem] md:text-[6rem] lg:text-[8rem] uppercase text-white leading-[0.9] tracking-tighter font-display',
+                      style: {
+                        transform: aboutTitleInView ? 'translateY(0)' : 'translateY(108%)',
+                        transition: 'transform 1s cubic-bezier(0.16,1,0.3,1)',
+                        display: 'block'
+                      }
+                    }, 'ONLINE ', h('br'), h('span', { className: 'text-transparent', style: { WebkitTextStroke: '2px #00ff66' } }, 'ROUTINE.'), h('br'), 'UTC SYNC.')
+                  )
                 : h('h3', { className: 'text-[4rem] md:text-[6rem] lg:text-[8rem] uppercase text-white leading-[0.9] tracking-tighter font-display transition-all duration-[1000ms] ease-[cubic-bezier(0.16,1,0.3,1)] ' + (aboutTitleInView ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-32') },
                     'ONLINE ', h('br'), h('span', { className: 'text-transparent', style: { WebkitTextStroke: '2px #00ff66' } }, 'ROUTINE.'), h('br'), 'UTC SYNC.'),
               h('div', { className: 'mt-8 w-16 h-1 bg-[#00ff66] transition-all duration-1000 delay-300 ' + (aboutTitleInView ? 'opacity-100' : 'opacity-0') })
             ),
             h('div', { ref: aboutParallaxRef, className: 'w-full lg:w-7/12 flex flex-col justify-end pb-4 space-y-8', style: { willChange: 'transform' } },
               h('p', { className: i18n.about1Cls }, i18n.about1),
-              FLAGS.status
-                ? h(StatusPanel)
-                : h('div', { className: 'flex flex-col md:flex-row gap-8 max-w-2xl my-4 py-6 border-t border-[#333]/40' },
-                    h('div', { className: 'flex flex-col gap-2' },
-                      h('span', { className: 'text-[#00ff66] text-[10px] md:text-xs font-mono tracking-widest opacity-80' }, 'UTC-8 ACTIVE'),
-                      h('span', { className: 'text-white text-lg md:text-xl font-bold font-mono tracking-wider' }, '17:00 - 00:00')
-                    ),
-                    h('div', { className: 'flex flex-col gap-2' },
-                      h('span', { className: 'text-[#00ff66] text-[10px] md:text-xs font-mono tracking-widest opacity-80' }, 'UTC+8 ACTIVE'),
-                      h('span', { className: 'text-white text-lg md:text-xl font-mono tracking-wider' }, '09:00 - 16:00')
-                    )
+              h('div', { className: 'flex flex-col md:flex-row gap-8 max-w-2xl my-4 py-6 border-t border-[#333]/40' },
+                  h('div', { className: 'flex flex-col gap-2' },
+                    h('span', { className: 'text-[#00ff66] text-[10px] md:text-xs font-mono tracking-widest opacity-80' }, 'UTC-8 ACTIVE'),
+                    h('span', { className: 'text-white text-lg md:text-xl font-bold font-mono tracking-wider' }, '17:00 - 00:00')
                   ),
+                  h('div', { className: 'flex flex-col gap-2' },
+                    h('span', { className: 'text-[#00ff66] text-[10px] md:text-xs font-mono tracking-widest opacity-80' }, 'UTC+8 ACTIVE'),
+                    h('span', { className: 'text-white text-lg md:text-xl font-mono tracking-wider' }, '09:00 - 16:00')
+                  )
+                ),
               h('div', { className: 'pt-2' },
                 h('p', { className: i18n.about2Cls }, i18n.about2)
               )
@@ -671,15 +656,16 @@ const LavroPortfolio = () => {
             h('div', { className: 'w-full md:w-4/12' },
               h('h2', { className: 'text-[#00ff66] tracking-[0.4em] text-xs md:text-sm font-bold font-mono opacity-80 mb-6 transition-all duration-700 ' + (hobbyTitleInView ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0') }, '/// HOBBIES & INTERESTS'),
               FLAGS.diagonal
-                ? h('h3', {
-                    className: 'text-[4rem] md:text-[6rem] lg:text-[7.5rem] uppercase text-white leading-[0.9] tracking-tighter font-display',
-                    style: {
-                      clipPath: hobbyTitleInView ? 'polygon(-5% 0, 115% 0, 100% 100%, -20% 100%)' : 'polygon(-5% 0, -5% 0, -20% 100%, -20% 100%)',
-                      opacity: hobbyTitleInView ? 1 : 0,
-                      transform: hobbyTitleInView ? 'translateX(0)' : 'translateX(-2rem)',
-                      transition: 'clip-path 1.2s cubic-bezier(0.16,1,0.3,1) 0.1s, transform 1.2s cubic-bezier(0.16,1,0.3,1) 0.1s, opacity 0.5s ease 0.1s'
-                    }
-                  }, 'GAMES & ', h('br'), ' ', h('span', { className: 'text-transparent', style: { WebkitTextStroke: '2px #00ff66' } }, 'ANIME.'))
+                ? h('div', { className: 'overflow-hidden pb-1' },
+                    h('h3', {
+                      className: 'text-[4rem] md:text-[6rem] lg:text-[7.5rem] uppercase text-white leading-[0.9] tracking-tighter font-display',
+                      style: {
+                        transform: hobbyTitleInView ? 'translateY(0)' : 'translateY(108%)',
+                        transition: 'transform 1s cubic-bezier(0.16,1,0.3,1) 0.1s',
+                        display: 'block'
+                      }
+                    }, 'GAMES & ', h('br'), ' ', h('span', { className: 'text-transparent', style: { WebkitTextStroke: '2px #00ff66' } }, 'ANIME.'))
+                  )
                 : h('h3', { className: 'text-[4rem] md:text-[6rem] lg:text-[7.5rem] uppercase text-white leading-[0.9] tracking-tighter font-display transition-all duration-1000 delay-100 ' + (hobbyTitleInView ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0') },
                     'GAMES & ', h('br'), ' ', h('span', { className: 'text-transparent', style: { WebkitTextStroke: '2px #00ff66' } }, 'ANIME.'))
             ),
@@ -708,10 +694,11 @@ const LavroPortfolio = () => {
         )
       ),
 
-      // D3: Diagonal seam between Hobby and Works
-      FLAGS.diagonal && h('div', { className: 'relative z-20 h-[5vw] max-h-16 -mb-px' },
-        h('div', { className: 'absolute inset-0 bg-[#00ff66]/40', style: { clipPath: 'polygon(0 100%, 100% 0, 100% 100%)', transform: 'translateY(-2px)' } }),
-        h('div', { className: 'absolute inset-0 bg-[#020202]', style: { clipPath: 'polygon(0 100%, 100% 0, 100% 100%)' } })
+      // D3: Section break between Hobby and Works
+      FLAGS.diagonal && h('div', { className: 'relative z-20 flex items-center gap-4 px-6 py-5 bg-[#020202]' },
+        h('div', { className: 'flex-1 h-px bg-[#1a1a1a]' }),
+        h('span', { className: 'font-mono text-[10px] tracking-[0.6em] text-[#00ff66] opacity-50 shrink-0' }, '/// 04 / WORKS'),
+        h('div', { className: 'flex-1 h-px bg-[#00ff66]/30', style: { transform: 'scaleX(1)', transformOrigin: 'left' } })
       ),
 
       // === 04. WORKS ===
@@ -728,11 +715,12 @@ const LavroPortfolio = () => {
 
 
       // PV3: Diagonal marquee band between Works and Contact
-      FLAGS.band && h('div', { className: 'relative z-30 overflow-hidden py-8 pointer-events-none' },
-        h('div', { style: { transform: 'rotate(-2deg)' } },
+      FLAGS.band && h('div', { style: { position: 'relative', zIndex: 30, pointerEvents: 'none', height: '80px', overflow: 'clip', overflowClipMargin: '60px' } },
+        h('div', { style: { position: 'absolute', left: 0, right: 0, top: '18px', transform: 'rotate(-2deg)' } },
           h('div', {
             ref: (el) => { if (FLAGS.velocity) marqueeRowsRef.current[3] = el; },
-            className: 'animate-marquee w-[110vw] -ml-[5vw] bg-[#00ff66] py-2'
+            className: 'animate-marquee bg-[#00ff66] py-3',
+            style: { width: '110vw', marginLeft: '-5vw' }
           },
             h('span', { className: 'whitespace-nowrap font-display uppercase text-black text-xl md:text-3xl tracking-tight' },
               'CREATIVE DEVELOPMENT ✕ GRAPHIC DESIGN ✕ STAY ONLINE ✕ CREATIVE DEVELOPMENT ✕ GRAPHIC DESIGN ✕ STAY ONLINE ✕ CREATIVE DEVELOPMENT ✕ GRAPHIC DESIGN ✕ STAY ONLINE ✕ '
@@ -757,17 +745,23 @@ const LavroPortfolio = () => {
       h('section', { className: 'relative w-full bg-black z-20 pb-24 pt-12 border-t border-[#111]' },
         h('footer', { className: 'pt-8 flex flex-col items-center gap-8' },
           FLAGS.footer && h(Fragment, null,
-            h('div', { className: 'w-full overflow-hidden px-4 pb-8' },
-              h('span', {
-                ref: footerGiantRef,
-                className: 'footer-giant font-display uppercase block text-center leading-[0.85] tracking-tighter select-none',
-                style: {
-                  fontSize: 'clamp(4rem, 13vw, 16rem)',
-                  opacity: footerGiantInView ? 1 : 0,
-                  transform: footerGiantInView ? 'translateY(0)' : 'translateY(40px)',
-                  transition: 'opacity 0.8s ease, transform 0.8s cubic-bezier(0.16,1,0.3,1)'
-                }
-              }, 'STAY ONLINE.')
+            h('div', { ref: footerGiantRef, className: 'w-full px-6 pb-6 overflow-hidden border-t border-[#1a1a1a] pt-8' },
+              h('div', { className: 'flex items-end justify-between gap-4' },
+                h('span', {
+                  className: 'font-display uppercase leading-[0.85] tracking-tighter select-none',
+                  style: {
+                    fontSize: 'clamp(3.5rem, 11vw, 14rem)',
+                    color: 'transparent',
+                    WebkitTextStroke: '1px #2c2c2c',
+                    clipPath: footerGiantInView ? 'inset(0 0% 0 0)' : 'inset(0 100% 0 0)',
+                    transition: 'clip-path 1.4s cubic-bezier(0.16,1,0.3,1)',
+                  }
+                }, 'LAVRO.ORG'),
+                h('div', { className: 'flex flex-col items-end gap-1 pb-2 shrink-0 hidden md:flex' },
+                  h('span', { className: 'font-mono text-[9px] tracking-[0.5em] text-[#00ff66] opacity-50' }, 'STAY ONLINE.'),
+                  h('span', { className: 'font-mono text-[9px] tracking-[0.3em] text-gray-700' }, new Date().getFullYear() + '')
+                )
+              )
             ),
             h('div', { className: 'overflow-hidden w-full' },
               h('div', { className: 'animate-marquee font-mono text-[10px] tracking-[0.3em] text-gray-700 uppercase whitespace-nowrap' },
