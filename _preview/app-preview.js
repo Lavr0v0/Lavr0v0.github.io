@@ -83,9 +83,9 @@ const T = {
     animeList: ['契约之吻', '无职转生', '颂乐人偶', '金牌得主', '堀与宫村'],
     enNotice: false,
     works: [
-      { title: 'PROJECTS', subtitle: { label: '成熟项目', desc: '已完成的正式项目入口' }, link: 'https://lavro.org/Projects/', color: 'white', align: 'left', iconName: 'code' },
-      { title: 'LABS', subtitle: { label: '试验场', desc: '创意实验与设计探索' }, link: 'https://lavro.org/Labs/', color: 'green', align: 'right', iconName: 'flask' },
-      { title: 'D&D ARCHIVES', subtitle: { label: '同人自设角色档案', desc: '自设网页设计实践' }, link: 'https://lavro.org/DnD/', color: 'white', align: 'left', iconName: 'dragon' },
+      { title: 'PROJECTS', subtitle: { label: '成熟项目', desc: '已完成的正式项目入口' }, link: 'https://lavro.org/Projects/', color: 'white', align: 'left', iconName: 'code', previewImg: '/HomePageAssets/projects-bg-1.webp' },
+      { title: 'LABS', subtitle: { label: '试验场', desc: '创意实验与设计探索' }, link: 'https://lavro.org/Labs/', color: 'green', align: 'right', iconName: 'flask', previewImg: '/HomePageAssets/Games/games-1.webp' },
+      { title: 'D&D ARCHIVES', subtitle: { label: '同人自设角色档案', desc: '自设网页设计实践' }, link: 'https://lavro.org/DnD/', color: 'white', align: 'left', iconName: 'dragon', previewImg: '/HomePageAssets/Anime/anime-1.webp' },
     ],
     contacts: [
       { title: 'EMAIL', subtitle: { label: 'Lavro@lavro.org', desc: '主线联系方式，处理重要事务与项目' }, link: 'mailto:Lavro@lavro.org', index: 4, align: 'left', iconName: 'envelope' },
@@ -112,7 +112,7 @@ const T = {
     animeList: ['ENGAGE KISS', 'MUSHOKU TENSEI', 'AVE MUJICA', 'MEDALIST', 'HORIMIYA'],
     enNotice: true,
     works: [
-      { title: 'PROJECTS', subtitle: { label: 'Mature Projects', desc: 'Completed project entries' }, link: 'https://lavro.org/en/Projects/', color: 'white', align: 'left', iconName: 'code' },
+      { title: 'PROJECTS', subtitle: { label: 'Mature Projects', desc: 'Completed project entries' }, link: 'https://lavro.org/en/Projects/', color: 'white', align: 'left', iconName: 'code', previewImg: '/HomePageAssets/projects-bg-1.webp' },
     ],
     contacts: [
       { title: 'EMAIL', subtitle: { label: 'Lavro@lavro.org', desc: 'Primary contact for important matters and projects' }, link: 'mailto:Lavro@lavro.org', index: 4, align: 'right', iconName: 'envelope' },
@@ -159,7 +159,7 @@ const StatusPanel = () => {
 };
 
 // Core Component: Monumental Physics Link
-const MonumentalLink = ({ title, subtitle, link, copyText, index, color = "white", align = "left", subLinks, iconName, badge }) => {
+const MonumentalLink = ({ title, subtitle, link, copyText, index, color = "white", align = "left", subLinks, iconName, badge, previewImg }) => {
   const [ref, inView] = useInView({ threshold: 0.2 });
   const containerRef = useRef(null);
   const iconRef = useRef(null);
@@ -258,9 +258,25 @@ const MonumentalLink = ({ title, subtitle, link, copyText, index, color = "white
     )
   );
 
-  return h('div', { ref: setRefs, className: 'flex flex-col ' + flexAlign + ' gap-4 md:gap-6 py-12 px-4 relative z-10 w-full' },
-    iconEl, titleEl, subtitleEl
-  );
+  const containerProps = { ref: setRefs, className: 'flex flex-col ' + flexAlign + ' gap-4 md:gap-6 py-12 px-4 relative z-10 w-full' };
+  if (FLAGS.preview && previewImg && canHoverDevice) {
+    containerProps.onMouseEnter = () => {
+      const el = getPreviewEl();
+      el.style.backgroundImage = 'url(' + previewImg + ')';
+      el.style.opacity = '1';
+      hoverPreview.visible = true;
+      if (!hoverPreview.raf) hoverPreview.raf = requestAnimationFrame(runPreviewRaf);
+    };
+    containerProps.onMouseMove = (e) => {
+      hoverPreview.tx = e.clientX + 24;
+      hoverPreview.ty = e.clientY - 100;
+    };
+    containerProps.onMouseLeave = () => {
+      if (hoverPreview.el) hoverPreview.el.style.opacity = '0';
+      hoverPreview.visible = false;
+    };
+  }
+  return h('div', containerProps, iconEl, titleEl, subtitleEl);
 };
 
 // CSS styles
@@ -315,6 +331,8 @@ html.rainbow-mode .konami-toast { display: block; }
 .animate-colon { animation: colon-blink 1s steps(1) infinite; }
 @keyframes status-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(0,255,102,0.4); } 70% { box-shadow: 0 0 0 6px rgba(0,255,102,0); } }
 .animate-status-pulse { animation: status-pulse 2s ease-out infinite; }
+.footer-giant { color: transparent; -webkit-text-stroke: 2px #1f1f1f; transition: color 0.6s ease, -webkit-text-stroke 0.6s ease; cursor: default; }
+.footer-giant:hover { color: #00ff66; -webkit-text-stroke: 2px transparent; }
 @media (prefers-reduced-motion: reduce) {
   .animate-marquee, .animate-marquee-reverse,
   .animate-brutal-glitch, .animate-bounce-down { animation: none !important; }
@@ -322,6 +340,68 @@ html.rainbow-mode .konami-toast { display: block; }
 `;
 
 // Main App
+
+// PV2: Hover image preview singleton
+const canHoverDevice = typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+const hoverPreview = { el: null, raf: 0, tx: 0, ty: 0, x: -9999, y: -9999, visible: false };
+function getPreviewEl() {
+  if (hoverPreview.el) return hoverPreview.el;
+  const d = document.createElement('div');
+  d.style.cssText = 'position:fixed;top:0;left:0;width:320px;aspect-ratio:16/10;background-size:cover;background-position:center;border:1px solid #333;pointer-events:none;z-index:90;opacity:0;transform:translate3d(-9999px,-9999px,0) rotate(-3deg);transition:opacity .25s ease;will-change:transform;';
+  document.body.appendChild(d); hoverPreview.el = d; return d;
+}
+function runPreviewRaf() {
+  hoverPreview.x += (hoverPreview.tx - hoverPreview.x) * 0.12;
+  hoverPreview.y += (hoverPreview.ty - hoverPreview.y) * 0.12;
+  const el = hoverPreview.el;
+  if (el) el.style.transform = 'translate3d(' + Math.round(hoverPreview.x) + 'px,' + Math.round(hoverPreview.y) + 'px,0) rotate(-3deg)';
+  if (!hoverPreview.visible && Math.abs(hoverPreview.x - hoverPreview.tx) < 0.5 && Math.abs(hoverPreview.y - hoverPreview.ty) < 0.5) {
+    hoverPreview.raf = 0; return;
+  }
+  hoverPreview.raf = requestAnimationFrame(runPreviewRaf);
+}
+
+
+// PV4: Section index sidebar rail
+const SectionRail = () => {
+  const SECTIONS = [
+    { id: 'hero', label: '01 / HERO' },
+    { id: 'sync', label: '02 / SYNC' },
+    { id: 'hobby', label: '03 / HOBBY' },
+    { id: 'works', label: '04 / WORKS' },
+    { id: 'contact', label: '05 / CONTACT' },
+  ];
+  const [active, setActive] = useState('01 / HERO');
+  const lineRef = useRef(null);
+
+  useEffect(() => {
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const s = SECTIONS.find(s => s.id === e.target.id);
+          if (s) setActive(s.label);
+        }
+      });
+    }, { threshold: 0.4 });
+    SECTIONS.forEach(s => { const el = document.getElementById(s.id); if (el) obs.observe(el); });
+    const updateLine = (scroll) => {
+      if (!lineRef.current) return;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = max > 0 ? Math.min(1, scroll / max) : 0;
+      lineRef.current.style.height = (progress * 100) + '%';
+    };
+    parallaxSubscribers.add(updateLine);
+    return () => { obs.disconnect(); parallaxSubscribers.delete(updateLine); };
+  }, []);
+
+  return h('div', { className: 'fixed right-5 top-1/2 -translate-y-1/2 z-40 hidden md:flex flex-col items-center gap-4 pointer-events-none' },
+    h('span', { className: 'font-mono text-[10px] tracking-[0.25em] text-[#00ff66] opacity-80', style: { writingMode: 'vertical-rl', transition: 'opacity 0.3s' } }, active),
+    h('div', { className: 'relative w-px h-32 bg-[#222]' },
+      h('div', { ref: lineRef, className: 'absolute top-0 left-0 w-px bg-[#00ff66]', style: { height: '0%', transition: 'height 0.1s linear' } })
+    )
+  );
+};
+
 const parallaxSubscribers = new Set();
 const LavroPortfolio = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -383,6 +463,7 @@ const LavroPortfolio = () => {
   const [hobbyTitleRef, hobbyTitleInView] = useInView({ threshold: 0.2 });
   const [devTitleRef, devTitleInView] = useInView({ threshold: 0.8 });
   const [contactTitleRef, contactTitleInView] = useInView({ threshold: 0.8 });
+  const [footerGiantRef, footerGiantInView] = useInView({ threshold: 0.2 });
 
   const gameImages = [
     '/HomePageAssets/Games/games-1.webp','/HomePageAssets/Games/games-2.webp','/HomePageAssets/Games/games-3.webp','/HomePageAssets/Games/games-4.webp',
@@ -467,7 +548,7 @@ const LavroPortfolio = () => {
       h('a', { href: T.langHref, className: 'fixed top-6 right-6 z-50 text-xs tracking-[0.2em] text-[#00ff66] border border-[#00ff66] px-4 py-2 hover:bg-[#00ff66] hover:text-[#050505] transition-all duration-300 font-mono' }, T.langSwitch),
 
       // === 01. HERO ===
-      h('header', { className: 'relative w-full h-screen flex items-center justify-center' },
+      h('header', { id: 'hero', className: 'relative w-full h-screen flex items-center justify-center' },
         h('div', { ref: heroContentRef, className: 'absolute inset-0 z-20 w-full max-w-[100rem] mx-auto px-6 flex flex-col items-start justify-center', style: { willChange: 'transform' } },
           h('div', { ref: heroFadeRef1, style: { willChange: 'opacity' } },
             h('div', { style: introTransition(0.1) },
@@ -530,7 +611,7 @@ const LavroPortfolio = () => {
       ),
 
       // === 02. ABOUT / TIMEZONE ===
-      h('section', { className: 'relative w-full min-h-screen flex flex-col justify-center py-24 md:py-40 z-10 overflow-hidden' },
+      h('section', { id: 'sync', className: 'relative w-full min-h-screen flex flex-col justify-center py-24 md:py-40 z-10 overflow-hidden' },
         h('div', { className: 'absolute inset-0 bg-[#050505]/80 z-0 border-t border-[#111]' }),
         h('div', { className: 'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300vw] pointer-events-none opacity-[0.03] z-0 flex justify-center' },
           h('h2', { ref: bgTextRef, className: 'text-[40vw] md:text-[30vw] leading-none whitespace-nowrap text-white font-display tracking-tighter ease-out transform-gpu' },
@@ -576,7 +657,7 @@ const LavroPortfolio = () => {
       ),
 
       // === 03. FAVORITES & INTERESTS ===
-      h('section', { className: 'relative w-full min-h-screen py-24 md:py-40 z-10 overflow-hidden flex items-center border-t border-[#111]' },
+      h('section', { id: 'hobby', className: 'relative w-full min-h-screen py-24 md:py-40 z-10 overflow-hidden flex items-center border-t border-[#111]' },
         h('div', { ref: hobbyParallaxRef, className: 'absolute inset-0 z-0 pointer-events-none mix-blend-screen opacity-[0.35] overflow-hidden transform-gpu', style: { willChange: 'transform' } },
           h('div', { className: 'absolute top-1/2 left-1/2 w-[140vw] h-[140vh] -translate-x-1/2 -translate-y-1/2 -rotate-[15deg] scale-110 flex flex-col gap-3 justify-center grayscale-[40%]' },
             marqueeRow(gameImages, 'animate-marquee', 0, 0),
@@ -634,7 +715,7 @@ const LavroPortfolio = () => {
       ),
 
       // === 04. WORKS ===
-      h('section', { className: 'relative w-full min-h-screen py-24 md:py-40 z-20 bg-[#020202]' },
+      h('section', { id: 'works', className: 'relative w-full min-h-screen py-24 md:py-40 z-20 bg-[#020202]' },
         h('div', { className: 'max-w-[100rem] mx-auto px-6 w-full' },
           h('div', { className: 'overflow-hidden mb-24 md:mb-32 pb-8 border-b border-[#111]' },
             h('h2', { ref: devTitleRef, className: 'text-[#00ff66] tracking-[0.4em] text-xs md:text-sm font-bold font-mono transition-all duration-[800ms] ease-out ' + (devTitleInView ? 'opacity-80 translate-x-0' : 'opacity-0 -translate-x-16') }, '/// 01. WORKS')
@@ -645,8 +726,23 @@ const LavroPortfolio = () => {
         )
       ),
 
+
+      // PV3: Diagonal marquee band between Works and Contact
+      FLAGS.band && h('div', { className: 'relative z-30 overflow-hidden py-8 pointer-events-none' },
+        h('div', { style: { transform: 'rotate(-2deg)' } },
+          h('div', {
+            ref: (el) => { if (FLAGS.velocity) marqueeRowsRef.current[3] = el; },
+            className: 'animate-marquee w-[110vw] -ml-[5vw] bg-[#00ff66] py-2'
+          },
+            h('span', { className: 'whitespace-nowrap font-display uppercase text-black text-xl md:text-3xl tracking-tight' },
+              'CREATIVE DEVELOPMENT ✕ GRAPHIC DESIGN ✕ STAY ONLINE ✕ CREATIVE DEVELOPMENT ✕ GRAPHIC DESIGN ✕ STAY ONLINE ✕ CREATIVE DEVELOPMENT ✕ GRAPHIC DESIGN ✕ STAY ONLINE ✕ '
+            )
+          )
+        )
+      ),
+
       // === CONTACT NETWORK ===
-      h('section', { id: 'contact-section', className: 'relative w-full py-24 md:py-40 z-10 bg-[#000]' },
+      h('section', { id: 'contact', className: 'relative w-full py-24 md:py-40 z-10 bg-[#000]' },
         h('div', { className: 'relative z-10 max-w-[100rem] mx-auto px-6 w-full' },
           h('div', { className: 'overflow-hidden mb-20 md:mb-32 pb-6 md:pb-8 border-b border-[#111]' },
             h('h2', { ref: contactTitleRef, className: 'text-[#00ff66] tracking-[0.4em] text-xs md:text-sm font-bold font-mono transition-all duration-[800ms] ease-out ' + (contactTitleInView ? 'opacity-80 translate-x-0' : 'opacity-0 -translate-x-16') }, '/// 02. CONTACT NETWORK')
@@ -660,6 +756,25 @@ const LavroPortfolio = () => {
       // === FOOTER ===
       h('section', { className: 'relative w-full bg-black z-20 pb-24 pt-12 border-t border-[#111]' },
         h('footer', { className: 'pt-8 flex flex-col items-center gap-8' },
+          FLAGS.footer && h(Fragment, null,
+            h('div', { className: 'w-full overflow-hidden px-4 pb-8' },
+              h('span', {
+                ref: footerGiantRef,
+                className: 'footer-giant font-display uppercase block text-center leading-[0.85] tracking-tighter select-none',
+                style: {
+                  fontSize: 'clamp(4rem, 13vw, 16rem)',
+                  opacity: footerGiantInView ? 1 : 0,
+                  transform: footerGiantInView ? 'translateY(0)' : 'translateY(40px)',
+                  transition: 'opacity 0.8s ease, transform 0.8s cubic-bezier(0.16,1,0.3,1)'
+                }
+              }, 'STAY ONLINE.')
+            ),
+            h('div', { className: 'overflow-hidden w-full' },
+              h('div', { className: 'animate-marquee font-mono text-[10px] tracking-[0.3em] text-gray-700 uppercase whitespace-nowrap' },
+                'LAVRO.ORG — PORTFOLIO — STAY ONLINE — LAVRO.ORG — PORTFOLIO — STAY ONLINE — LAVRO.ORG — PORTFOLIO — STAY ONLINE — LAVRO.ORG — PORTFOLIO — STAY ONLINE — '
+              )
+            )
+          ),
           h('button', {
             onClick: () => { if (lenisRef.current) lenisRef.current.scrollTo(0, { duration: 2 }); else window.scrollTo({ top: 0, behavior: 'smooth' }); },
             className: 'group flex flex-col items-center gap-2 cursor-pointer transition-all duration-300 hover:text-[#00ff66] text-gray-600'
@@ -677,6 +792,9 @@ const LavroPortfolio = () => {
         )
       )
     ),
+
+    // PV4: Section rail
+    FLAGS.rail && h(SectionRail),
 
     // PREVIEW CONTROL PANEL
     h('div', {
