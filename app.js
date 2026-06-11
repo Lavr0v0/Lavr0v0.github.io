@@ -278,7 +278,7 @@ const LavroPortfolio = () => {
   // Lenis smooth scroll
   useEffect(() => {
     let lenisInstance; let reqId;
-    import('https://esm.sh/lenis@1.1.18').then(({ default: Lenis }) => {
+    if (typeof Lenis !== 'undefined') {
       lenisInstance = new Lenis({ duration: 1.5, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smoothWheel: true, smoothTouch: true });
       lenisInstance.on('scroll', (e) => {
         scrollYRef.current = e.scroll;
@@ -289,7 +289,7 @@ const LavroPortfolio = () => {
       lenisRef.current = lenisInstance;
       function raf(time) { lenisInstance.raf(time); reqId = requestAnimationFrame(raf); }
       reqId = requestAnimationFrame(raf);
-    }).catch(err => console.log("Lenis load failed.", err));
+    } else { console.log("Lenis not available."); }
     return () => { if (reqId) cancelAnimationFrame(reqId); if (lenisInstance) lenisInstance.destroy(); if (rafUpdateRef.current) cancelAnimationFrame(rafUpdateRef.current); };
   }, []);
 

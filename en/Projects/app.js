@@ -101,12 +101,12 @@ const ProjectsPage = () => {
   useEffect(() => { window.history.scrollRestoration = 'manual'; window.scrollTo(0, 0); }, []);
   useEffect(() => {
     let lenisInstance; let reqId;
-    import('https://esm.sh/lenis@1.1.18').then(({ default: Lenis }) => {
+    if (typeof Lenis !== 'undefined') {
       lenisInstance = new Lenis({ duration: 1.5, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smoothWheel: true, smoothTouch: true });
       lenisInstance.on('scroll', (e) => { scrollYRef.current = e.scroll; if (!rafUpdateRef.current) { rafUpdateRef.current = requestAnimationFrame(() => { setScrollY(e.scroll); rafUpdateRef.current = null; }); } });
       lenisRef.current = lenisInstance;
       function raf(time) { lenisInstance.raf(time); reqId = requestAnimationFrame(raf); } reqId = requestAnimationFrame(raf);
-    }).catch(err => console.log("Lenis load failed.", err));
+    } else { console.log("Lenis not available."); }
     return () => { if (reqId) cancelAnimationFrame(reqId); if (lenisInstance) lenisInstance.destroy(); if (rafUpdateRef.current) cancelAnimationFrame(rafUpdateRef.current); };
   }, []);
   useEffect(() => { const t1 = setTimeout(() => setIntroPhase('animating'), 10); const t3 = setTimeout(() => setIntroPhase('done'), 1500); return () => { clearTimeout(t1); clearTimeout(t3); }; }, []);
