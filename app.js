@@ -172,6 +172,12 @@ const MonumentalLink = ({ title, subtitle, link, copyText, index, color = "white
 // ==========================================
 const globalCSS = `
 @font-face {
+  font-family: 'Anton';
+  src: url('/HomePageAssets/Anton-subset.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
   font-family: 'Alibaba PuHuiTi';
   src: url('./HomePageAssets/AlibabaPuHuiTi-Light-subset.woff2') format('woff2');
   font-weight: 300;
