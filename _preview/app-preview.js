@@ -66,7 +66,7 @@ const ScrambledText = ({ text, phase }) => {
 };
 
 // i18n dictionary — all language-specific content
-const T = {
+const i18n = {
   zh: {
     langSwitch: 'EN', langHref: '/en/',
     heroSubtitle: '国际学生 / 平面设计 / 创意开发',
@@ -545,7 +545,7 @@ const LavroPortfolio = () => {
     h('main', { className: 'relative z-10 w-full' },
 
       // Language switch
-      h('a', { href: T.langHref, className: 'fixed top-6 right-6 z-50 text-xs tracking-[0.2em] text-[#00ff66] border border-[#00ff66] px-4 py-2 hover:bg-[#00ff66] hover:text-[#050505] transition-all duration-300 font-mono' }, T.langSwitch),
+      h('a', { href: i18n.langHref, className: 'fixed top-6 right-6 z-50 text-xs tracking-[0.2em] text-[#00ff66] border border-[#00ff66] px-4 py-2 hover:bg-[#00ff66] hover:text-[#050505] transition-all duration-300 font-mono' }, i18n.langSwitch),
 
       // === 01. HERO ===
       h('header', { id: 'hero', className: 'relative w-full h-screen flex items-center justify-center' },
@@ -563,8 +563,8 @@ const LavroPortfolio = () => {
           h('div', { ref: heroFadeRef2, className: 'w-full', style: { willChange: 'opacity' } },
             h('div', { style: introTransition(0.3) },
               LANG === 'zh'
-                ? h('h2', { className: T.heroSubtitleCls }, '国际学生 / 平面设计 / 创意开发')
-                : h('h2', { className: T.heroSubtitleCls }, 'INTERNATIONAL STUDENT', h('br'), 'CREATIVE DEVELOPMENT', h('br'), 'GRAPHIC DESIGN')
+                ? h('h2', { className: i18n.heroSubtitleCls }, '国际学生 / 平面设计 / 创意开发')
+                : h('h2', { className: i18n.heroSubtitleCls }, 'INTERNATIONAL STUDENT', h('br'), 'CREATIVE DEVELOPMENT', h('br'), 'GRAPHIC DESIGN')
             ),
             h('div', { className: 'w-full max-w-4xl', style: introTransition(0.5) },
               h('div', { className: 'flex flex-wrap gap-x-12 gap-y-6 mt-12 md:mt-16 text-xs md:text-sm tracking-[0.1em] md:tracking-[0.2em] font-mono font-bold text-white relative z-20' },
@@ -600,7 +600,7 @@ const LavroPortfolio = () => {
       ),
 
       // EN-only notice banner
-      T.enNotice && h('div', { className: 'relative z-20 w-full py-6 md:py-8' },
+      i18n.enNotice && h('div', { className: 'relative z-20 w-full py-6 md:py-8' },
         h('div', { className: 'max-w-3xl mx-auto px-6' },
           h('div', { className: 'border border-[#00ff66]/30 bg-[#0a0a0a]/80 px-6 py-4 md:px-8 md:py-5' },
             h('p', { className: 'text-center text-xs md:text-sm font-mono tracking-[0.15em] text-gray-400 leading-relaxed' },
@@ -635,7 +635,7 @@ const LavroPortfolio = () => {
               h('div', { className: 'mt-8 w-16 h-1 bg-[#00ff66] transition-all duration-1000 delay-300 ' + (aboutTitleInView ? 'opacity-100' : 'opacity-0') })
             ),
             h('div', { ref: aboutParallaxRef, className: 'w-full lg:w-7/12 flex flex-col justify-end pb-4 space-y-8', style: { willChange: 'transform' } },
-              h('p', { className: T.about1Cls }, T.about1),
+              h('p', { className: i18n.about1Cls }, i18n.about1),
               FLAGS.status
                 ? h(StatusPanel)
                 : h('div', { className: 'flex flex-col md:flex-row gap-8 max-w-2xl my-4 py-6 border-t border-[#333]/40' },
@@ -649,7 +649,7 @@ const LavroPortfolio = () => {
                     )
                   ),
               h('div', { className: 'pt-2' },
-                h('p', { className: T.about2Cls }, T.about2)
+                h('p', { className: i18n.about2Cls }, i18n.about2)
               )
             )
           )
@@ -684,20 +684,20 @@ const LavroPortfolio = () => {
                     'GAMES & ', h('br'), ' ', h('span', { className: 'text-transparent', style: { WebkitTextStroke: '2px #00ff66' } }, 'ANIME.'))
             ),
             h('div', { className: 'w-full md:w-8/12 border-l-[3px] border-[#00ff66] pl-6 md:pl-12 transition-all duration-1000 delay-300 ' + (hobbyTitleInView ? 'translate-x-0 opacity-100' : 'translate-x-12 opacity-0') },
-              h('p', { className: T.hobbyParaCls }, T.hobbyPara),
+              h('p', { className: i18n.hobbyParaCls }, i18n.hobbyPara),
               h('div', { className: 'grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-12 mt-10 pt-8 border-t border-[#333]/50' },
                 h('div', null,
-                  h('h4', { className: 'text-[#00ff66] text-xs font-mono mb-4 tracking-widest opacity-80' }, T.gamesLabel),
+                  h('h4', { className: 'text-[#00ff66] text-xs font-mono mb-4 tracking-widest opacity-80' }, i18n.gamesLabel),
                   h('ul', { className: 'space-y-3 font-mono text-sm tracking-wider text-white' },
-                    T.gamesList.map((g, i) =>
+                    i18n.gamesList.map((g, i) =>
                       h('li', { key: i, className: 'flex items-center gap-3' }, h('span', { className: 'text-[#333]' }, '-'), ' ', g)
                     )
                   )
                 ),
                 h('div', null,
-                  h('h4', { className: 'text-[#00ff66] text-xs font-mono mb-4 tracking-widest opacity-80' }, T.animeLabel),
+                  h('h4', { className: 'text-[#00ff66] text-xs font-mono mb-4 tracking-widest opacity-80' }, i18n.animeLabel),
                   h('ul', { className: 'space-y-3 font-mono text-sm tracking-wider text-white' },
-                    T.animeList.map((a, i) =>
+                    i18n.animeList.map((a, i) =>
                       h('li', { key: i, className: 'flex items-center gap-3' }, h('span', { className: 'text-[#333]' }, '-'), ' ', a)
                     )
                   )
@@ -721,7 +721,7 @@ const LavroPortfolio = () => {
             h('h2', { ref: devTitleRef, className: 'text-[#00ff66] tracking-[0.4em] text-xs md:text-sm font-bold font-mono transition-all duration-[800ms] ease-out ' + (devTitleInView ? 'opacity-80 translate-x-0' : 'opacity-0 -translate-x-16') }, '/// 01. WORKS')
           ),
           h('div', { className: 'flex flex-col gap-16 md:gap-32 w-full' },
-            T.works.map((w, i) => h(MonumentalLink, Object.assign({ key: i }, w)))
+            i18n.works.map((w, i) => h(MonumentalLink, Object.assign({ key: i }, w)))
           )
         )
       ),
@@ -748,7 +748,7 @@ const LavroPortfolio = () => {
             h('h2', { ref: contactTitleRef, className: 'text-[#00ff66] tracking-[0.4em] text-xs md:text-sm font-bold font-mono transition-all duration-[800ms] ease-out ' + (contactTitleInView ? 'opacity-80 translate-x-0' : 'opacity-0 -translate-x-16') }, '/// 02. CONTACT NETWORK')
           ),
           h('div', { className: 'flex flex-col gap-12 md:gap-24 relative z-10' },
-            T.contacts.map((c, i) => h(MonumentalLink, Object.assign({ key: i }, c)))
+            i18n.contacts.map((c, i) => h(MonumentalLink, Object.assign({ key: i }, c)))
           )
         )
       ),
@@ -788,7 +788,7 @@ const LavroPortfolio = () => {
           h('p', { className: 'font-mono text-xs text-gray-600' },
             'LAVRO.ORG © ' + new Date().getFullYear() + ' // STAY ONLINE.'
           ),
-          h('a', { href: T.creditsHref, className: 'font-mono text-[10px] tracking-[0.3em] text-gray-500 hover:text-[#00ff66] transition-colors duration-300 mt-2' }, '[ CREDITS ]')
+          h('a', { href: i18n.creditsHref, className: 'font-mono text-[10px] tracking-[0.3em] text-gray-500 hover:text-[#00ff66] transition-colors duration-300 mt-2' }, '[ CREDITS ]')
         )
       )
     ),
