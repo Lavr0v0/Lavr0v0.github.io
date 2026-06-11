@@ -266,6 +266,10 @@ html.rainbow-mode { animation: rainbow-hue 3s linear infinite; }
 html.rainbow-mode .konami-toast { display: block; }
 .konami-toast { display: none; position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); z-index: 9999; font-family: 'Anton', monospace; font-size: 1rem; letter-spacing: 0.3em; color: #00ff66; background: rgba(0,0,0,0.85); border: 1px solid #00ff66; padding: 0.6rem 2rem; pointer-events: none; animation: toast-fade 3s ease forwards; }
 @keyframes toast-fade { 0% { opacity: 0; transform: translateX(-50%) translateY(-10px); } 10% { opacity: 1; transform: translateX(-50%) translateY(0); } 80% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee, .animate-marquee-reverse,
+  .animate-brutal-glitch, .animate-bounce-down { animation: none !important; }
+}
 `;
 
 // Main App
@@ -335,7 +339,8 @@ const LavroPortfolio = () => {
   // Lenis smooth scroll
   useEffect(() => {
     let lenisInstance; let reqId;
-    if (typeof Lenis !== 'undefined') {
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (typeof Lenis !== 'undefined' && !prefersReduced) {
       lenisInstance = new Lenis({ duration: 1.5, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smoothWheel: true, smoothTouch: true });
       lenisInstance.on('scroll', (e) => {
         scrollYRef.current = e.scroll;
