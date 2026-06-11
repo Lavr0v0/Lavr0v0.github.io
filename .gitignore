@@ -6,3 +6,4 @@ node_modules
 src/input.css
 _tmp_*
 Temp/
+DnD/lucide.min.js
