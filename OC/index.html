@@ -16,8 +16,8 @@ main{max-width:860px;margin:24px auto 100px;padding:0 18px}.section{background:v
 .section{padding:clamp(18px,4vw,30px);margin:18px 0}.section h2{margin:0 0 10px;color:#4e604c;font-size:25px;font-weight:600}.group-title{margin:26px 0 6px;padding-bottom:5px;border-bottom:1px solid var(--line);color:#596457}
 .field{padding:18px 0;border-bottom:1px solid #ededeb}.field:last-child{border:0}.question{display:block;font-weight:600;margin-bottom:12px}.reverse{font-size:12px;color:#9b5a4e}
 .options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.option{position:relative;min-width:0}.option input{position:absolute;opacity:0;pointer-events:none}.option span{display:flex;align-items:center;width:100%;min-height:50px;padding:10px 13px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;transition:.15s;touch-action:manipulation}.option span::before{content:"";flex:0 0 auto;width:16px;height:16px;margin-right:10px;border:1.5px solid #a7ada5;border-radius:50%;background:#fff}.option input:checked+span{border-color:var(--accent);background:var(--soft);color:#354633}.option input:checked+span::before{width:8px;height:8px;border:5px solid var(--accent)}.option:hover span{border-color:#98a396;background:#fafbf9}.option input:focus-visible+span{outline:3px solid #66776435;outline-offset:2px}
-/* 二选一：两个大按钮，题干不重复选项文字 */
-#A .field{display:grid;grid-template-columns:42px 1fr;align-items:center;gap:8px}#A .question{margin:0;color:var(--muted);font-variant-numeric:tabular-nums}#A .options{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-width:560px}#A .option span{justify-content:center;text-align:center}#A .option span::before{display:none}#A .option input:checked+span{background:var(--accent);color:#fff}
+/* 二选一：两个大按钮 */
+#A .options{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-width:560px}#A .option span{justify-content:center;text-align:center}#A .option span::before{display:none}#A .option input:checked+span{background:var(--accent);color:#fff}
 /* 量表：整行五格，点击区域一致 */
 #B .options{grid-template-columns:repeat(5,minmax(44px,1fr));gap:6px;max-width:430px}#B .option span{justify-content:center;min-height:48px;padding:0;font-variant-numeric:tabular-nums}#B .option span::before{display:none}#B .option input:checked+span{background:var(--accent);border-color:var(--accent);color:#fff}
 /* 普通单选：选项卡整块可点 */
@@ -28,7 +28,7 @@ input[type=text],textarea,select{width:100%;border:1px solid var(--line);backgro
 .save-status{position:fixed;left:50%;bottom:84px;z-index:20;max-width:calc(100% - 24px);padding:10px 15px;border-radius:8px;background:#2f3a2e;color:#fff;box-shadow:0 4px 16px #0003;transform:translate(-50%,20px);opacity:0;pointer-events:none;transition:.2s}.save-status.show{transform:translate(-50%,0);opacity:1}
 .score-box{display:none;margin:18px 0;padding:18px;border-radius:10px;background:var(--soft);border:1px solid #d5ddd2}.score-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px}.score-item{padding:10px;background:#fff;border-radius:7px}.score-item b{display:block;color:#536851;font-size:18px}
 .actions{position:fixed;right:22px;bottom:22px;z-index:12;display:flex;gap:8px}.btn{border:1px solid var(--line);border-radius:8px;padding:10px 16px;font:600 14px inherit;cursor:pointer}.primary{background:var(--accent);border-color:var(--accent);color:white}.secondary{background:white;color:var(--ink)}.danger{color:#94534a}.note{font-size:13px;color:var(--muted);margin-bottom:0}
-@media(max-width:700px){header{padding:20px 16px}.progress-inner{padding-left:14px;padding-right:14px}main{margin-top:14px;padding:0 12px 120px}.section{padding:18px 15px;margin:14px 0;border-radius:9px}.section h2{font-size:22px}.field{padding:15px 0}.question{line-height:1.55}.actions{left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom))}.btn{flex:1;min-height:48px}.options{grid-template-columns:1fr;gap:7px}#B .options{grid-template-columns:repeat(5,minmax(44px,1fr));max-width:none;gap:5px}#A .field{grid-template-columns:34px 1fr}#A .options{grid-template-columns:repeat(2,minmax(0,1fr));max-width:none}.identity .options{grid-template-columns:repeat(2,minmax(0,1fr))}.relation-fields{grid-template-columns:1fr}.save-status{bottom:78px}}
+@media(max-width:700px){header{padding:20px 16px}.progress-inner{padding-left:14px;padding-right:14px}main{margin-top:14px;padding:0 12px 120px}.section{padding:18px 15px;margin:14px 0;border-radius:9px}.section h2{font-size:22px}.field{padding:15px 0}.question{line-height:1.55}.actions{left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom))}.btn{flex:1;min-height:48px}.options{grid-template-columns:1fr;gap:7px}#B .options{grid-template-columns:repeat(5,minmax(44px,1fr));max-width:none;gap:5px}#A .options{grid-template-columns:repeat(2,minmax(0,1fr));max-width:none}.identity .options{grid-template-columns:repeat(2,minmax(0,1fr))}.relation-fields{grid-template-columns:1fr}.save-status{bottom:78px}}
 @media(min-width:701px) and (max-width:1024px){main{max-width:780px;padding:0 24px 110px}.section{padding:26px}.option span{padding-left:14px;padding-right:14px}}
 @media print{.actions,.progress-wrap{display:none}body{background:#fff}.section{break-inside:avoid}}
 </style>
@@ -167,7 +167,7 @@ async function copyAnswers(){
   try{
     const packed=await compressText(markdown());
     await navigator.clipboard.writeText(packed);
-    status('已复制压缩后的答案，发给整理者即可');
+    status('OK啦');
   }catch(error){
     console.error(error);
     status('复制失败，请重试');
@@ -185,7 +185,7 @@ async function finishAndSave(){
   const link=document.createElement('a');
   link.href=URL.createObjectURL(blob);link.download=file.name;link.click();
   setTimeout(()=>URL.revokeObjectURL(link.href),1000);
-  status('答案文件已下载，请把文件发给整理者');
+  status('OK啦');
 }
 document.querySelector('#copyBtn').addEventListener('click',copyAnswers);
 document.querySelector('#downloadBtn').addEventListener('click',finishAndSave);
