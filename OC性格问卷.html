@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>OC 性格问卷 · 完整版</title>
+<style>
+:root{--bg:#f4f2ed;--paper:#fff;--ink:#2f312e;--muted:#747872;--line:#dddeda;--accent:#667764;--soft:#edf1eb}
+*{box-sizing:border-box}html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}body{margin:0;color:var(--ink);background:var(--bg);font:16px/1.65 Arial,"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif}
+header{padding:26px 20px;text-align:center;background:var(--paper);border-bottom:1px solid var(--line)}
+h1{margin:0;font:600 clamp(26px,5vw,36px)/1.3 inherit;letter-spacing:.04em}
+.credit{display:block;margin-top:6px;font-size:13px;color:var(--muted);font-weight:400}
+.progress-wrap{position:sticky;top:0;z-index:10;background:#ffffffed;backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.progress-inner{max-width:860px;margin:auto;padding:9px 18px;display:flex;align-items:center;gap:12px}.bar{height:6px;flex:1;border-radius:9px;background:#e5e7e2;overflow:hidden}.bar span{display:block;height:100%;width:0;background:var(--accent);transition:.25s}.progress-text{font-size:13px;color:var(--muted);white-space:nowrap}
+main{max-width:860px;margin:24px auto 100px;padding:0 18px}.section{background:var(--paper);border:1px solid var(--line);border-radius:12px}
+.section{padding:clamp(18px,4vw,30px);margin:18px 0}.section h2{margin:0 0 10px;color:#4e604c;font-size:25px;font-weight:600}.group-title{margin:26px 0 6px;padding-bottom:5px;border-bottom:1px solid var(--line);color:#596457}
+.field{padding:18px 0;border-bottom:1px solid #ededeb}.field:last-child{border:0}.question{display:block;font-weight:600;margin-bottom:12px}.reverse{font-size:12px;color:#9b5a4e}
+.options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.option{position:relative;min-width:0}.option input{position:absolute;opacity:0;pointer-events:none}.option span{display:flex;align-items:center;width:100%;min-height:50px;padding:10px 13px;border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;transition:.15s;touch-action:manipulation}.option span::before{content:"";flex:0 0 auto;width:16px;height:16px;margin-right:10px;border:1.5px solid #a7ada5;border-radius:50%;background:#fff}.option input:checked+span{border-color:var(--accent);background:var(--soft);color:#354633}.option input:checked+span::before{width:8px;height:8px;border:5px solid var(--accent)}.option:hover span{border-color:#98a396;background:#fafbf9}.option input:focus-visible+span{outline:3px solid #66776435;outline-offset:2px}
+/* 二选一：两个大按钮，题干不重复选项文字 */
+#A .field{display:grid;grid-template-columns:42px 1fr;align-items:center;gap:8px}#A .question{margin:0;color:var(--muted);font-variant-numeric:tabular-nums}#A .options{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-width:560px}#A .option span{justify-content:center;text-align:center}#A .option span::before{display:none}#A .option input:checked+span{background:var(--accent);color:#fff}
+/* 量表：整行五格，点击区域一致 */
+#B .options{grid-template-columns:repeat(5,minmax(44px,1fr));gap:6px;max-width:430px}#B .option span{justify-content:center;min-height:48px;padding:0;font-variant-numeric:tabular-nums}#B .option span::before{display:none}#B .option input:checked+span{background:var(--accent);border-color:var(--accent);color:#fff}
+/* 普通单选：选项卡整块可点 */
+#C .option span,#D .option span,#E .option span,#F .option span{padding:10px 13px}
+input[type=text],textarea,select{width:100%;border:1px solid var(--line);background:#fcfcfb;border-radius:8px;padding:12px 13px;color:var(--ink);font-family:inherit;font-size:16px;line-height:1.5;outline:none}input[type=text]:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px #66776415}textarea{display:block;min-height:100px;resize:vertical}.short{max-width:none}
+.identity{margin-top:0}.identity .options{grid-template-columns:repeat(5,minmax(0,1fr))}.identity .option span{justify-content:center;text-align:center}.identity .option span::before{display:none}.identity .option input:checked+span{background:var(--accent);color:#fff}.identity-hint{margin:6px 0 0;color:var(--muted);font-size:13px}
+.relation-mode{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0 16px}.relation-mode label{position:relative}.relation-mode input{position:absolute;opacity:0}.relation-mode span{display:flex;justify-content:center;align-items:center;min-height:46px;border:1px solid var(--line);border-radius:8px;cursor:pointer}.relation-mode input:checked+span{border-color:var(--accent);background:var(--accent);color:#fff}.relation-list{display:grid;gap:12px}.relation-card{padding:16px;border:1px solid var(--line);border-radius:9px;background:#fafbf9}.relation-card[hidden],.relation-panel[hidden]{display:none}.relation-card h3{margin:0 0 12px;color:#4e604c;font-size:17px}.relation-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.relation-field span{display:block;margin-bottom:4px;color:var(--muted);font-size:13px}.relation-field input{min-height:44px}.relation-summary{min-height:180px}
+.save-status{position:fixed;left:50%;bottom:84px;z-index:20;max-width:calc(100% - 24px);padding:10px 15px;border-radius:8px;background:#2f3a2e;color:#fff;box-shadow:0 4px 16px #0003;transform:translate(-50%,20px);opacity:0;pointer-events:none;transition:.2s}.save-status.show{transform:translate(-50%,0);opacity:1}
+.score-box{display:none;margin:18px 0;padding:18px;border-radius:10px;background:var(--soft);border:1px solid #d5ddd2}.score-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px}.score-item{padding:10px;background:#fff;border-radius:7px}.score-item b{display:block;color:#536851;font-size:18px}
+.actions{position:fixed;right:22px;bottom:22px;z-index:12;display:flex;gap:8px}.btn{border:1px solid var(--line);border-radius:8px;padding:10px 16px;font:600 14px inherit;cursor:pointer}.primary{background:var(--accent);border-color:var(--accent);color:white}.secondary{background:white;color:var(--ink)}.danger{color:#94534a}.note{font-size:13px;color:var(--muted);margin-bottom:0}
+@media(max-width:700px){header{padding:20px 16px}.progress-inner{padding-left:14px;padding-right:14px}main{margin-top:14px;padding:0 12px 120px}.section{padding:18px 15px;margin:14px 0;border-radius:9px}.section h2{font-size:22px}.field{padding:15px 0}.question{line-height:1.55}.actions{left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom))}.btn{flex:1;min-height:48px}.options{grid-template-columns:1fr;gap:7px}#B .options{grid-template-columns:repeat(5,minmax(44px,1fr));max-width:none;gap:5px}#A .field{grid-template-columns:34px 1fr}#A .options{grid-template-columns:repeat(2,minmax(0,1fr));max-width:none}.identity .options{grid-template-columns:repeat(2,minmax(0,1fr))}.relation-fields{grid-template-columns:1fr}.save-status{bottom:78px}}
+@media(min-width:701px) and (max-width:1024px){main{max-width:780px;padding:0 24px 110px}.section{padding:26px}.option span{padding-left:14px;padding-right:14px}}
+@media print{.actions,.progress-wrap{display:none}body{background:#fff}.section{break-inside:avoid}}
+</style>
+</head>
+<body>
+<header><h1>OC 性格问卷<small class="credit">（雪露做的）</small></h1></header>
+<div class="progress-wrap"><div class="progress-inner"><div class="bar"><span id="progressBar"></span></div><div class="progress-text" id="progressText">已填写 0 / 96</div></div></div>
+<main>
+<section class="section identity" id="identity">
+<h2>你是谁？</h2>
+<div class="options">
+<label class="option"><input type="radio" name="respondent" value="雪露"><span>雪露</span></label>
+<label class="option"><input type="radio" name="respondent" value="阿尔贝莉娜"><span>阿尔贝莉娜</span></label>
+<label class="option"><input type="radio" name="respondent" value="芙勒维拉"><span>芙勒维拉</span></label>
+<label class="option"><input type="radio" name="respondent" value="佩伦"><span>佩伦</span></label>
+<label class="option"><input type="radio" name="respondent" value="斯卡摩斯"><span>斯卡摩斯</span></label>
+</div>
+<p class="identity-hint">选择后，关系速答会自动隐藏自己。</p>
+</section>
+<form id="quiz"></form><div id="scoreBox" class="score-box"></div>
+</main>
+<div class="actions"><button type="button" class="btn secondary" id="copyBtn">复制答案</button><button type="button" class="btn primary" id="downloadBtn">完成并保存</button></div>
+<div class="save-status" id="saveStatus" role="status" aria-live="polite"></div>
+<script>
+const sections=[
+{id:'A',title:'A · 二选一速答',desc:'凭直觉，别犹豫。每题只能选一边。',questions:[
+[1,'早起 / 夜猫',['早起','夜猫']],[2,'存钱 / 花钱',['存钱','花钱']],[3,'先动手 / 先动嘴',['先动手','先动嘴']],[4,'记仇 / 转头就忘',['记仇','转头就忘']],[5,'地图 / 直觉',['地图','直觉']],[6,'独食 / 分食',['独食','分食']],[7,'怕鬼 / 不怕鬼',['怕鬼','不怕鬼']],[8,'爱干净 / 无所谓',['爱干净','无所谓']],[9,'睡得沉 / 一点动静就醒',['睡得沉','一点动静就醒']],[10,'甜 / 咸',['甜','咸']],[11,'热闹的集市 / 安静的小路',['热闹的集市','安静的小路']],[12,'先道歉 / 等对方先开口',['先道歉','等对方先开口']],[13,'借钱给朋友 / 找理由推掉',['借钱给朋友','找理由推掉']],[14,'规则 / 变通',['规则','变通']],[15,'旧东西修了再用 / 坏了就换',['旧东西修了再用','坏了就换']],[16,'被误解也不解释 / 一定要说清楚',['被误解也不解释','一定要说清楚']]]},
+{id:'B',title:'B · 性格五维',desc:'1＝完全不像 ta，5＝就是 ta。标有 (R) 的反向题照常打分即可。',scale:true,groups:[['开放性',[[17,'ta 对没见过的东西总是先好奇，再警惕。'],[18,'ta 喜欢听故事、传说，或琢磨没有用处的问题。'],[19,'ta 吃饭愿意点没吃过的菜。'],[20,'ta 觉得老规矩存在自有道理，不该乱动。',1],[21,'ta 会注意到晚霞、花色、好听的声音这类没用的东西。'],[22,'让 ta 换一种全新的生活方式，ta 会抗拒很久。',1]]],['尽责性',[[23,'ta 的随身物品各有各的位置。'],[24,'答应的事，ta 就算吃亏也会办完。'],[25,'ta 做事之前会先想好步骤。'],[26,'ta 经常迟到，或者忘记约定。',1],[27,'没做完的事放着，ta 会一直惦记。'],[28,'ta 觉得“差不多就行”是句好话。',1]]],['外向性',[[29,'人多的场合，ta 是说话多的那个。'],[30,'ta 容易和陌生人搭上话。'],[31,'热闹散场后，ta 觉得充实而不是累。'],[32,'比起被注意，ta 更希望没人看到 ta。',1],[33,'高兴的时候，全队都会知道 ta 高兴。'],[34,'连续几天和人待在一起，ta 需要躲开独处。',1]]],['宜人性',[[35,'ta 默认相信别人说的话。'],[36,'别人有难处，ta 很难袖手旁观。'],[37,'吵架时 ta 常常先软下来。'],[38,'ta 觉得多数人靠不住，防着点没错。',1],[39,'ta 会替别人找台阶下。'],[40,'挡 ta 路的人，ta 不介意得罪。',1]]],['情绪稳定性',[[41,'出了大事，ta 是队里比较镇定的那个。'],[42,'被冒犯之后，ta 当晚照样睡得着。'],[43,'ta 很少后悔已经做过的决定。'],[44,'ta 的心情写在脸上，藏不住。',1],[45,'等待和不确定会让 ta 坐立难安。',1],[46,'挫折过后，ta 恢复得比别人快。']]]]},
+{id:'C',title:'C · 价值与道德',desc:'选择最接近 ta 的答案。',questions:[
+[47,'“正确”和“合法”冲突时，ta 站：',['正确','合法','看代价','看谁在看着']],[48,'ta 撒谎的门槛：',['几乎不说谎','善意的谎随口就来','谎话是工具，好用就行','说谎比说真话舒服']],[49,'复仇在 ta 看来：',['必须的','可以理解但不值得','交给规则/神明','没想过这个问题']],[50,'对乞讨的孩子，ta：',['给钱','给吃的','不给，但记住了','绕开走']],[51,'队伍利益和陌生人性命冲突时，ta 救：',['陌生人，代价再说','队伍，心里留疤','队伍，不留疤','当场僵住']],[52,'ta 眼里最不可原谅的行为：',['背叛','欺凌弱小','说谎','浪费（食物/性命/才能）','抛弃同伴']],[53,'“只要没人受伤就不算坏事”——ta：',['同意','不同意','嘴上不同意，行动上同意']],[54,'ta 信神吗：',['虔诚','拜但不指望','不信但尊重','不信也不装','有私人的信法']],[55,'权力落到 ta 手里，ta 的第一反应：',['想卸掉','小心用','用得挺顺手','先看有没有人盯着']],[56,'ta 觉得自己是好人吗：',['是','想是','不是，但无所谓','好坏这个分法很蠢']]]},
+{id:'D',title:'D · 梦想、恐惧、欲望',questions:[
+[57,'冒险结束后 ta 最想要的结局：',['一个能回去的家','名声','某个人平安','别结束，继续在路上','找回失去的东西']],[58,'ta 最怕失去：',['性命','脸面','某个人','自由','记忆/自我']],[59,'ta 的梦想说出口过吗：',['逢人就说','只对一个人说过','谁都没说过','ta 自己都没意识到']],[60,'半夜惊醒的噩梦，最可能梦到：',['过去的某件事','失去某个人','变回从前的自己','说不清形状的东西','ta 不做噩梦']],[61,'如果能改掉自己一个毛病，ta 会改吗：',['立刻改','嘴上说改','那不是毛病，是 ta 的一部分']],[62,'给多少钱都不卖的东西：',null,'text'],[63,'十年后 ta 在哪、在做什么：',null,'text'],[64,'ta 嫉妒过什么人：',null,'text']]},
+{id:'E',title:'E · 习惯与身体',questions:[
+[65,'吃饭速度：',['狼吞虎咽','正常','细嚼慢咽','经常忘了吃']],[66,'酒量与酒品：',['千杯不倒','喝多话多','喝多就睡','滴酒不沾','千万别让 ta 喝']],[67,'钱袋管理：',['每一枚都有数','大概有数','从来不数','钱在别人那儿存着']],[68,'受了伤，ta：',['立刻处理','忍着不说','大声嚷嚷','找人看，顺便撒娇']],[69,'无聊的时候 ta 的手在干什么：',null,'text'],[70,'睡姿：',['端正','蜷着','四仰八叉','抱着东西睡','坐着也能睡']],[71,'对天气的态度：最喜欢什么天，最烦什么天？',null,'text'],[72,'ta 身上常带着一件没什么用但一直带着的东西：',null,'text'],[73,'走路的样子：',['快而直','慢悠悠','无声','大动静','走一路看一路']],[74,'洗漱频率在队里属于：',['最讲究的','正常','被队友押着去洗的']],[75,'早上叫醒 ta 的难度：',['自己醒','叫一声就起','要叫三遍','有生命危险']],[76,'ta 的笑点：',['低，什么都能笑','正常','高冷，难逗','只有特定的人逗得笑']]]},
+{id:'F',title:'F · 谈吐声线',questions:[
+[77,'句长：',['短句蹦字','正常','爱绕爱铺垫','看对象切换']],[78,'音量：',['偏轻','正常','偏大','情绪一上来就失控']],[79,'语速：',['慢','正常','快','忽快忽慢']],[80,'称呼队友：',['名字','外号','头衔（“法师”“骑士”）','喂、那个谁']],[81,'口头禅或语气词（最多 3 个）：',null,'text'],[82,'说谎时的破绽：',['不敢看人','话变多','话变少','几乎无破绽','ta 不说谎，只是沉默']],[83,'脏话等级：',['0 从不','1 急了会冒','2 日常调味','3 出口成脏']],[84,'被夸时 ta 说的第一句话（原话）：',null,'text'],[85,'道歉时 ta 说的话（原话）：',null,'text'],[86,'威胁人时 ta 说的话（原话）：',null,'text'],[87,'夸同伴时 ta 说的话（原话）：',null,'text'],[88,'ta 生气时说话会：',['变快变大声','变慢变轻','完全不说话','阴阳怪气']]]},
+{id:'G',title:'G · 关系速答',desc:'先填写每位队友的四格，再回答下面三题。',relation:true,questions:[[89,'队里 ta 最先想到要保护的人是谁？',null,'text'],[90,'队里谁最让 ta 放心把后背交出去？',null,'text'],[91,'如果 ta 有事瞒着全队，最可能先被谁发现？',null,'text']]},
+{id:'H',title:'H · 可选简答',desc:'愿意写再写，每题两三句即可。',questions:[[92,'一件小时候的事，能解释 ta 现在的某个习惯。',null,'long'],[93,'ta 绝对不做的一件事，以及为什么。',null,'long'],[94,'ta 身上一个 ta 自己没意识到的矛盾。',null,'long'],[95,'ta 人生里最接近“幸福”的一个瞬间。',null,'long'],[96,'如果 ta 明天死了，墓碑上会刻什么？谁来刻？',null,'long']]}
+];
+const quiz=document.querySelector('#quiz');
+const letters='abcdefghijklmnopqrstuvwxyz'.split('');
+function optionHTML(n,opts,kind='choice'){return `<div class="options ${kind}">${opts.map((o,i)=>{const prefix=kind==='choice'?`${letters[i]}. `:'';return `<label class="option"><input type="radio" name="q${n}" value="${escapeHTML(o)}"><span>${prefix}${escapeHTML(o)}</span></label>`}).join('')}</div>`}
+function fieldHTML(q,scale=false){const [n,text,opts,type]=q;let input;if(scale)input=optionHTML(n,['1','2','3','4','5'],'scale');else if(opts)input=optionHTML(n,opts,n<=16?'binary':'choice');else if(type==='long')input=`<textarea name="q${n}" placeholder="可选填写……"></textarea>`;else input=`<input class="short" type="text" name="q${n}" placeholder="请输入答案……">`;return `<div class="field"><label class="question">${n}. ${escapeHTML(text)}${q[2]===1&&scale?' <span class="reverse">(R)</span>':''}</label>${input}</div>`}
+function escapeHTML(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+const memberNames=['雪露','阿尔贝莉娜','芙勒维拉','佩伦','斯卡摩斯'];
+function relationHTML(){
+  const labels=['一个词形容','最欣赏哪点','最受不了哪点','想单独做的事'];
+  const cards=memberNames.map((name,i)=>`<div class="relation-card" data-member="${name}"><h3>${name}</h3><div class="relation-fields">${labels.map((label,j)=>`<label class="relation-field"><span>${label}</span><input name="rel${i}_${j}" aria-label="${name}：${label}"></label>`).join('')}</div></div>`).join('');
+  return `<div class="relation-mode">
+    <label><input type="radio" name="relationMode" value="detail" checked><span>分项填写</span></label>
+    <label><input type="radio" name="relationMode" value="summary"><span>写一整段</span></label>
+  </div>
+  <div class="relation-panel" id="relationDetail"><div class="relation-list">${cards}</div></div>
+  <div class="relation-panel" id="relationSummary" hidden><textarea class="relation-summary" name="relationSummary" placeholder="可以在这里自由描述 ta 和其他成员的关系……"></textarea></div>`;
+}
+sections.forEach(s=>{const el=document.createElement('section');el.className='section';el.id=s.id;let body=`<h2>${s.title}</h2>`;if(s.groups)s.groups.forEach(g=>{body+=`<h3 class="group-title">${g[0]}</h3>${g[1].map(q=>fieldHTML(q,true)).join('')}`});if(s.relation)body+=relationHTML();if(s.questions)body+=s.questions.map(q=>fieldHTML(q)).join('');el.innerHTML=body;quiz.appendChild(el)});
+const allInputs=[...document.querySelectorAll('input,textarea')];
+function currentMember(){return document.querySelector('[name="respondent"]:checked')?.value||''}
+function relationMode(){return document.querySelector('[name="relationMode"]:checked')?.value||'detail'}
+function syncRelationUI(){
+  const me=currentMember();
+  document.querySelectorAll('.relation-card').forEach(card=>card.hidden=card.dataset.member===me);
+  document.querySelector('#relationDetail').hidden=relationMode()!=='detail';
+  document.querySelector('#relationSummary').hidden=relationMode()!=='summary';
+}
+function save(){
+  const data={};
+  allInputs.forEach(input=>{if(input.type==='radio'){if(input.checked)data[input.name]=input.value}else data[input.name]=input.value});
+  localStorage.setItem('ocQuizFull',JSON.stringify(data));
+  updateProgress();
+}
+function load(){
+  let data={};
+  try{data=JSON.parse(localStorage.getItem('ocQuizFull'))||{}}catch{}
+  allInputs.forEach(input=>{if(input.type==='radio')input.checked=data[input.name]===input.value||(data[input.name]==null&&input.name==='relationMode'&&input.value==='detail');else if(data[input.name]!=null)input.value=data[input.name]});
+  syncRelationUI();
+  updateProgress();
+}
+function updateProgress(){let done=0;for(let i=1;i<=96;i++){const x=document.querySelector(`[name=q${i}]:checked`)||document.querySelector(`[name=q${i}]`);if(x&&((x.type==='radio'&&x.checked)||(x.type!=='radio'&&x.value.trim())))done++}document.querySelector('#progressText').textContent=`已填写 ${done} / 96`;document.querySelector('#progressBar').style.width=`${done/96*100}%`}
+document.querySelector('main').addEventListener('input',()=>{syncRelationUI();save()});
+load();
+const titles={A:'二选一速答',B:'性格五维',C:'价值与道德',D:'梦想、恐惧、欲望',E:'习惯与身体',F:'谈吐声线',G:'关系速答',H:'可选简答'};
+const dimGroups={开放性:[17,18,19,-20,21,-22],尽责性:[23,24,25,-26,27,-28],外向性:[29,30,31,-32,33,-34],宜人性:[35,36,37,-38,39,-40],情绪稳定性:[41,42,43,-44,-45,46]};
+function value(n){const checked=document.querySelector(`[name=q${n}]:checked`);const field=document.querySelector(`[name=q${n}]`);return checked?checked.value:(field?.value.trim()||'')}
+function scores(){const out={};for(const [dim,nums] of Object.entries(dimGroups)){let sum=0,complete=true;nums.forEach(n=>{const v=Number(value(Math.abs(n)));if(!v)complete=false;else sum+=n<0?6-v:v});out[dim]=complete?sum:null}return out}
+function level(n){return n<=13?'低':n<=22?'中':'高'}
+function questionText(n){for(const s of sections){if(s.groups)for(const g of s.groups)for(const q of g[1])if(q[0]===n)return q[1];if(s.questions)for(const q of s.questions)if(q[0]===n)return q[1]}return ''}
+function markdown(){
+  const me=currentMember()||'未选择成员';
+  let md=`# ${me} · OC 性格问卷答案\n\n> 导出时间：${new Date().toLocaleString('zh-CN')}\n\n`;
+  for(const s of sections){
+    md+=`## ${s.id} · ${titles[s.id]}\n\n`;
+    if(s.id==='B'){
+      const sc=scores();
+      md+='### 五维判读\n\n';
+      for(const [name,score] of Object.entries(sc))md+=`- **${name}**：${score==null?'未完成':`${score} / 30（${level(score)}）`}\n`;
+      md+='\n';
+    }
+    if(s.relation){
+      if(relationMode()==='summary'){
+        md+=`### 关系描述\n\n${document.querySelector('[name="relationSummary"]').value.trim()||'—'}\n\n`;
+      }else{
+        md+='| 队友 | 一个词形容 | 最欣赏哪点 | 最受不了哪点 | 想单独做的事 |\n|---|---|---|---|---|\n';
+        memberNames.forEach((name,i)=>{
+          if(name===me)return;
+          const cells=[0,1,2,3].map(j=>(document.querySelector(`[name=rel${i}_${j}]`).value.trim()||'—').replace(/\|/g,'\\|'));
+          md+=`| ${name} | ${cells.join(' | ')} |\n`;
+        });
+        md+='\n';
+      }
+    }
+    let questions=[];
+    if(s.groups)s.groups.forEach(group=>questions.push(...group[1]));
+    if(s.questions)questions.push(...s.questions);
+    questions.forEach(q=>{md+=`**${q[0]}. ${q[1]}**  \n${value(q[0])||'—'}\n\n`});
+  }
+  return md;
+}
+function showScores(){const sc=scores();const box=document.querySelector('#scoreBox');box.style.display='block';box.innerHTML=`<h3>大五人格得分</h3><div class="score-grid">${Object.entries(sc).map(([k,v])=>`<div class="score-item"><span>${k}</span><b>${v==null?'未完成':`${v} · ${level(v)}`}</b></div>`).join('')}</div>`}
+function fileName(){return `${currentMember()||'未命名'}_OC性格问卷答案.md`}
+function status(message){const el=document.querySelector('#saveStatus');el.textContent=message;el.classList.add('show');clearTimeout(status.timer);status.timer=setTimeout(()=>el.classList.remove('show'),2400)}
+
+/* 只压缩，不加密：gzip 压缩后转 Base64，体积更小，复制/保存都不需要密码 */
+async function gzip(bytes){
+  if(!('CompressionStream' in window))return bytes;
+  const stream=new Blob([bytes]).stream().pipeThrough(new CompressionStream('gzip'));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+function bytesToBase64(bytes){return btoa(Array.from(bytes,b=>String.fromCharCode(b)).join(''))}
+async function compressText(text){
+  const compressed=await gzip(new TextEncoder().encode(text));
+  return `OCQZ1:${bytesToBase64(compressed)}`;
+}
+
+async function copyAnswers(){
+  try{
+    const packed=await compressText(markdown());
+    await navigator.clipboard.writeText(packed);
+    status('已复制压缩后的答案，发给整理者即可');
+  }catch(error){
+    console.error(error);
+    status('复制失败，请重试');
+  }
+}
+async function finishAndSave(){
+  if(!currentMember()){document.querySelector('#identity').scrollIntoView({behavior:'smooth'});status('请先选择你是谁');return}
+  save();showScores();
+  const packed=await compressText(markdown());
+  const file=new File([packed],fileName().replace(/\.md$/,'.txt'),{type:'text/plain'});
+  if(navigator.share&&navigator.canShare?.({files:[file]})){
+    try{await navigator.share({title:'OC 性格问卷答案',files:[file]});status('已保存或分享答案');return}catch(error){if(error.name==='AbortError')return}
+  }
+  const blob=new Blob([packed],{type:'text/plain;charset=utf-8'});
+  const link=document.createElement('a');
+  link.href=URL.createObjectURL(blob);link.download=file.name;link.click();
+  setTimeout(()=>URL.revokeObjectURL(link.href),1000);
+  status('答案文件已下载，请把文件发给整理者');
+}
+document.querySelector('#copyBtn').addEventListener('click',copyAnswers);
+document.querySelector('#downloadBtn').addEventListener('click',finishAndSave);
+</script>
+</body>
+</html>
